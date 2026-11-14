@@ -62,6 +62,7 @@ class ProbeSession(
         softFactor = config.budgetSoftFactor,
         hardFactor = config.budgetHardFactor,
         runawayFactor = config.runawayFactor,
+        minimumReferenceBytes = (config.priorReplyBytes * config.minimumReplyShare).toLong(),
     )
 
     private val mutableState = MutableStateFlow(

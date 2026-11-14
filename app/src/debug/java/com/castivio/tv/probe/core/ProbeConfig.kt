@@ -43,6 +43,9 @@ data class ProbeConfig(
     /** A single run that receives more than this many times the reference reply is cancelled. */
     val runawayFactor: Double = 2.0,
 
+    /** A one-reply measurement smaller than this share of the known reply is not a full catalogue download. */
+    val minimumReplyShare: Double = 0.50,
+
     /** More bytes counted for the app than the probe read, beyond the larger of this and [contaminationShare], is another traffic. */
     val contaminationFloorBytes: Long = BYTES_PER_MB,
     val contaminationShare: Double = 0.02,

@@ -19,6 +19,7 @@ class DataBudget(
     private val softFactor: Double,
     private val hardFactor: Double,
     private val runawayFactor: Double,
+    private val minimumReferenceBytes: Long = 1L,
 ) {
     enum class Level { WITHIN, SOFT, HARD }
 
@@ -42,7 +43,7 @@ class DataBudget(
 
     /** A run has measured the one reply: the projection follows it. */
     fun adoptReference(replyBytes: Long) {
-        if (replyBytes > 0L) referenceBytes = replyBytes
+        if (replyBytes >= minimumReferenceBytes) referenceBytes = replyBytes
     }
 
     fun add(bytes: Long) {

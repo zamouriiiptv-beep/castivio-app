@@ -277,7 +277,10 @@ internal class RunState(
         }
         if (networkChanged) invalid += InvalidReason.NETWORK_CHANGED
         val noCategories = step.arm.fetch == Fetch.BY_CATEGORY && (scanned?.categories?.isEmpty() ?: true)
-        if (counted == 0L || noCategories) invalid += InvalidReason.NO_DATA
+        val oneReplyBytes = all.firstOrNull { it.kind == RequestKind.REPLY && it.outcome == Outcome.OK }?.bytes ?: 0L
+        val tooSmallOneReply = step.arm.fetch == Fetch.ONE_REPLY &&
+            oneReplyBytes < (config.priorReplyBytes * config.minimumReplyShare).toLong()
+        if (counted == 0L || noCategories || tooSmallOneReply) invalid += InvalidReason.NO_DATA
 
         val categoryBytes = LinkedHashMap<String, Long>()
         for (record in all) {

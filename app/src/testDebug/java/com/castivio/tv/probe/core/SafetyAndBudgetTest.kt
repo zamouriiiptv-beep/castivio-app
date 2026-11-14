@@ -25,12 +25,13 @@ class SafetyAndBudgetTest {
 
     // ----------------------------------------------------------------------------------- budget
 
-    private fun budget() = DataBudget(
+    private fun budget(minimumReferenceBytes: Long = 50L) = DataBudget(
         plannedDownloads = 10,
         priorReplyBytes = 100L,
         softFactor = 1.05,
         hardFactor = 1.30,
         runawayFactor = 2.0,
+        minimumReferenceBytes = minimumReferenceBytes,
     )
 
     @Test
@@ -100,12 +101,22 @@ class SafetyAndBudgetTest {
     }
 
     @Test
-    fun a_reply_of_no_bytes_or_less_is_not_a_measurement() {
-        val budget = budget()
+    fun an_empty_or_too_small_reply_cannot_shrink_the_reference() {
+        val budget = budget(minimumReferenceBytes = 50L)
         budget.adoptReference(0L)
+        budget.adoptReference(49L)
         budget.adoptReference(-5L)
         budget.add(-10L)
         assertEquals(100L, budget.referenceBytes)
         assertEquals(0L, budget.receivedBytes)
+    }
+
+    @Test
+    fun a_full_reply_at_the_minimum_threshold_can_be_adopted() {
+        val budget = budget(minimumReferenceBytes = 50L)
+        budget.adoptReference(50L)
+        assertEquals(50L, budget.referenceBytes)
+        assertEquals(500L, budget.projectedBytes)
+        assertEquals(100L, budget.runLimitBytes)
     }
 }
