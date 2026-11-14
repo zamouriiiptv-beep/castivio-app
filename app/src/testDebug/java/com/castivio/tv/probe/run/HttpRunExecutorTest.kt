@@ -52,7 +52,8 @@ class HttpRunExecutorTest {
     private val secret = "s3cretPass"
 
     /** Windows of 100 ms for the bytes of each connection, and the monitor looks every 100 ms. */
-    private val config = ProbeConfig(bucketMs = 100L)
+    // These HTTP tests use tiny synthetic payloads; the production reference is covered separately below.
+    private val config = ProbeConfig(bucketMs = 100L, priorReplyBytes = 0L)
 
     private val categories = listOf("1", "2", "3")
     private val films = listOf(FakeFilm(11, "1"), FakeFilm(12, "1"), FakeFilm(21, "2"), FakeFilm(31, "3"))
@@ -108,6 +109,19 @@ class HttpRunExecutorTest {
             // One reply for the whole section, and never a category on its own.
             assertEquals(1, panel.requests.count { it == "reply" })
             assertTrue(panel.requests.none { it.startsWith("category:") })
+        }
+    }
+
+    @Test
+    fun a_timed_one_reply_below_the_minimum_reference_share_is_no_data() {
+        FakePanel(categories, films).use { panel ->
+            panel.replyOverride = "{}"
+            val settings = config.copy(priorReplyBytes = 100L)
+            val record = executor(panel, settings = settings).execute(request(ProbeArms.K1)).record
+
+            assertFalse(record.valid)
+            assertTrue(InvalidReason.NO_DATA in record.invalid)
+            assertTrue(record.requests.first { it.kind == RequestKind.REPLY }.bytes < 50L)
         }
     }
 
