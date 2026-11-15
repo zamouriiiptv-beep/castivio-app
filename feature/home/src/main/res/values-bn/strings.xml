@@ -177,6 +177,7 @@
     <string name="movie_plot_close">বন্ধ করুন</string>
     <string name="movie_director">পরিচালক:</string>
     <string name="movie_cast">অভিনয়শিল্পী:</string>
+    <string name="movie_crew">কলাকুশলী:</string>
     <string name="movie_favorite_add">প্রিয় করুন</string>
     <string name="movie_favorite_remove">প্রিয় থেকে সরান</string>
     <string name="hide_title">বুকেট ও চ্যানেল লুকান</string>
