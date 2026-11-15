@@ -177,6 +177,7 @@
     <string name="movie_plot_close">Sluiten</string>
     <string name="movie_director">Regie:</string>
     <string name="movie_cast">Cast:</string>
+    <string name="movie_crew">Ploeg:</string>
     <string name="movie_favorite_add">Toevoegen aan favorieten</string>
     <string name="movie_favorite_remove">Verwijderen uit favorieten</string>
     <string name="hide_title">Boeketten en zenders verbergen</string>
