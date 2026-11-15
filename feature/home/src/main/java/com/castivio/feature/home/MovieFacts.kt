@@ -37,7 +37,9 @@ internal fun Movie.withDetails(details: MovieDetails?): Movie {
 internal fun ratingText(rating: Double): String = String.format(Locale.ROOT, "%.1f", rating)
 
 /** The names stay in provider order; isolate the complete Latin run, including its separators, in RTL layouts. */
-private const val CREDIT_SEPARATOR = " · "
+// Keep the separator attached to the preceding name. A normal space before the dot
+// lets Compose wrap it onto the next line, where it looks like punctuation at line start.
+private const val CREDIT_SEPARATOR = "\u00A0· "
 private const val NO_BREAK_SPACE = '\u00A0'
 
 internal fun creditNames(names: List<String>, rtl: Boolean): String {
