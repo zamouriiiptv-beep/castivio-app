@@ -51,9 +51,18 @@ internal fun movieDisplayTitle(title: String, cast: List<String>): String {
     return if (isCastFragment) title.substring(0, year.range.last + 1).trimEnd() else title
 }
 
-/** Xtream's director field is a comma-separated list; display its leading director, not the whole crew string. */
-internal fun primaryDirector(value: String?): String? =
-    value.orEmpty().split(',').firstOrNull()?.trim()?.takeIf { it.isNotEmpty() }
+/**
+ * Xtream's director field may contain a comma-separated list. Keep the first entry as the director
+ * and preserve the remaining entries as crew instead of silently dropping them.
+ */
+internal data class MovieCredits(val director: String?, val crew: List<String>)
+
+internal fun movieCredits(value: String?): MovieCredits {
+    val names = value.orEmpty().split(',').map(String::trim).filter(String::isNotEmpty)
+    return MovieCredits(names.firstOrNull(), names.drop(1))
+}
+
+internal fun primaryDirector(value: String?): String? = movieCredits(value).director
 
 internal fun ratingText(rating: Double): String = String.format(Locale.ROOT, "%.1f", rating)
 
