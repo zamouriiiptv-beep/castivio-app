@@ -46,9 +46,7 @@ data class ProbeConfig(
     /** A one-reply measurement smaller than this share of the known reply is not a full catalogue download. */
     val minimumReplyShare: Double = 0.50,
 
-    /** More bytes counted for the app than the probe read, beyond the larger of this and [contaminationShare], is another traffic. */
-    val contaminationFloorBytes: Long = BYTES_PER_MB,
-    val contaminationShare: Double = 0.02,
+    /** UID RX is diagnostic only: Android exposes it per UID, not per Probe socket/client. */
 
     /** Invalid runs in a row after which the session stops: the conditions, not the provider, are what to look at. */
     val maxConsecutiveInvalid: Int = 3,

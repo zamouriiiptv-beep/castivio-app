@@ -271,10 +271,8 @@ internal class RunState(
         if (reason != null) invalid += reason
         if (request.control.cancelled) invalid += InvalidReason.CANCELLED
         if (stopStatus.get() != 0) invalid += InvalidReason.PROVIDER_STOP
-        if (wire != null) {
-            val allowed = maxOf(config.contaminationFloorBytes, (counted * config.contaminationShare).toLong())
-            if (wire - counted > allowed) invalid += InvalidReason.CONTAMINATED
-        }
+        // UID RX is process/application-wide, not scoped to this Probe client. Keep it as
+        // diagnostic evidence, but never reject a run from this difference alone.
         if (networkChanged) invalid += InvalidReason.NETWORK_CHANGED
         val noCategories = step.arm.fetch == Fetch.BY_CATEGORY && (scanned?.categories?.isEmpty() ?: true)
         val oneReplyBytes = all.firstOrNull { it.kind == RequestKind.REPLY && it.outcome == Outcome.OK }?.bytes ?: 0L

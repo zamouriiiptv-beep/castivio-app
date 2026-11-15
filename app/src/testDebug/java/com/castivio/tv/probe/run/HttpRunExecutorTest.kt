@@ -483,12 +483,15 @@ class HttpRunExecutorTest {
     }
 
     @Test
-    fun other_traffic_over_the_same_time_makes_a_run_contaminated() {
+    fun app_wide_uid_traffic_is_reported_but_does_not_invalidate_probe_measurements() {
         FakePanel(categories, films).use { panel ->
             val record = executor(panel, MeterEnvironment(extra = 50L * 1_048_576L)).execute(request(ProbeArms.K1)).record
             assertNotNull(record.wireBytes)
-            assertTrue(InvalidReason.CONTAMINATED in record.invalid)
-            assertFalse(record.valid)
+            assertFalse(InvalidReason.CONTAMINATED in record.invalid)
+            assertTrue(record.invalid.toString(), record.valid)
+            val report = ProbeReport.render(Fixtures.state(listOf(record)))
+            assertTrue(report, report.contains("UID/Probe delta +"))
+            assertTrue(report, report.contains("UID RX is app-wide diagnostic data"))
         }
     }
 

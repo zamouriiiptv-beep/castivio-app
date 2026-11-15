@@ -92,6 +92,7 @@ object ProbeReport {
     private fun runLines(state: SessionState): List<String> {
         val lines = ArrayList<String>()
         lines += "RUNS (time: first request to last byte; MB = 1048576 bytes)"
+        lines += "UID RX is app-wide diagnostic data, not Probe-only traffic; its delta never invalidates a run."
         if (state.runs.isEmpty()) {
             lines += "none yet"
             return lines
@@ -111,7 +112,11 @@ object ProbeReport {
         } else {
             parts += "not timed"
         }
-        val wire = run.wireBytes?.let { " (wire ${Fmt.megabytes(it)})" }.orEmpty()
+        val wire = run.wireBytes?.let {
+            val delta = it - run.bytes
+            val sign = if (delta >= 0L) "+" else "-"
+            " (UID ${Fmt.megabytes(it)} MB · UID/Probe delta $sign${Fmt.megabytes(kotlin.math.abs(delta))} MB)"
+        }.orEmpty()
         parts += "${Fmt.megabytes(run.bytes)} MB$wire"
         parts += "req ${run.requests.size}"
         parts += failureText(run)
