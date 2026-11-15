@@ -39,12 +39,12 @@ internal fun Movie.withDetails(details: MovieDetails?): Movie {
  * the beginning of a known cast member's name. Unrecognized suffixes are preserved.
  */
 internal fun movieDisplayTitle(title: String, cast: List<String>): String {
-    val year = Regex("""\\s*\\(\\d{4}\\)(.*)$""").find(title) ?: return title
+    val year = Regex("""\s*\(\d{4}\)(.*)$""").find(title) ?: return title
     val suffix = year.groupValues[1].trim().trim('-', '–', '—', ':', '|').trim()
     if (suffix.isEmpty()) return title
-    val suffixWords = suffix.split(Regex("""\\s+"""))
+    val suffixWords = suffix.split(Regex("""\s+"""))
     val isCastFragment = cast.any { person ->
-        val personWords = person.trim().split(Regex("""\\s+""")).filter { it.isNotEmpty() }
+        val personWords = person.trim().split(Regex("""\s+""")).filter { it.isNotEmpty() }
         suffixWords.size <= personWords.size &&
             suffixWords.indices.all { suffixWords[it].equals(personWords[it], ignoreCase = true) }
     }
