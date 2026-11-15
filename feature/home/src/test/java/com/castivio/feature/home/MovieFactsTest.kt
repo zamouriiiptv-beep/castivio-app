@@ -162,7 +162,7 @@ class MovieFactsTest {
         val text = creditNames(listOf("Charlton Heston", "Haya Harareet"), rtl = true)
 
         // The names and middle-dot separators share one LTR isolate, so punctuation cannot reorder in RTL.
-        assertEquals("\u2066Charlton\u00A0Heston · Haya\u00A0Harareet\u2069", text)
+        assertEquals("\u2066Charlton\u00A0Heston\u00A0· Haya\u00A0Harareet\u2069", text)
     }
 
     @Test
