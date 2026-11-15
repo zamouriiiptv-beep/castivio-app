@@ -73,8 +73,13 @@ private const val CREDIT_SEPARATOR = "\u00A0· "
 private const val NO_BREAK_SPACE = '\u00A0'
 
 internal fun creditNames(names: List<String>, rtl: Boolean): String {
-    val joined = names.joinToString(CREDIT_SEPARATOR) { it.replace(' ', NO_BREAK_SPACE) }
-    return if (rtl && joined.isNotEmpty()) ltrIsolate(joined) else names.joinToString(", ")
+    // Provider data sometimes includes a leading/trailing dot or list separator in a person's name.
+    // Strip only boundary punctuation; keep punctuation inside legitimate names unchanged.
+    val cleaned = names.map { name ->
+        name.trim().trim('.', '·', ',', ';', ':', ' ', NO_BREAK_SPACE)
+    }.filter { it.isNotEmpty() }
+    val joined = cleaned.joinToString(CREDIT_SEPARATOR) { it.replace(' ', NO_BREAK_SPACE) }
+    return if (rtl && joined.isNotEmpty()) ltrIsolate(joined) else cleaned.joinToString(", ")
 }
 
 internal fun creditLines(fitted: Boolean, whenFitted: Int): Int = if (fitted) whenFitted else Int.MAX_VALUE
