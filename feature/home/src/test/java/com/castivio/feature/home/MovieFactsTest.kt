@@ -144,6 +144,44 @@ class MovieFactsTest {
     }
 
     @Test
+    fun `a trailing cast name fragment after the year is removed from the display title`() {
+        assertEquals(
+            "EN - All The President's Men (1976)",
+            movieDisplayTitle("EN - All The President's Men (1976) DUSTIN", listOf("Dustin Hoffman", "Robert Redford")),
+        )
+    }
+
+    @Test
+    fun `a full trailing cast name after the year is removed`() {
+        assertEquals(
+            "Film (2024)",
+            movieDisplayTitle("Film (2024) Dustin Hoffman", listOf("Dustin Hoffman")),
+        )
+    }
+
+    @Test
+    fun `a suffix that is not a cast name is preserved`() {
+        assertEquals(
+            "Film (2024) Extended Edition",
+            movieDisplayTitle("Film (2024) Extended Edition", listOf("Dustin Hoffman")),
+        )
+    }
+
+    @Test
+    fun `a title without a year or cast is preserved`() {
+        assertEquals("DUSTIN", movieDisplayTitle("DUSTIN", listOf("Dustin Hoffman")))
+        assertEquals("Film (2024) DUSTIN", movieDisplayTitle("Film (2024) DUSTIN", emptyList()))
+    }
+
+    @Test
+    fun `only the first director entry is displayed`() {
+        assertEquals("Alan J. Pakula", primaryDirector("Alan J. Pakula, Kim Kurumada, Charles Ziarko"))
+        assertEquals("Alan J. Pakula", primaryDirector(" Alan J. Pakula "))
+        assertNull(primaryDirector(null))
+        assertNull(primaryDirector(""))
+    }
+
+    @Test
     fun `a rating reads as one decimal, as the provider's figure is shown`() {
         assertEquals("8.1", ratingText(8.1))
         assertEquals("7.0", ratingText(7.0))
