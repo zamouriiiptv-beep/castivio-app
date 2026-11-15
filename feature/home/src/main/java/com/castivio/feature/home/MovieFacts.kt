@@ -9,20 +9,7 @@ import java.util.Date
 import java.util.Locale
 
 /**
- * What the films screen says about a film, from what the provider actually sent and nothing else.
- *
- * A playlist carries a name, a poster, a stream and -- for some films -- a running time. It carries no
- * rating, no synopsis and no cast, and the screens that draw a film are written so that a fact that is
- * not here is not drawn: no empty chip, no "N/A", and certainly no number that was not in the data.
- * Pure, so what is said and what is left unsaid are tested without a screen.
- */
-
-/**
- * `2h 46m`, `46m` or `3h`: a running time in the form the reference draws, or null when the provider gave
- * none -- zero and a negative are "no running time", not a film of nought minutes.
- *
- * Western digits and Latin unit letters in every language, as the board's clock is: the figure is a
- * token, and the caller keeps it whole in a right-to-left line with `ltrToken`.
+ * What the films screen says about a film, and what it leaves unsaid.
  */
 internal fun movieDuration(minutes: Int?): String? {
     if (minutes == null || minutes <= 0) return null
@@ -35,14 +22,9 @@ internal fun movieDuration(minutes: Int?): String? {
     }
 }
 
-/** The facts a film's page lists beside its name, in the order they are read: the year, then the running time. */
 internal fun movieFacts(movie: Movie): List<String> =
     listOfNotNull(movie.year?.takeIf { it > 0 }?.toString(), movieDuration(movie.durationMinutes))
 
-/**
- * [movie] with what the provider's details add to it: a year, a running time and genres the list row did not
- * carry. What the row does carry is kept as it is, so a list and its page never disagree about a film.
- */
 internal fun Movie.withDetails(details: MovieDetails?): Movie {
     if (details == null) return this
     return copy(
@@ -52,57 +34,25 @@ internal fun Movie.withDetails(details: MovieDetails?): Movie {
     )
 }
 
-/** A provider's rating as one decimal, `8.1`: the figure IMDb itself shows. */
 internal fun ratingText(rating: Double): String = String.format(Locale.ROOT, "%.1f", rating)
 
-/** The comma a right-to-left language parts a list with: Arabic, Persian and Urdu write the same one. */
-private const val RTL_COMMA = "\u060C "
-
-/** A space that does not break a line, so a person's name is not split across two. */
+/** The names stay in provider order; isolate the complete Latin run, including its separators, in RTL layouts. */
+private const val CREDIT_SEPARATOR = " · "
 private const val NO_BREAK_SPACE = '\u00A0'
 
-/**
- * The names of a credit line as one text.
- *
- * Left to right they are as the provider sent them, parted by a comma and a space. Right to left each name stands as a unit --
- * isolated, with its spaces unbreakable, so a Latin name keeps its own order and a narrow line does not split it -- and the
- * names are parted by the language's comma: the list then reads from its label outwards, first name first, and where the line
- * is cut the cut is at its far end, beside the link. Without that the names, being one run of left-to-right letters, would read
- * from the far end in, and the cut would take the last of them from beside the label.
- */
-internal fun creditNames(names: List<String>, rtl: Boolean): String =
-    if (rtl) names.joinToString(RTL_COMMA) { ltrIsolate(it.replace(' ', NO_BREAK_SPACE)) } else names.joinToString(", ")
+internal fun creditNames(names: List<String>, rtl: Boolean): String {
+    val joined = names.joinToString(CREDIT_SEPARATOR) { it.replace(' ', NO_BREAK_SPACE) }
+    return if (rtl && joined.isNotEmpty()) ltrIsolate(joined) else names.joinToString(", ")
+}
 
-/**
- * How many lines a credit line -- the director, the cast -- may take on the film's page.
- *
- * [whenFitted] where the page is fitted to its height and does not scroll, because the plot has first call on the height and
- * a line of names that ran on is one press from being read whole; as many as the names need where the page scrolls anyway,
- * because there is nothing to save the height for and a cut list would be cut for no reason.
- */
 internal fun creditLines(fitted: Boolean, whenFitted: Int): Int = if (fitted) whenFitted else Int.MAX_VALUE
 
-/**
- * The rating a film's poster shows, as its page shows it, or null when there is none to draw.
- *
- * The same figure and the same digits as the page's badge -- [ratingText] -- from the rating the provider's list gave.
- * A film with none, with zero, or with anything that is not a number above zero has no rating, and its poster draws
- * nothing: no `0.0`, no `N/A`, and no number that was not in the data.
- */
 internal fun posterRating(movie: Movie): String? =
     movie.rating?.takeIf { it.isFinite() && it > 0 }?.let(::ratingText)
 
-/** A day a film was added on, `24/10/2026`, from the provider's time in seconds. */
 internal fun addedDateText(epochSeconds: Long): String =
     SimpleDateFormat("dd/MM/yyyy", Locale.ROOT).format(Date(epochSeconds * MILLIS_PER_SECOND))
 
-/**
- * Which list the films screen is showing: everything, the viewer's favourites, the films they played last,
- * or one category.
- *
- * Read off the holder's state and not kept beside it, so the rail, the header and the wall can never
- * disagree about it.
- */
 internal sealed interface MovieList {
     data object All : MovieList
     data object Favorites : MovieList
@@ -110,7 +60,6 @@ internal sealed interface MovieList {
     data class Category(val id: String) : MovieList
 }
 
-/** The list [this] is in -- the viewer's own lists win over a category, as they do in the query. */
 internal fun BrowseState.movieList(): MovieList {
     val group = selectedGroup
     return when {
@@ -121,43 +70,19 @@ internal fun BrowseState.movieList(): MovieList {
     }
 }
 
-/**
- * The figure above the wall: how many films the list holds -- or null when there is no figure that is
- * true. The count is the scope's (the open category, or the section); a search narrows to a number the
- * count does not know, and the favourites and the films played last are counted by other stores, so for
- * those the wall says nothing rather than a number that is not theirs.
- */
 internal fun BrowseState.headingCount(): Int? =
     if (search.isNotEmpty() || favorites || recent) null else total
 
-/**
- * How many posters fit across [available] with [gutter] between each pair, none narrower than [minimum]:
- * the same arithmetic as the generic screens' grid, so the cells take an equal share of what is left and
- * the row always fills the width. Never fewer than two, which is where a wall stops reading as a list.
- */
 internal fun posterColumns(available: Dp, gutter: Dp, minimum: Dp): Int =
     ((available + gutter) / (minimum + gutter)).toInt().coerceAtLeast(MIN_POSTER_COLUMNS)
 
-/**
- * The height a poster is drawn at, so the wall shows two whole rows and only the top of the third: a sliver
- * of [peek] of a poster's height, which is what tells a viewer there is more below and no more.
- *
- * A row is a poster and what sits under it, [rowExtra], and the gap between rows, [rowGap]. Two rows and
- * the sliver come to [available], so the poster is that less the two extras, shared over two posters and
- * the sliver. Never shorter than [floor], so a very short surface still draws a poster rather than a line.
- */
 internal fun posterHeightFor(available: Dp, rowExtra: Dp, rowGap: Dp, peek: Float, floor: Dp): Dp =
     ((available - (rowExtra + rowGap) * 2) / (2f + peek)).coerceAtLeast(floor)
 
-/**
- * The width a card is drawn at: an equal share of [available] across [columns], with [gutter] between each
- * pair. The card takes its whole column so the name under the poster has the most room the row can give it.
- */
 internal fun posterCardWidth(available: Dp, gutter: Dp, columns: Int): Dp =
     (available - gutter * (columns - 1)) / columns
 
 private const val MINUTES_PER_HOUR = 60
 private const val SECONDS_PER_MINUTE = 60
 private const val MILLIS_PER_SECOND = 1_000L
-
 private const val MIN_POSTER_COLUMNS = 2
