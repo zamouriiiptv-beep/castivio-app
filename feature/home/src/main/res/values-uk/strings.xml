@@ -181,6 +181,7 @@
     <string name="movie_plot_close">Закрити</string>
     <string name="movie_director">Режисер:</string>
     <string name="movie_cast">У ролях:</string>
+    <string name="movie_crew">Знімальна група:</string>
     <string name="movie_favorite_add">В обране</string>
     <string name="movie_favorite_remove">Прибрати з обраного</string>
     <string name="hide_title">Приховати пакети й канали</string>
