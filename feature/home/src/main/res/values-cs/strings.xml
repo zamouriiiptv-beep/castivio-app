@@ -181,6 +181,7 @@
     <string name="movie_plot_close">Zavřít</string>
     <string name="movie_director">Režie:</string>
     <string name="movie_cast">Hrají:</string>
+    <string name="movie_crew">Štáb:</string>
     <string name="movie_favorite_add">Přidat k oblíbeným</string>
     <string name="movie_favorite_remove">Odebrat z oblíbených</string>
     <string name="hide_title">Skrýt balíčky a kanály</string>
