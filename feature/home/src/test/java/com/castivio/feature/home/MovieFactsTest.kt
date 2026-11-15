@@ -176,9 +176,13 @@ class MovieFactsTest {
     @Test
     fun `only the first director entry is displayed`() {
         assertEquals("Alan J. Pakula", primaryDirector("Alan J. Pakula, Kim Kurumada, Charles Ziarko"))
-        assertEquals("Alan J. Pakula", primaryDirector(" Alan J. Pakula "))
-        assertNull(primaryDirector(null))
-        assertNull(primaryDirector(""))
+        assertEquals(
+            MovieCredits("Alan J. Pakula", listOf("Kim Kurumada", "Charles Ziarko")),
+            movieCredits("Alan J. Pakula, Kim Kurumada, Charles Ziarko"),
+        )
+        assertEquals(MovieCredits("Alan J. Pakula", emptyList()), movieCredits(" Alan J. Pakula "))
+        assertEquals(MovieCredits(null, emptyList()), movieCredits(null))
+        assertEquals(MovieCredits(null, emptyList()), movieCredits(""))
     }
 
     @Test
