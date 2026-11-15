@@ -175,9 +175,11 @@ fun MovieScreen(
     val playFocus = remember { FocusRequester() }
     LaunchedEffect(movie.id) { runCatching { playFocus.requestFocus() } }
     val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
-    val director = remember(known?.director) { primaryDirector(known?.director) }
-    val directorNames = remember(director) { listOfNotNull(director) }
+    val credits = remember(known?.director) { movieCredits(known?.director) }
+    val directorNames = remember(credits) { listOfNotNull(credits.director) }
     val directorText = remember(directorNames, rtl) { creditNames(directorNames, rtl) }
+    val crew = credits.crew
+    val crewText = remember(crew, rtl) { creditNames(crew, rtl) }
     val displayTitle = remember(movie.title, known?.cast) { movieDisplayTitle(movie.title, known?.cast.orEmpty()) }
     val cast = known?.cast.orEmpty()
     val castText = remember(cast, rtl) { creditNames(cast, rtl) }
@@ -189,6 +191,7 @@ fun MovieScreen(
     val moreFocus = remember { FocusRequester() }
     val directorFocus = remember { FocusRequester() }
     val castFocus = remember { FocusRequester() }
+    val crewFocus = remember { FocusRequester() }
     val closeWhole: () -> Unit = {
         wholeClosed = whole
         whole = null
@@ -203,6 +206,7 @@ fun MovieScreen(
                 WholeText.Plot -> moreFocus
                 WholeText.Director -> directorFocus
                 WholeText.Cast -> castFocus
+                WholeText.Crew -> crewFocus
             }
             runCatching { link.requestFocus() }
             wholeClosed = null
@@ -358,7 +362,7 @@ fun MovieScreen(
             // A line takes one line where the page is fitted to its height, and is cut with an ellipsis, with a link at
             // its end to the whole of it; where the page scrolls anyway the names are all there, on as many lines as
             // they need.
-            val bottom: (@Composable () -> Unit)? = if (directorNames.isNotEmpty() || cast.isNotEmpty()) {
+            val bottom: (@Composable () -> Unit)? = if (directorNames.isNotEmpty() || crew.isNotEmpty() || cast.isNotEmpty()) {
                 {
                     Column(verticalArrangement = Arrangement.spacedBy(m.rowGap)) {
                         if (directorNames.isNotEmpty()) {
@@ -366,6 +370,13 @@ fun MovieScreen(
                                 Icons.Rounded.Person, stringResource(R.string.movie_director), directorText,
                                 creditLines(fit, DIRECTOR_LINES), iconSize, bodyStyle, m,
                                 onShowAll = { whole = WholeText.Director }, linkFocus = directorFocus,
+                            )
+                        }
+                        if (crew.isNotEmpty()) {
+                            Credit(
+                                Icons.Rounded.Groups, stringResource(R.string.movie_crew), crewText,
+                                creditLines(fit, CREW_LINES), iconSize, bodyStyle, m,
+                                onShowAll = { whole = WholeText.Crew }, linkFocus = crewFocus,
                             )
                         }
                         if (cast.isNotEmpty()) {
@@ -454,6 +465,7 @@ fun MovieScreen(
                     WholeText.Plot -> AnnotatedString(known?.plot.orEmpty())
                     WholeText.Director -> creditText(stringResource(R.string.movie_director), directorText)
                     WholeText.Cast -> creditText(stringResource(R.string.movie_cast), castText)
+                    WholeText.Crew -> creditText(stringResource(R.string.movie_crew), crewText)
                 },
                 closeLabel = stringResource(R.string.movie_plot_close),
                 onClose = closeWhole,
@@ -465,7 +477,7 @@ fun MovieScreen(
 }
 
 /** What the page's small dialog can hold: the plot, or a credit line the page had to cut. */
-private enum class WholeText { Plot, Director, Cast }
+private enum class WholeText { Plot, Director, Crew, Cast }
 
 /**
  * The film's poster, and on a debuggable build the line its request cost over its lower edge.
@@ -805,6 +817,9 @@ private const val PAGE_TITLE_LINES = 1
  * page that scrolls anyway they are all there: [creditLines].
  */
 private const val CAST_LINES = 1
+
+/** Supporting crew gets its own line; the plot yields height first through FitInfo. */
+private const val CREW_LINES = 1
 
 /** The director's line is held to one as the cast's is, for the same reason, and by the same rule. */
 private const val DIRECTOR_LINES = 1
