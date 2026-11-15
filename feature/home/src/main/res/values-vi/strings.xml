@@ -175,6 +175,7 @@
     <string name="movie_plot_close">Đóng</string>
     <string name="movie_director">Đạo diễn:</string>
     <string name="movie_cast">Diễn viên:</string>
+    <string name="movie_crew">Ê-kíp:</string>
     <string name="movie_favorite_add">Thêm vào yêu thích</string>
     <string name="movie_favorite_remove">Xóa khỏi yêu thích</string>
     <string name="hide_title">Ẩn gói và kênh</string>
