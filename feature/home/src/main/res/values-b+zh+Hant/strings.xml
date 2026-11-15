@@ -175,6 +175,7 @@
     <string name="movie_plot_close">關閉</string>
     <string name="movie_director">導演：</string>
     <string name="movie_cast">演員：</string>
+    <string name="movie_crew">工作人員：</string>
     <string name="movie_favorite_add">加入最愛</string>
     <string name="movie_favorite_remove">移除最愛</string>
     <string name="hide_title">隱藏分組和頻道</string>
