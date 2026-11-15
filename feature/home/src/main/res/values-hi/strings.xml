@@ -177,6 +177,7 @@
     <string name="movie_plot_close">बंद करें</string>
     <string name="movie_director">निर्देशक:</string>
     <string name="movie_cast">कलाकार:</string>
+    <string name="movie_crew">तकनीकी दल:</string>
     <string name="movie_favorite_add">पसंदीदा में जोड़ें</string>
     <string name="movie_favorite_remove">पसंदीदा से हटाएँ</string>
     <string name="hide_title">बुके और चैनल छिपाएँ</string>
