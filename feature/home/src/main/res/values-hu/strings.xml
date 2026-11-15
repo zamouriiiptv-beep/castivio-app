@@ -177,6 +177,7 @@
     <string name="movie_plot_close">Bezárás</string>
     <string name="movie_director">Rendező:</string>
     <string name="movie_cast">Szereplők:</string>
+    <string name="movie_crew">Stáb:</string>
     <string name="movie_favorite_add">Hozzáadás a kedvencekhez</string>
     <string name="movie_favorite_remove">Eltávolítás a kedvencek közül</string>
     <string name="hide_title">Csomagok és csatornák elrejtése</string>
