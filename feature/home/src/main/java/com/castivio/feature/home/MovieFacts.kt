@@ -34,6 +34,27 @@ internal fun Movie.withDetails(details: MovieDetails?): Movie {
     )
 }
 
+/**
+ * Remove a trailing cast-name fragment only when it follows a release year and exactly matches
+ * the beginning of a known cast member's name. Unrecognized suffixes are preserved.
+ */
+internal fun movieDisplayTitle(title: String, cast: List<String>): String {
+    val year = Regex("""\\s*\\(\\d{4}\\)(.*)$""").find(title) ?: return title
+    val suffix = year.groupValues[1].trim().trim('-', '–', '—', ':', '|').trim()
+    if (suffix.isEmpty()) return title
+    val suffixWords = suffix.split(Regex("""\\s+"""))
+    val isCastFragment = cast.any { person ->
+        val personWords = person.trim().split(Regex("""\\s+""")).filter { it.isNotEmpty() }
+        suffixWords.size <= personWords.size &&
+            suffixWords.indices.all { suffixWords[it].equals(personWords[it], ignoreCase = true) }
+    }
+    return if (isCastFragment) title.substring(0, year.range.last + 1).trimEnd() else title
+}
+
+/** Xtream's director field is a comma-separated list; display its leading director, not the whole crew string. */
+internal fun primaryDirector(value: String?): String? =
+    value.orEmpty().split(',').firstOrNull()?.trim()?.takeIf { it.isNotEmpty() }
+
 internal fun ratingText(rating: Double): String = String.format(Locale.ROOT, "%.1f", rating)
 
 /** The names stay in provider order; isolate the complete Latin run, including its separators, in RTL layouts. */
