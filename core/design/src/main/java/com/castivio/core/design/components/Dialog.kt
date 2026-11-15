@@ -45,6 +45,8 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -272,6 +274,8 @@ fun CastivioNoticeDialog(
      * it reads as a note and not as a page.
      */
     maxFraction: Float = PANEL_MAX_FRACTION,
+    /** Draw provider plot text as a left-aligned LTR paragraph, independent of the page locale. */
+    bodyIsLtr: Boolean = false,
 ) {
     val colors = CastivioTheme.colors
     val close = remember { FocusRequester() }
@@ -284,11 +288,15 @@ fun CastivioNoticeDialog(
     DialogPanel(title = title, onScrim = onClose, modifier = modifier, maxFraction = maxFraction) { _ ->
         Text(
             text = body,
-            style = CastivioType.bodySmall,
+            style = if (bodyIsLtr) {
+                CastivioType.bodySmall.copy(textDirection = TextDirection.Ltr)
+            } else {
+                CastivioType.bodySmall
+            },
             color = colors.onBackgroundVariant,
-            // The body may be the provider's -- a film's plot -- and run the other way from the language: set against
-            // the panel's start edge either way, its words in their own order.
-            textAlign = startEdgeAlign(body.text),
+            // Plot text is a complete LTR paragraph and is physically left-aligned; credit dialogs retain
+            // the page-edge behavior because they contain an Arabic label followed by provider names.
+            textAlign = if (bodyIsLtr) TextAlign.Left else startEdgeAlign(body.text),
             modifier = Modifier
                 .weight(1f, fill = false)
                 .verticalScroll(rememberScrollState())
