@@ -217,6 +217,13 @@ fun MovieScreen(
     BoxWithConstraints(
         modifier
             .fillMaxSize()
+            // This page is drawn over the still-composed movies wall. Consume otherwise-unhandled
+            // touches here so they cannot reach a poster underneath and replace the open film.
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = {},
+            )
             // Drawn over the wall beneath it, so it brings the application's own ground: see `ShowScreen`.
             .castivioBackdrop()
             .statusBarsPadding(),
