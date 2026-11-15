@@ -276,6 +276,7 @@ fun MovieScreen(
                             onClick = { favorites.flip(movie.id) },
                             weight = ButtonWeight.Secondary,
                             icon = if (favorite) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
+                            iconTint = if (favorite) colors.secondary else null,
                         )
                     }
                     val rating = known?.rating
