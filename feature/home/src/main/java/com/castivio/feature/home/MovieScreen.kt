@@ -249,7 +249,7 @@ fun MovieScreen(
                                 style = castivioTitleStyle(m.frame.fsTitle),
                                 color = colors.onBackground,
                                 maxLines = PAGE_TITLE_LINES,
-                                overflow = TextOverflow.Ellipsis,
+                                overflow = TextOverflow.Clip,
                                 textAlign = startEdgeAlign(movie.title),
                                 modifier = Modifier.weight(1f),
                             )
