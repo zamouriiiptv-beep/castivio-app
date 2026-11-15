@@ -212,6 +212,7 @@
     <string name="movie_added">أُضيف في %1$s</string>
     <string name="movie_director">المخرج :</string>
     <string name="movie_cast">الممثلون :</string>
+    <string name="movie_crew">طاقم العمل :</string>
     <string name="show_play">تشغيل</string>
     <string name="show_play_episode">تشغيل %1$s</string>
     <string name="show_continue">متابعة %1$s</string>
