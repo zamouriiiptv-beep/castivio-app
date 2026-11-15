@@ -175,6 +175,7 @@
     <string name="movie_plot_close">닫기</string>
     <string name="movie_director">감독:</string>
     <string name="movie_cast">출연:</string>
+    <string name="movie_crew">제작진:</string>
     <string name="movie_favorite_add">즐겨찾기 추가</string>
     <string name="movie_favorite_remove">즐겨찾기 삭제</string>
     <string name="hide_title">부케 및 채널 숨기기</string>
