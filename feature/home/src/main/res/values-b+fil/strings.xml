@@ -177,6 +177,7 @@
     <string name="movie_plot_close">Isara</string>
     <string name="movie_director">Direktor:</string>
     <string name="movie_cast">Mga artista:</string>
+    <string name="movie_crew">Mga tauhan:</string>
     <string name="movie_favorite_add">Idagdag sa mga paborito</string>
     <string name="movie_favorite_remove">Alisin sa mga paborito</string>
     <string name="hide_title">Itago ang mga bouquet at channel</string>
