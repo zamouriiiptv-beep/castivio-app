@@ -61,8 +61,10 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Constraints
@@ -329,11 +331,13 @@ fun MovieScreen(
                     val more = stringResource(R.string.movie_plot_more)
                     Text(
                         text = text,
-                        style = bodyStyle,
+                        // Provider plot text is laid out as its own LTR paragraph. Left alignment
+                        // is physical here: the Arabic page must not pull an English paragraph to its right edge.
+                        style = bodyStyle.copy(textDirection = TextDirection.Ltr),
                         color = colors.onBackgroundVariant,
                         maxLines = lines,
                         overflow = TextOverflow.Ellipsis,
-                        textAlign = startEdgeAlign(text),
+                        textAlign = TextAlign.Left,
                         onTextLayout = { plotCut = it.hasVisualOverflow },
                         modifier = if (plotCut) {
                             Modifier.focusProperties { canFocus = false }.clickable(
@@ -452,6 +456,7 @@ fun MovieScreen(
                 closeLabel = stringResource(R.string.movie_plot_close),
                 onClose = closeWhole,
                 maxFraction = PLOT_DIALOG_FRACTION,
+                bodyIsLtr = open == WholeText.Plot,
             )
         }
     }
