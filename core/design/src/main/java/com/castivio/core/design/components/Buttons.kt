@@ -69,6 +69,8 @@ fun CastivioButton(
     weight: ButtonWeight = ButtonWeight.Secondary,
     icon: ImageVector? = null,
     tint: Color? = null,
+    /** Tint for the icon alone, leaving the label and button surface unchanged. */
+    iconTint: Color? = null,
     /**
      * A disabled button is dimmed, unfocusable and unclickable — all three, because any
      * one of them alone is a control that still looks or behaves live. A D-pad that can
@@ -228,7 +230,7 @@ fun CastivioButton(
             when {
                 busy -> CastivioSpinner(size = Sizing.iconMd, tint = contentColor)
                 icon != null ->
-                    Icon(icon, null, tint = contentColor, modifier = Modifier.size(Sizing.iconMd))
+                    Icon(icon, null, tint = iconTint ?: contentColor, modifier = Modifier.size(Sizing.iconMd))
             }
             Text(text, color = contentColor, style = labelStyle ?: CastivioType.labelLarge)
         }
