@@ -175,9 +175,10 @@ fun MovieScreen(
     val playFocus = remember { FocusRequester() }
     LaunchedEffect(movie.id) { runCatching { playFocus.requestFocus() } }
     val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
-    val director = known?.director
-    val directorNames = remember(director) { director.orEmpty().split(',').map { it.trim() }.filter { it.isNotEmpty() } }
+    val director = remember(known?.director) { primaryDirector(known?.director) }
+    val directorNames = remember(director) { listOfNotNull(director) }
     val directorText = remember(directorNames, rtl) { creditNames(directorNames, rtl) }
+    val displayTitle = remember(movie.title, known?.cast) { movieDisplayTitle(movie.title, known?.cast.orEmpty()) }
     val cast = known?.cast.orEmpty()
     val castText = remember(cast, rtl) { creditNames(cast, rtl) }
     // The page's long texts, whole: the plot has a link at the end of its heading, and the director and the cast one at
@@ -245,7 +246,7 @@ fun MovieScreen(
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Text(
-                                text = movie.title,
+                                text = displayTitle,
                                 style = castivioTitleStyle(m.frame.fsTitle),
                                 color = colors.onBackground,
                                 maxLines = PAGE_TITLE_LINES,
