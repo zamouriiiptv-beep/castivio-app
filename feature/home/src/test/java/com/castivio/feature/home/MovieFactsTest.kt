@@ -158,11 +158,11 @@ class MovieFactsTest {
     }
 
     @Test
-    fun `right to left each name stands as a unit and the names are parted by the language's comma`() {
+    fun `right to left keeps the complete names and separators in one left to right isolate`() {
         val text = creditNames(listOf("Charlton Heston", "Haya Harareet"), rtl = true)
 
-        // Each name isolated, its space unbreakable; the Arabic comma and a space between.
-        assertEquals("\u2066Charlton\u00A0Heston\u2069\u060C \u2066Haya\u00A0Harareet\u2069", text)
+        // The names and middle-dot separators share one LTR isolate, so punctuation cannot reorder in RTL.
+        assertEquals("\u2066Charlton\u00A0Heston · Haya\u00A0Harareet\u2069", text)
     }
 
     @Test
