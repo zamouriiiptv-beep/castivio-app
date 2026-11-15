@@ -336,7 +336,7 @@ fun MovieScreen(
                         style = bodyStyle.copy(textDirection = TextDirection.Ltr),
                         color = colors.onBackgroundVariant,
                         maxLines = lines,
-                        overflow = TextOverflow.Ellipsis,
+                        overflow = TextOverflow.Clip,
                         textAlign = TextAlign.Left,
                         onTextLayout = { plotCut = it.hasVisualOverflow },
                         modifier = if (plotCut) {
@@ -729,7 +729,7 @@ private fun Credit(
             style = style,
             color = colors.onBackgroundVariant,
             maxLines = lines,
-            overflow = TextOverflow.Ellipsis,
+            overflow = TextOverflow.Clip,
             onTextLayout = { cut = it.hasVisualOverflow },
             modifier = Modifier.weight(1f),
         )
