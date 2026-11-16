@@ -684,7 +684,7 @@ internal fun BoardBand(
                     style = castivioBodyStyle(m.frame.fsBody * LEGEND_OF_BODY),
                     color = colors.onBackgroundVariant,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
+                    overflow = TextOverflow.Clip,
                 )
             }
 
