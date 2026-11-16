@@ -714,7 +714,9 @@ private fun creditText(label: String, names: String): AnnotatedString {
     return remember(label, names, ink) {
         buildAnnotatedString {
             withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = ink)) { append(label) }
-            append(" ")
+            // Keep the Arabic label, its colon, and the first name together in RTL.
+            // A regular space can be reordered at the bidi boundary before the isolated LTR names.
+            append('\u00A0')
             append(names)
         }
     }
