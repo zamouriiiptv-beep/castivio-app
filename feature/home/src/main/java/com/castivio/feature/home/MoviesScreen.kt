@@ -140,6 +140,7 @@ fun MoviesScreen(
                 onSearchFocus = {},
                 hint = stringResource(R.string.movies_search_hint),
                 hideLeading = true,
+                alignSearchToPane = true,
                 // Shared board header: keep Castivio branding, reserve the former breadcrumb slot, then search, sort, clock and back.
                 trailing = {
                     CastivioChip(

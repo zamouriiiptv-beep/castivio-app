@@ -140,6 +140,7 @@ fun SeriesScreen(
                 onSearchFocus = {},
                 hint = stringResource(R.string.series_search_hint),
                 hideLeading = true,
+                alignSearchToPane = true,
                 // Match the shared films header: branding stays visible; the breadcrumb slot remains reserved but empty.
                 trailing = {
                     CastivioChip(

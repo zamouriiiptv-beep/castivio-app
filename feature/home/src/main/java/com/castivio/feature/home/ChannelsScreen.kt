@@ -631,6 +631,8 @@ internal fun BoardBand(
     withBack: Boolean = true,
     /** Hide section/category text while preserving its slot so all boards share the same search start. */
     hideLeading: Boolean = false,
+    /** Start search at the poster pane's leading edge, after the category rail and panel inset. */
+    alignSearchToPane: Boolean = false,
 ) {
     val colors = CastivioTheme.colors
 
@@ -662,24 +664,30 @@ internal fun BoardBand(
                 )
             }
 
-            // Retain the breadcrumb width when its text is hidden so search starts consistently.
-            Box(Modifier.width(m.crumb)) {
-                if (!hideLeading) {
-                    Column {
-                        Text(
-                            text = section,
-                            style = castivioChipStyle(m.frame.fsLabel),
-                            color = colors.secondary,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                        Text(
-                            text = list,
-                            style = castivioBodyStyle(m.frame.fsBody * LEGEND_OF_BODY),
-                            color = colors.onBackgroundVariant,
-                            maxLines = 1,
-                            overflow = TextOverflow.Clip,
-                        )
+            if (alignSearchToPane) {
+                // The poster pane starts after the board's inner panel inset, category rail and rail gap.
+                // Branding keeps its existing cell and position; this spacer moves only the search start.
+                Spacer(Modifier.width(m.panelPad))
+            } else {
+                // Other boards retain the breadcrumb slot to preserve their established header geometry.
+                Box(Modifier.width(m.crumb)) {
+                    if (!hideLeading) {
+                        Column {
+                            Text(
+                                text = section,
+                                style = castivioChipStyle(m.frame.fsLabel),
+                                color = colors.secondary,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                            Text(
+                                text = list,
+                                style = castivioBodyStyle(m.frame.fsBody * LEGEND_OF_BODY),
+                                color = colors.onBackgroundVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Clip,
+                            )
+                        }
                     }
                 }
             }
