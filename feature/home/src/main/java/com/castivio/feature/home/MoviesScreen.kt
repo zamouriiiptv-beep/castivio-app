@@ -139,9 +139,8 @@ fun MoviesScreen(
                 onSearch = model::search,
                 onSearchFocus = {},
                 hint = stringResource(R.string.movies_search_hint),
-                hideLeading = false,
-                // Restore the original movies header: Castivio mark and wordmark, section title and provider list,
-                // followed by search, sort, clock and back. Keep the movies board and its spacing unchanged.
+                hideLeading = true,
+                // Shared board header: keep Castivio branding, reserve the former breadcrumb slot, then search, sort, clock and back.
                 trailing = {
                     CastivioChip(
                         text = stringResource(R.string.browse_sort, stringResource(state.sort.label)),

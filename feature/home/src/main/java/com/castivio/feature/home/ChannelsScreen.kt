@@ -629,7 +629,7 @@ internal fun BoardBand(
      * categories first, and a second one that left the page altogether would answer the same press two ways.
      */
     withBack: Boolean = true,
-    /** Movies use the full band for search, sort, clock and back; no section/category breadcrumb. */
+    /** Hide section/category text while preserving its slot so all boards share the same search start. */
     hideLeading: Boolean = false,
 ) {
     val colors = CastivioTheme.colors
@@ -639,60 +639,49 @@ internal fun BoardBand(
             Modifier.fillMaxWidth().height(m.header),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            if (!hideLeading) {
-                // **Exactly as wide as the rail column beneath it.**
-                //
-                // Which is what puts the breadcrumb after it at the channel list's own
-                // leading edge -- directly above the slot each row reserves for a channel
-                // logo. It was sitting against the wordmark, and `Live TV` read as part of
-                // the product's name rather than as which section is open.
-                Row(
-                    Modifier.width(m.rail + m.railGap),
-                    verticalAlignment = Alignment.CenterVertically,
-                    // **The pair is in the middle of that cell** -- the same space from the frame's edge to the mark as from the
-                    // name to the section's name, which is where the cell ends. It stood at the column's start, over the
-                    // bouquets' search mark, and the space after the name was six times the one before the mark. Drawn first
-                    // in `design/mockups/channels-band-brand-ar.html`, option A.
-                    //
-                    // The pair is one thing: what fills the space is the mark being large enough, not the two being far apart.
-                    horizontalArrangement = Arrangement.spacedBy(m.osdGap, Alignment.CenterHorizontally),
-                ) {
-                    Image(
-                        painter = painterResource(DesignR.drawable.castivio_logo),
-                        contentDescription = null,
-                        contentScale = ContentScale.Fit,
-                        modifier = Modifier.height(m.header * MARK_OF_HEADER).testTag(BAND_MARK_TAG),
-                    )
-                    Text(
-                        text = stringResource(R.string.gate_wordmark),
-                        style = castivioTitleStyle(m.frame.fsLabel * WORDMARK_OF_LABEL),
-                        color = colors.onBackgroundStrong,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
+            // Branding is independent of the breadcrumb: it remains visible on every board.
+            // Keep the old breadcrumb cell's width even when its text is hidden so the search field
+            // begins at the same horizontal position on films, series, radio and channels.
+            Row(
+                Modifier.width(m.rail + m.railGap),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(m.osdGap, Alignment.CenterHorizontally),
+            ) {
+                Image(
+                    painter = painterResource(DesignR.drawable.castivio_logo),
+                    contentDescription = null,
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.height(m.header * MARK_OF_HEADER).testTag(BAND_MARK_TAG),
+                )
+                Text(
+                    text = stringResource(R.string.gate_wordmark),
+                    style = castivioTitleStyle(m.frame.fsLabel * WORDMARK_OF_LABEL),
+                    color = colors.onBackgroundStrong,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+
+            // Retain the breadcrumb width when its text is hidden so search starts consistently.
+            Box(Modifier.width(m.crumb)) {
+                if (!hideLeading) {
+                    Column {
+                        Text(
+                            text = section,
+                            style = castivioChipStyle(m.frame.fsLabel),
+                            color = colors.secondary,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                        Text(
+                            text = list,
+                            style = castivioBodyStyle(m.frame.fsBody * LEGEND_OF_BODY),
+                            color = colors.onBackgroundVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Clip,
+                        )
+                    }
                 }
-    
-                // Bounded, because the second line is a *provider's* words — see
-                // `ChannelsMetrics.crumb`. An unbounded cell let one long category name
-                // decide where everything after it on the band sat.
-                Column(Modifier.width(m.crumb)) {
-                    Text(
-                        text = section,
-                        style = castivioChipStyle(m.frame.fsLabel),
-                        color = colors.secondary,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                    Text(
-                        text = list,
-                        style = castivioBodyStyle(m.frame.fsBody * LEGEND_OF_BODY),
-                        color = colors.onBackgroundVariant,
-                        maxLines = 1,
-                        overflow = TextOverflow.Clip,
-                    )
-                }
-    
-    
             }
 
             val field: @Composable () -> Unit = {

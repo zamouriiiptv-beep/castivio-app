@@ -298,8 +298,9 @@ fun CastivioNoticeDialog(
             // the page-edge behavior because they contain an Arabic label followed by provider names.
             textAlign = if (bodyIsLtr) TextAlign.Left else startEdgeAlign(body.text),
             modifier = Modifier
-                .weight(1f, fill = false)
+                .weight(1f, fill = true)
                 .verticalScroll(rememberScrollState())
+                // Fill the remaining panel height so long plots scroll without pushing the close action out.
                 // Focusable so a remote can scroll it. Not focus-requested: the
                 // close button is still what the dialog opens on, and a user who
                 // only wants out should not have to travel to find the way.
