@@ -139,10 +139,9 @@ fun MoviesScreen(
                 onSearch = model::search,
                 onSearchFocus = {},
                 hint = stringResource(R.string.movies_search_hint),
-                hideLeading = true,
-                // The band is the channels' band, and the order is the one thing the films add to it: between the
-                // field and the clock, the same space either side as the band leaves between all of its pieces, with
-                // no count beside it. The panel under it starts at the same height as the channel list does.
+                hideLeading = false,
+                // Restore the original movies header: Castivio mark and wordmark, section title and provider list,
+                // followed by search, sort, clock and back. Keep the movies board and its spacing unchanged.
                 trailing = {
                     CastivioChip(
                         text = stringResource(R.string.browse_sort, stringResource(state.sort.label)),
