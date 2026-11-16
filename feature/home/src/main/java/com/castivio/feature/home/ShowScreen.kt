@@ -31,6 +31,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
+import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.material.icons.rounded.CalendarToday
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Favorite
@@ -42,6 +43,8 @@ import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.TheaterComedy
 import androidx.compose.material.icons.rounded.ThumbUp
 import androidx.compose.material.icons.rounded.VideoLibrary
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -240,24 +243,21 @@ fun ShowScreen(
                         )
                     }
                 } else {
-                    item(key = "seasons") {
+                    item(key = "episodes-heading") {
+                        val episodes = season?.episodes.orEmpty()
                         val panelShape = RoundedCornerShape(Radius.md)
-                        Column(
+                        Row(
                             Modifier
                                 .fillMaxWidth()
                                 .clip(panelShape)
                                 .background(CastivioTheme.colors.glassFill)
                                 .border(1.dp, CastivioTheme.colors.glassBorderSoft, panelShape)
-                                .padding(m.cardPad),
-                            verticalArrangement = Arrangement.spacedBy(m.rowGap),
+                                .padding(horizontal = m.cardPad, vertical = m.rowGap),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
                         ) {
-                            SectionTitle(stringResource(R.string.show_nav_seasons), m)
-                            SeasonChips(state.seasons, season, m, tv) { picked = it }
-                        }
-                    }
-                    if (season?.episodes.orEmpty().isNotEmpty()) {
-                        item(key = "episodes-heading") {
-                            SectionTitle(plural(R.plurals.show_episodes, season?.episodes?.size ?: 0), m)
+                            SectionTitle(plural(R.plurals.show_episodes, episodes.size), m)
+                            SeasonSelector(state.seasons, season, m, tv) { picked = it }
                         }
                     }
                     items(season?.episodes.orEmpty(), key = { it.id }) { episode ->
@@ -265,7 +265,6 @@ fun ShowScreen(
                             episode = episode,
                             mark = state.marks[episode.id] ?: EpisodeMark.None,
                             plot = state.plots[episode.id],
-                            // The plots come with the same reply as the rest: until it is in, a bar stands there.
                             waiting = state.asking && state.plots.isEmpty(),
                             m = m,
                             onStart = start,
@@ -438,9 +437,7 @@ private fun ShowTop(
             Modifier
                 .fillMaxWidth()
                 .clip(heroShape)
-                .background(colors.glassFill.copy(alpha = HERO_PANEL_ALPHA))
-                .border(1.dp, colors.glassBorderSoft, heroShape)
-                .padding(m.cardPad),
+                .padding(horizontal = m.cardPad, vertical = m.rowGap),
             horizontalArrangement = Arrangement.spacedBy(m.paneGap),
         ) {
             PosterFrame(
@@ -583,6 +580,76 @@ private fun SeasonChips(seasons: List<Season>, chosen: Season?, m: CatalogMetric
                     scope.launch { listState.animateScrollToItem(listState.firstVisibleItemIndex + CHIPS_STEP) }
                 },
             )
+        }
+    }
+}
+
+@Composable
+private fun SeasonSelector(
+    seasons: List<Season>,
+    chosen: Season?,
+    m: CatalogMetrics,
+    tv: Boolean,
+    onSeason: (Int) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val colors = CastivioTheme.colors
+    val shape = RoundedCornerShape(Radius.md)
+    val current = chosen
+    Box {
+        Row(
+            Modifier
+                .clip(shape)
+                .background(colors.selectedFill)
+                .border(1.5.dp, colors.focusRing, shape)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                ) { expanded = true }
+                .padding(horizontal = m.entryPadH, vertical = m.rowGap),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(m.rowGap),
+        ) {
+            Icon(
+                Icons.Rounded.ExpandMore,
+                contentDescription = null,
+                tint = colors.onBackground,
+                modifier = Modifier.size(m.frame.fsBody * 1.25f),
+            )
+            Text(
+                text = current?.let { stringResource(R.string.show_season, it.number) }
+                    ?: stringResource(R.string.show_nav_seasons),
+                style = castivioChipStyle(m.frame.fsChip).copy(fontWeight = FontWeight.Bold),
+                color = colors.onBackground,
+                maxLines = 1,
+            )
+            current?.let {
+                Text(
+                    text = "(${plural(R.plurals.show_episodes, it.episodes.size)})",
+                    style = castivioBodyStyle(m.frame.fsBody),
+                    color = colors.onBackgroundVariant,
+                    maxLines = 1,
+                )
+            }
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+        ) {
+            seasons.forEach { item ->
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            text = "${stringResource(R.string.show_season, item.number)} · ${plural(R.plurals.show_episodes, item.episodes.size)}",
+                            style = castivioChipStyle(m.frame.fsChip),
+                        )
+                    },
+                    onClick = {
+                        expanded = false
+                        onSeason(item.number)
+                    },
+                )
+            }
         }
     }
 }
@@ -916,10 +983,10 @@ private const val BACKDROP_SHARE = 0.62f
 private const val HERO_PANEL_ALPHA = 0.72f
 
 /** How tall the show's poster is, as a share of the screen: beside the page's other things, not all of it. */
-private const val POSTER_OF_HEIGHT = 0.34f
+private const val POSTER_OF_HEIGHT = 0.42f
 private const val SIMILAR_POSTER_OF_HEIGHT = 0.3f
 private val MIN_POSTER = 96.dp
-private val MAX_POSTER = 240.dp
+private val MAX_POSTER = 300.dp
 
 private const val FACT_ICON_OF_BODY = 1.25f
 private val FACT_GAP = 6.dp
