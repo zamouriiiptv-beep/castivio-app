@@ -192,6 +192,7 @@ fun RadioScreen(
                 onSearch = model::search,
                 onSearchFocus = {},
                 hint = stringResource(R.string.radio_search_hint),
+                hideLeading = true,
                 // The films' band, and the order is the one thing a section adds to it: between the field and the
                 // clock, the same space either side as the band leaves between all of its pieces, with no count
                 // beside it.
