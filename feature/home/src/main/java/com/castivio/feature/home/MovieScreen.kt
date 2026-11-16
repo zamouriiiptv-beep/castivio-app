@@ -792,7 +792,18 @@ private fun FitInfo(
         val gaps = (if (plot != null) 1 else 0) + (if (bottom != null) 1 else 0)
         val room = constraints.maxHeight - topHeight - bottomHeight - gaps * gapPx
         val lines = (room / lineHeight).toInt().coerceAtLeast(1)
-        val plotPlaced = plot?.let { content -> subcompose("plot") { content(lines) }.map { it.measure(loose) } }.orEmpty()
+        // First try giving the plot one more line. Use it only when the measured text still fits
+        // above the credits; this spends the otherwise-unused fractional line space safely.
+        val extraPlot = plot?.let { content ->
+            subcompose("plot-extra") { content(lines + 1) }.map { it.measure(loose) }
+        }.orEmpty()
+        val extraHeight = extraPlot.sumOf { it.height }
+        val useExtraLine = plot != null && extraHeight <= room
+        val plotPlaced = if (useExtraLine) {
+            extraPlot
+        } else {
+            plot?.let { content -> subcompose("plot") { content(lines) }.map { it.measure(loose) } }.orEmpty()
+        }
         val plotHeight = plotPlaced.sumOf { it.height }
 
         layout(constraints.maxWidth, constraints.maxHeight) {
@@ -802,11 +813,11 @@ private fun FitInfo(
             if (plot != null) {
                 y += gapPx
                 plotPlaced.forEach { it.placeRelative(0, y) }
-                y += plotHeight
             }
             if (bottom != null) {
-                y += gapPx
-                bottomPlaced.forEach { it.placeRelative(0, y) }
+                // Keep the credits at the bottom of the text pane instead of leaving spare space below them.
+                val bottomY = (constraints.maxHeight - bottomHeight).coerceAtLeast(y + plotHeight + gapPx)
+                bottomPlaced.forEach { it.placeRelative(0, bottomY) }
             }
         }
     }
