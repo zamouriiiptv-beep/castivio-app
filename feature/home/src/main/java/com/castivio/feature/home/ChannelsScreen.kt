@@ -589,6 +589,7 @@ private fun BoardHeader(
         onSearchFocus = onSearchFocus,
         // Reorder mode is of the lists as they are: nothing to narrow while it is on.
         searchEnabled = state.arranging == null,
+        hideLeading = true,
     )
 }
 
