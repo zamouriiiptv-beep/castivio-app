@@ -240,7 +240,26 @@ fun ShowScreen(
                         )
                     }
                 } else {
-                    item(key = "seasons") { SeasonChips(state.seasons, season, m, tv) { picked = it } }
+                    item(key = "seasons") {
+                        val panelShape = RoundedCornerShape(Radius.md)
+                        Column(
+                            Modifier
+                                .fillMaxWidth()
+                                .clip(panelShape)
+                                .background(CastivioTheme.colors.glassFill)
+                                .border(1.dp, CastivioTheme.colors.glassBorderSoft, panelShape)
+                                .padding(m.cardPad),
+                            verticalArrangement = Arrangement.spacedBy(m.rowGap),
+                        ) {
+                            SectionTitle(stringResource(R.string.show_nav_seasons), m)
+                            SeasonChips(state.seasons, season, m, tv) { picked = it }
+                        }
+                    }
+                    if (season?.episodes.orEmpty().isNotEmpty()) {
+                        item(key = "episodes-heading") {
+                            SectionTitle(plural(R.plurals.show_episodes, season?.episodes?.size ?: 0), m)
+                        }
+                    }
                     items(season?.episodes.orEmpty(), key = { it.id }) { episode ->
                         EpisodeRow(
                             episode = episode,
@@ -414,7 +433,16 @@ private fun ShowTop(
                 ShowBackdrop(url, Modifier.align(Alignment.TopEnd).fillMaxWidth(BACKDROP_SHARE).fillMaxHeight())
             }
         }
-        Row(horizontalArrangement = Arrangement.spacedBy(m.paneGap)) {
+        val heroShape = RoundedCornerShape(Radius.md)
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .clip(heroShape)
+                .background(colors.glassFill.copy(alpha = HERO_PANEL_ALPHA))
+                .border(1.dp, colors.glassBorderSoft, heroShape)
+                .padding(m.cardPad),
+            horizontalArrangement = Arrangement.spacedBy(m.paneGap),
+        ) {
             PosterFrame(
                 url = show.artworkUrl,
                 seed = 0,
@@ -883,6 +911,9 @@ private const val PLOT_LINES_TV = 3
 
 /** How much of the page's width the wide picture takes, from its end edge. */
 private const val BACKDROP_SHARE = 0.62f
+
+/** A quiet glass ground that groups the show's identity and actions without obscuring its backdrop. */
+private const val HERO_PANEL_ALPHA = 0.72f
 
 /** How tall the show's poster is, as a share of the screen: beside the page's other things, not all of it. */
 private const val POSTER_OF_HEIGHT = 0.34f
