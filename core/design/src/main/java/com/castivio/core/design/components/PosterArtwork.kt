@@ -43,13 +43,12 @@ import com.castivio.core.common.artwork.ArtworkKick
 import com.castivio.core.common.artwork.ArtworkMetrics
 import com.castivio.core.common.artwork.PosterRetry
 import com.castivio.core.common.artwork.PosterSize
+import com.castivio.core.common.artwork.PrefetchWindow
 import com.castivio.core.common.artwork.PosterTimeline
 import com.castivio.core.design.theme.CastivioTheme
 import com.castivio.core.design.theme.CastivioType
 import com.castivio.core.design.theme.Radius
 import com.castivio.core.design.theme.posterPlaceholderBrush
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withTimeoutOrNull
@@ -201,13 +200,22 @@ private fun backdropRequest(context: Context, url: String): ImageRequest =
         .build()
 
 /**
- * Asks for the posters just below a wall before it scrolls to them, so they are on the device when the cards arrive.
+ * Asks for the posters just below a wall before the cards reach them -- **while the wall scrolls**, and not only once it is still.
  *
- * Only while the wall is still: a scroll is the moment the cards on screen need the connection, and a request made
- * for a row the thumb is about to pass would stand in front of theirs. When a scroll starts, what is still on its way
- * is cancelled; when the wall settles for [PREFETCH_SETTLE_MS], the [ahead] posters after the last one drawn are asked
- * for again, and any that already arrived are answered from the cache. The request is the backdrop's, which is the
- * small one, but it brings the whole picture into the disk cache on the way, and the poster is then read from there.
+ * The window is the [ahead] posters after the last card drawn ([PrefetchWindow]). As the wall moves, the posters that came into
+ * the window are asked for and the ones that left it are let go: a poster whose card has come on screen is that card's to fetch,
+ * and one the viewer has scrolled back past is not wanted. So no more than the window is ever in flight, however fast the thumb
+ * goes, and a card on screen never queues behind posters for cards that are not.
+ *
+ * It used to ask only after the wall had been still for a quarter of a second, and to cancel everything the moment a scroll began,
+ * so that a request for a row the thumb was about to pass would not stand in front of the cards on screen. That was the right
+ * trade for a poster of a hundred kilobytes and more; at the card's size ([PosterSize.forCard], 44 KB median) the window costs
+ * little, and a scrolling viewer -- the one the wall is for -- was the one it left with nothing ahead: every card asked for its own
+ * poster as it arrived, and while a section's first load was running each ask waited 0.72 s (median), 2.10 s (p90) for its first
+ * byte, against 0.16 s once the list had come.
+ *
+ * The request is the backdrop's, which is the small one, but it brings the whole picture into the disk cache on the way, and the
+ * poster is then read from there. A poster already fetched is not asked for again while it stays in the window.
  *
  * The feature hands over its list as two lookups and does not see the loader. [itemCount] bounds the lookup, which is
  * how many items the list holds now; [urlAt] answers the poster's address without loading anything.
@@ -224,25 +232,23 @@ fun PosterPrefetch(
     val lookup by rememberUpdatedState(urlAt)
     LaunchedEffect(state, ahead) {
         val loader = context.imageLoader
-        val pending = ArrayList<Disposable>()
-        fun cancel() {
-            pending.forEach { it.dispose() }
-            pending.clear()
-        }
+        // Every position asked for and still in the window, finished or not: a finished one is in the cache, and is not asked
+        // for again until it has left the window.
+        val asked = HashMap<Int, Disposable>()
         try {
-            snapshotFlow { state.isScrollInProgress to (state.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1) }
+            snapshotFlow { state.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1 }
                 .distinctUntilChanged()
-                .collectLatest { (scrolling, last) ->
-                    cancel()
-                    if (scrolling) return@collectLatest
-                    delay(PREFETCH_SETTLE_MS)
-                    for (index in postersAhead(last, ahead, count())) {
+                .collect { last ->
+                    val plan = PrefetchWindow.plan(asked.keys, last, ahead, count())
+                    for (index in plan.drop) asked.remove(index)?.dispose()
+                    for (index in plan.ask) {
                         val url = lookup(index) ?: continue
-                        pending += loader.enqueue(backdropRequest(context, url))
+                        asked[index] = loader.enqueue(backdropRequest(context, url))
                     }
                 }
         } finally {
-            cancel()
+            asked.values.forEach { it.dispose() }
+            asked.clear()
         }
     }
 }
@@ -253,12 +259,7 @@ fun PosterPrefetch(
  * Empty when nothing is shown yet -- [lastShown] is -1 -- because there is no "after" to measure from, and the cards
  * on screen ask for themselves.
  */
-internal fun postersAhead(lastShown: Int, ahead: Int, count: Int): IntRange =
-    if (lastShown < 0 || ahead <= 0 || count <= 0) IntRange.EMPTY
-    else (lastShown + 1)..minOf(lastShown + ahead, count - 1)
-
-/** How long a wall must be still before the posters below it are asked for, in milliseconds. */
-private const val PREFETCH_SETTLE_MS = 250L
+internal fun postersAhead(lastShown: Int, ahead: Int, count: Int): IntRange = PrefetchWindow.window(lastShown, ahead, count)
 
 /**
  * The size the backdrop is asked for, in pixels, at the poster's own 2:3. Small enough that enlarging it to a

@@ -276,7 +276,7 @@ private fun ShowWall(
     onOpenShow: (SeriesSummary) -> Unit,
 ) {
     val titleStep = filmTitleStep(m)
-    // The covers of the next rows are asked for while the wall is still, so they are on the device when it scrolls.
+    // The covers of the next rows are asked for as the wall moves, so they are on the device when their cards arrive.
     PosterPrefetch(
         state = gridState,
         ahead = columns * PREFETCH_ROWS,
