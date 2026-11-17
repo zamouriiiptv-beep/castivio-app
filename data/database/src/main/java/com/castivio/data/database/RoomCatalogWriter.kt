@@ -260,6 +260,8 @@ class RoomCatalogWriter(
      * One batch of rows into `media`, with its six indices -- and nothing else: the search
      * index takes them at the end of the import. Timed per batch, never per row.
      */
+    private val writerPriority = WriterPriority.ofThisThread()
+
     override fun writeItems(items: List<CatalogItem>) {
         val source = requireStarted()
         val statement = itemStatement ?: error("writeItems before begin")
@@ -276,8 +278,11 @@ class RoomCatalogWriter(
         // And the scheduler's account of the same stretch: how long the thread ran, and how long it waited for a processor.
         // What is neither was spent asleep -- on a lock, a file -- which the thread's CPU time alone cannot tell from a wait.
         val schedAt = if (measuring) ProcStats.schedStatOfThisThread() else null
-        timed(DatabaseStep.ROWS) {
-            for (item in items) insert(source, statement, item)
+        // A little more of the processor for the rows while they are written; see [WriterPriority].
+        writerPriority.during {
+            timed(DatabaseStep.ROWS) {
+                for (item in items) insert(source, statement, item)
+            }
         }
         if (measuring) {
             figures.rowsCpuNanos += Debug.threadCpuTimeNanos() - cpuAt
