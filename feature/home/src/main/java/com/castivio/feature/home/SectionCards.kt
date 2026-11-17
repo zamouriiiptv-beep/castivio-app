@@ -136,11 +136,12 @@ enum class Press {
  * Whether [kind] opens with the first category of its first load, rather than when the load
  * ends, and lets the rest of it arrive unannounced.
  *
- * Live TV, films and series. Radio keeps the rule it has -- a section that has never loaded
- * opens when its load ends -- until its own phase, and then this is the one line that changes.
+ * Live TV, films, series and radio. The radio was the last to keep the rule it had -- a section that had never loaded
+ * opened when its load ended -- and it is now the others' too: it opens with its first category and the rest of its few
+ * categories arrive unannounced.
  */
 internal fun opensWithFirstCategory(kind: MediaKind): Boolean =
-    kind == MediaKind.LIVE || kind == MediaKind.MOVIE || kind == MediaKind.SERIES
+    kind == MediaKind.LIVE || kind == MediaKind.MOVIE || kind == MediaKind.SERIES || kind == MediaKind.RADIO
 
 /**
  * The press on [kind]'s card, from what is on the device and what its load is doing.

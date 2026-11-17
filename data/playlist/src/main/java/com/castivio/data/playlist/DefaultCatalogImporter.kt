@@ -741,9 +741,10 @@ class DefaultCatalogImporter(
         // panel cannot claim a concurrency the import is not using.
         PerformanceLog.importConcurrency(XtreamImportEngine.DEFAULT_CONCURRENCY)
         PerformanceLog.phase(PerfPhase.IMPORT)
-        // The categories a viewer asks for while this section arrives. Not for the radio, which walks its own few
-        // categories and has no long reply to be ahead of; the channel is closed when this load ends.
-        val asks = if (kind == MediaKind.RADIO) null else early.open(kind)
+        // The categories a viewer asks for while this section arrives: served beside the one reply, or by moving the
+        // category to the front of the walk -- the radio's own few categories included. The channel is closed when this
+        // load ends.
+        val asks = early.open(kind)
         // Development builds only: how much of the import's wall time the processor spent on it, in all, and what
         // the runtime's collector did meanwhile. Read here and in the `finally` below, twice and never in between.
         val probing = DevDiagnostics.enabled
@@ -833,7 +834,7 @@ class DefaultCatalogImporter(
             xtreamFailure(e, writer, saved, clock() - startedAt)
         } finally {
             // The viewer's asks end with the load: one made after this finds no channel and is dropped.
-            if (asks != null) early.close(kind, asks)
+            early.close(kind, asks)
             if (probing) {
                 sampler?.stop()?.let { PerformanceLog.note(NOTE_ROOM_THREADS, it) }
                 val ioAfter = ProcStats.ioOfThisProcess()

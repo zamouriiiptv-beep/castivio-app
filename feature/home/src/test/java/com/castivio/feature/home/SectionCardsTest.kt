@@ -187,11 +187,11 @@ class SectionCardsTest {
     // `design/mockups/channels-arriving.html`, and `home-loading.html` set f.
 
     @Test
-    fun `live, films and series open with their first category, radio does not yet`() {
+    fun `live, films, series and radio all open with their first category`() {
         assertEquals(true, opensWithFirstCategory(MediaKind.LIVE))
         assertEquals(true, opensWithFirstCategory(MediaKind.MOVIE))
         assertEquals(true, opensWithFirstCategory(MediaKind.SERIES))
-        assertEquals(false, opensWithFirstCategory(MediaKind.RADIO))
+        assertEquals(true, opensWithFirstCategory(MediaKind.RADIO))
     }
 
     /**
@@ -213,11 +213,24 @@ class SectionCardsTest {
         )
     }
 
+    /** The radio's first load is waited for and opened like the channels': by its first category. */
+    @Test
+    fun `a press during the radio's first load waits for its first category, then opens`() {
+        assertEquals(Press.Await, pressOf(MediaKind.RADIO, onDevice = false, marked = false, run = first(SectionLoad.Queued)))
+        assertEquals(
+            Press.Await,
+            pressOf(MediaKind.RADIO, onDevice = true, marked = false, run = first(SectionLoad.Loading(items = 31, groups = 12))),
+        )
+        assertEquals(
+            Press.Open,
+            pressOf(MediaKind.RADIO, onDevice = true, marked = false, run = first(SectionLoad.Loading(items = 48, groups = 12, listed = 1))),
+        )
+    }
+
     /** The other sections, and Live TV's other loads, keep the presses they had. */
     @Test
     fun `every other press is the one it was`() {
         val arriving = SectionLoad.Loading(items = 48, groups = 340, listed = 1)
-        assertEquals("radio still says when it opens", Press.Hint, pressOf(MediaKind.RADIO, onDevice = false, marked = false, run = first(arriving)))
         assertEquals("a refresh over rows opens", Press.Open, pressOf(MediaKind.LIVE, onDevice = true, marked = true, run = run(arriving)))
         assertEquals(Press.Fetch, pressOf(MediaKind.LIVE, onDevice = false, marked = false, run = null))
         assertEquals(Press.Open, pressOf(MediaKind.LIVE, onDevice = true, marked = true, run = first(SectionLoad.Done(48))))
@@ -286,7 +299,7 @@ class SectionCardsTest {
         assertEquals(LoadPress.FIRST_OPENS, loadPressOf(MediaKind.LIVE, Press.Fetch, run = null))
         assertEquals(LoadPress.FIRST_OPENS, loadPressOf(MediaKind.MOVIE, Press.Fetch, run = null))
         assertEquals(LoadPress.FIRST_OPENS, loadPressOf(MediaKind.SERIES, Press.Fetch, run = null))
-        assertEquals("radio keeps the viewer on Home until it has loaded", LoadPress.FIRST_STAYS, loadPressOf(MediaKind.RADIO, Press.Fetch, run = null))
+        assertEquals("radio opens with its first category, as the others do", LoadPress.FIRST_OPENS, loadPressOf(MediaKind.RADIO, Press.Fetch, run = null))
     }
 
     @Test

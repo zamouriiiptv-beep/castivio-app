@@ -19,6 +19,7 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Semaphore
@@ -378,9 +379,10 @@ class XtreamImportEngine(
         /**
          * The ids of categories a viewer asked for while the section was still arriving, in the order they asked.
          *
-         * Each is fetched on its own, beside the one reply, and written ahead of the rest -- see [serveEarly]. Only
-         * the pass that reads a section in one reply serves them: a walk of the categories is already a request
-         * for each, and a viewer's category would only be a fifth request over the limit. Null serves none.
+         * Served by whichever pass is bringing the section. Beside the one reply, each is fetched on its own and written
+         * ahead of the rest -- see [serveEarly]. In a walk of the categories, which is already a request for each, it is
+         * not a request of its own, and so never one over the limit: the category goes to the front of the walk's list --
+         * see [FrontQueue] -- and the next free worker takes it. Null serves none.
          */
         earlyAsks: ReceiveChannel<String>? = null,
     ): ImportSummary {
@@ -829,17 +831,25 @@ class XtreamImportEngine(
                 if (perCategory.isNotEmpty() && !cancelled && !isCancelled()) {
                     val meter = PassMeter(nanoClock)
                     pass(countCategories = true, meter = meter) { events ->
-                        val gate = Semaphore(concurrency)
+                        // The categories still to fetch, taken by the workers in the provider's order -- except that one a
+                        // viewer asks for goes to the front. See [FrontQueue]: an asked category costs the walk no request
+                        // of its own, so it never has more than [concurrency] open, and no category is fetched twice.
+                        val queue = FrontQueue(perCategory) { it.groupId }
                         coroutineScope {
-                            for (plan in perCategory) {
+                            val asking = earlyAsks?.let { asks ->
+                                launch(Dispatchers.IO) { for (groupId in asks) queue.bump(groupId) }
+                            }
+                            val workers = List(minOf(concurrency, perCategory.size)) {
                                 launch(Dispatchers.IO) {
-                                    gate.withPermit {
-                                        if (!isCancelled()) {
-                                            fetchCategory(sourceId, api, plan, events, meter)
-                                        }
+                                    while (!isCancelled()) {
+                                        val plan = queue.next() ?: break
+                                        fetchCategory(sourceId, api, plan, events, meter)
                                     }
                                 }
                             }
+                            workers.joinAll()
+                            // Every category is taken: what is asked for after this has nothing left to be ahead of.
+                            asking?.cancel()
                         }
                     }
                     onPass(

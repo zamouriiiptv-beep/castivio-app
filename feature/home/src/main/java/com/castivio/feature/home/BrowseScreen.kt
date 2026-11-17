@@ -431,7 +431,9 @@ internal fun <T : Any> Paged(
     when {
         paged.itemCount > 0 -> rows()
 
-        paged.loadState.refresh is LoadState.Loading -> LoadingRows(m)
+        // The open category is one still on its way, brought ahead of the rest at the viewer's press: its rows are
+        // coming, and the wall says so with the shape of what is coming and not with "no films".
+        paged.loadState.refresh is LoadState.Loading || state.arriving -> LoadingRows(m)
 
         else -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             SectionEmpty(
