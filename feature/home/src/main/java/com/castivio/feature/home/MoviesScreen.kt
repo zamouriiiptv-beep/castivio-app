@@ -128,18 +128,13 @@ fun MoviesScreen(
                 .padding(horizontal = m.edge)
                 .padding(top = m.boardTop, bottom = m.boardBottom),
         ) {
-            BoardBand(
-                section = stringResource(R.string.browse_movies),
-                list = movieListName(state),
+            BoardHeader(
                 m = m,
                 searchText = typed,
                 onSearch = model::search,
-                onSearchFocus = {},
                 hint = stringResource(R.string.movies_search_hint),
-                hideLeading = true,
-                alignSearchToPane = true,
-                // Shared board header: keep Castivio branding, reserve the former breadcrumb slot, then search, sort, clock and back.
-                trailing = { SortChip(state.sort, m) { model.sortBy(state.sort.next()) } },
+                order = state.bandOrder,
+                onOrder = model::nextOrder,
             )
 
             Spacer(Modifier.height(m.headerGap))
@@ -155,15 +150,6 @@ fun MoviesScreen(
             )
         }
     }
-}
-
-/** What the band calls the list that is open: the category's name, or one of the viewer's own lists, or all. */
-@Composable
-private fun movieListName(state: BrowseState): String = when (val list = state.movieList()) {
-    MovieList.All -> stringResource(R.string.movies_all)
-    MovieList.Favorites -> stringResource(R.string.channels_favorites)
-    MovieList.Recent -> stringResource(R.string.channels_recent)
-    is MovieList.Category -> state.categoryNames[list.id] ?: stringResource(R.string.movies_all)
 }
 
 /**

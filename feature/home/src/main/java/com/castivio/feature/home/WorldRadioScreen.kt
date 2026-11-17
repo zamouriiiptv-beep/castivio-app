@@ -184,16 +184,15 @@ fun WorldRadioScreen(
                 .padding(horizontal = m.edge)
                 .padding(top = m.boardTop, bottom = m.boardBottom),
         ) {
-            BoardBand(
-                section = stringResource(R.string.browse_radio),
-                list = stringResource(R.string.radio_world_in, worldListName(choice, typed.trim(), locale)),
+            BoardHeader(
                 m = m,
                 searchText = typed,
                 onSearch = model::search,
-                onSearchFocus = {},
-                // The radio's own words, short: the band says "World" and the rail's switch is on it, and a field of this width holds about twenty
-                // letters -- "Search the world's stations" was cut at "stati…". The hint cannot wrap, so what it says has to be short in every language.
+                // The radio's own words, short: a field of this width holds about twenty letters -- "Search the world's stations" was cut at
+                // "stati…". The hint cannot wrap, so what it says has to be short in every language.
                 hint = stringResource(R.string.radio_search_hint),
+                // The directory has no order to offer, so its band has no control for one.
+                order = null,
             )
 
             Spacer(Modifier.height(m.headerGap))
@@ -279,19 +278,6 @@ private fun stepIn(session: WorldRadioSession, open: OpenStations, by: Int) {
     val current = session.station ?: return
     val target = neighbourOf(current.uuid, by, open.count) { open.at(it)?.uuid } ?: return
     open.at(target)?.let(session::play)
-}
-
-/** What the band calls the list that is open: the country's or the genre's name, one of the viewer's own lists, or what was searched. */
-@Composable
-private fun worldListName(choice: WorldChoice, query: String, locale: Locale): String = when {
-    query.isNotEmpty() -> stringResource(R.string.radio_world_results, query)
-    else -> when (choice) {
-        WorldChoice.Top -> stringResource(R.string.radio_world_top)
-        WorldChoice.Favorites -> stringResource(R.string.channels_favorites)
-        WorldChoice.Recents -> stringResource(R.string.radio_recent)
-        is WorldChoice.Country -> countryNameOf(choice.code, choice.code, locale)
-        is WorldChoice.Tag -> choice.name.replaceFirstChar { it.titlecase(locale) }
-    }
 }
 
 /**

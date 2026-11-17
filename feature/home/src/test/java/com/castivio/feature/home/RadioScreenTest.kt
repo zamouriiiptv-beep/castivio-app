@@ -121,10 +121,10 @@ class RadioScreenTest {
     // ----------------------------------------------------------------------------- the band and the rail
 
     @Test
-    fun `the band names the section, and its field says what it searches`() {
+    fun `the band's field says what it searches`() {
         show()
 
-        compose.onNodeWithText("Radio").assertIsDisplayed()
+        // The band does not name the section: the rail says which list is open.
         compose.onNodeWithText("Search stations").assertIsDisplayed()
     }
 
@@ -132,7 +132,7 @@ class RadioScreenTest {
     fun `the rail lists all the stations, the viewer's own lists and every category with its total`() {
         show()
 
-        // "All stations" is the rail's first entry and also what the band calls the list it opens on.
+        // "All stations" is the rail's first entry.
         assertTrue(compose.onAllNodesWithText("All stations").fetchSemanticsNodes().isNotEmpty())
         compose.onNodeWithText("Favorites").assertIsDisplayed()
         compose.onNodeWithText("Recently played").assertIsDisplayed()

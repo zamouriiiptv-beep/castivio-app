@@ -10,10 +10,10 @@ import com.castivio.core.design.components.castivioChipStyle
 import com.castivio.domain.SortOrder
 
 /**
- * The control a board's band carries for its order -- "Sort: Provider" -- drawn by one function, so that the films', the
- * shows' and the channels' bands are one band and cannot part as the pages' arrows and hearts did. It stands between the
- * field and the clock ([BoardBand]'s `trailing`). What a press does is the board's: the films and the shows go round four
- * orders of their rows, and the channels go between two orders of their bouquets.
+ * The control a board's band carries for its order -- "Sort: Provider" -- drawn by one function, so that the boards' bands are
+ * one band and cannot part as the pages' arrows and hearts did. [BoardHeader] puts it between the field and the clock
+ * ([BoardBand]'s `trailing`). What a press does is the holder's -- see `BrowseViewModel.nextOrder`: the films, the shows and
+ * the radio go round four orders of their rows, and the channels go between two orders of their bouquets.
  */
 @Composable
 internal fun SortChip(order: SortOrder, m: ChannelsMetrics, onClick: () -> Unit) {

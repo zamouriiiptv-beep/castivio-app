@@ -34,9 +34,9 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 /**
- * The films screen, composed with the channels board's own band and rail over the holder's state: the band
- * names the section and its search field narrows the films, the rail lists the categories with their totals
- * beside the viewer's own lists, a press chooses one, and the wall carries what the provider sent.
+ * The films screen, composed with the channels board's own band and rail over the holder's state: the band's
+ * search field narrows the films, the rail lists the categories with their totals beside the viewer's own
+ * lists, a press chooses one, and the wall carries what the provider sent.
  *
  * What the lists hold, and in what order, is `BrowseSearchTest`'s and the data layer's.
  */
@@ -96,10 +96,11 @@ class MoviesScreenTest {
     // ----------------------------------------------------------------------------- the band and the rail
 
     @Test
-    fun `the band names the section, and its field says what it searches`() {
+    fun `the band's field says what it searches`() {
         show(holder())
 
-        compose.onNodeWithText("Movies").assertIsDisplayed()
+        // The band is the one every board has -- the product's name, the field, the order, the clock, the way back -- and does
+        // not name the section: the rail says which list is open.
         compose.onNodeWithText("Search movies").assertIsDisplayed()
     }
 
@@ -107,7 +108,7 @@ class MoviesScreenTest {
     fun `the rail lists the films, the viewer's own lists, and every category with its total`() {
         show(holder())
 
-        // "All movies" is the rail's first entry and also what the band calls the list it opens on.
+        // "All movies" is the rail's first entry.
         assertTrue(compose.onAllNodesWithText("All movies").fetchSemanticsNodes().size >= 1)
         compose.onNodeWithText("Favorites").assertIsDisplayed()
         compose.onNodeWithText("Recently Watched").assertIsDisplayed()
@@ -118,7 +119,7 @@ class MoviesScreenTest {
     }
 
     @Test
-    fun `a press on a category chooses it, and the band names it`() {
+    fun `a press on a category chooses it`() {
         val model = holder()
         show(model)
 
@@ -126,8 +127,8 @@ class MoviesScreenTest {
         compose.waitForIdle()
 
         assertEquals("comedy", model.state.value.selectedGroup)
-        // The band's second line, and the rail's own entry.
-        assertTrue(compose.onAllNodesWithText("Comedy").fetchSemanticsNodes().size >= 2)
+        // The band does not repeat the name: the rail's own entry is the one on the screen.
+        assertTrue(compose.onAllNodesWithText("Comedy").fetchSemanticsNodes().isNotEmpty())
     }
 
     @Test

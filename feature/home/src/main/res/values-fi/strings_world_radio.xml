@@ -6,9 +6,7 @@
     <string name="radio_source_subscription">Tilaus</string>
     <string name="radio_source_world">Maailma</string>
     <string name="radio_source_label">Radion lähde</string>
-    <string name="radio_world_in">Maailma · %1$s</string>
     <string name="radio_world_top">Kuunnelluimmat</string>
-    <string name="radio_world_results">Tulokset haulle ”%1$s”</string>
     <string name="radio_world_countries">Maat</string>
     <string name="radio_world_genres">Lajityypit</string>
     <string name="radio_world_search_countries">Hae maita</string>

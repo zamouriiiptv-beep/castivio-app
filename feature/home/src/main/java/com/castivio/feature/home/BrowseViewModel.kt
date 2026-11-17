@@ -78,6 +78,12 @@ data class BrowseState(
      */
     val bouquetSort: SortOrder = SortOrder.PROVIDER,
     /**
+     * The order the band's control names, which depends on the board: the bouquets' on the live board, whose rows keep their
+     * numbers ([bouquetSort]), and the rows' on the others ([sort]). Decided here, where the section is known, so a board draws
+     * it and does not choose it.
+     */
+    val bandOrder: SortOrder = SortOrder.PROVIDER,
+    /**
      * From an indexed `COUNT`, never from measuring a list. What the scope holds -- the open
      * category, or the whole section while a search is on -- and not how many rows match: whether
      * the section has anything is one question, and whether this search found any is the list's.
@@ -383,6 +389,7 @@ class BrowseViewModel @Inject constructor(
             selectedGroup = asked.groupId,
             sort = asked.sort,
             bouquetSort = around.bouquets,
+            bandOrder = if (current == CatalogSection.Live) around.bouquets else asked.sort,
             total = counts.first,
             sectionTotal = counts.second,
             groupFilter = filter,
@@ -766,6 +773,16 @@ class BrowseViewModel @Inject constructor(
     fun sortBouquetsBy(value: SortOrder) {
         if (arrangement.value != null) return
         bouquetOrder.value = value
+    }
+
+    /**
+     * A press on the band's order control, which every board draws the same way. The rule is the holder's, which knows its
+     * section, and not the screens': the live board goes between the two orders of its bouquets -- its rows keep their numbers --
+     * and the others go round the four of their rows.
+     */
+    fun nextOrder() {
+        if (section.value == CatalogSection.Live) sortBouquetsBy(bouquetOrder.value.otherBouquetOrder())
+        else sortBy(order.value.next())
     }
 
     /** One show's seasons, small enough to read whole because it is bounded by the show. */

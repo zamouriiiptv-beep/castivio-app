@@ -422,12 +422,17 @@ fun ChannelsScreen(
                 .padding(top = m.boardTop, bottom = m.boardBottom),
         ) {
             BoardHeader(
-                state = state,
                 m = m,
                 searchText = searchText,
                 onSearch = model::search,
+                hint = stringResource(R.string.channels_search_hint),
+                order = state.bandOrder,
+                onOrder = model::nextOrder,
+                // Reorder mode is of the lists as they are: nothing to narrow while it is on.
+                searchEnabled = state.arranging == null,
                 onSearchFocus = { searchFocused = it },
-                onSort = model::sortBouquetsBy,
+                // The channels' band keeps the geometry it had: the field starts after the breadcrumb's cell, not at a pane's edge.
+                alignSearchToPane = false,
             )
 
             Spacer(Modifier.height(m.headerGap))
@@ -532,73 +537,6 @@ internal data class RowPick(val picked: Boolean, val favorite: Boolean)
 /* ---------------------------------------------------------------- the header */
 
 /**
- * One thin band, in the order the approved drawing sets: mark, breadcrumb, search,
- * dates.
- *
- * ## What it carries, and what came off it
- *
- * The mark, which section and which category, the search, and the two dates that decide
- * whether anything on this screen still works.
- *
- * Off it went a clock, the provider's hostname, an Active/Inactive chip and the version
- * number. The clock went with the system bars — this is a screen for watching television
- * and neither the phone's time nor a second copy of it is one of the facts a viewer
- * opened it for. The hostname is a credential rather than a fact anybody reads, and it
- * was long enough on its own to push the dates off the band.
- *
- * ## The two dates are two different things
- *
- *  - **Subscription** is the provider's. When it lapses the streams stop.
- *  - **Licence** is Castivio's. When it lapses the app stops.
- *
- * A viewer whose picture has gone needs to know which of the two ran out, so both are
- * drawn and both are captioned.
- *
- * ## Each date is one string, and that is load-bearing
- *
- * The caption and the value were two composables side by side, which pins their physical
- * order: in Arabic the value ended up *before* its caption and the line read `2026/09/17
- * ينتهي الاشتراك`. One `Text` holding `"caption: value"` lets the text engine place them,
- * and it places them correctly in both directions from the same source — caption first,
- * value after it, in Arabic and in English alike.
- *
- * The band is laid out left to right in every language, like the columns under it. That
- * is the whole of the difference between languages on this screen: none of these boxes
- * moves, and only the glyphs inside them are shaped by their own script.
- */
-@Composable
-private fun BoardHeader(
-    state: BrowseState,
-    m: ChannelsMetrics,
-    searchText: String,
-    onSearch: (String) -> Unit,
-    onSearchFocus: (Boolean) -> Unit,
-    onSort: (SortOrder) -> Unit,
-) {
-    BoardBand(
-        section = stringResource(R.string.browse_live),
-        list = state.selectedGroup?.let { state.categoryNames[it] }
-            ?: stringResource(
-                when {
-                    state.favorites -> R.string.channels_favorites
-                    state.recent -> R.string.channels_recent
-                    else -> R.string.channels_all_rail
-                },
-            ),
-        m = m,
-        searchText = searchText,
-        onSearch = onSearch,
-        onSearchFocus = onSearchFocus,
-        // Reorder mode is of the lists as they are: nothing to narrow while it is on.
-        searchEnabled = state.arranging == null,
-        hideLeading = true,
-        // The order of the bouquets, the films' and the shows' control drawn by the same function: the provider's, or by name.
-        // Not the rows' -- a channel's place is its number -- and not in reorder mode, which is of the order they are saved in.
-        trailing = { SortChip(state.bouquetSort, m) { if (state.arranging == null) onSort(state.bouquetSort.otherBouquetOrder()) } },
-    )
-}
-
-/**
  * The band over a board, whichever section's it is: the mark, the section and the list that is open, the
  * search field and the clock -- the channels' header exactly, which the films' screen draws too.
  *
@@ -606,8 +544,12 @@ private fun BoardHeader(
  * open ([list]) and what the field says it searches ([hint]). Everything else -- the cells, their widths,
  * the order they sit in -- is one band, so the two boards read as one product.
  *
- * A section may add one control to the band ([trailing]): the films' order. It stands between the field and the
+ * A section may add one control to the band ([trailing]): its order -- see [SortChip]. It stands between the field and the
  * clock.
+ *
+ * **The boards do not call this themselves.** They call [BoardHeader], which sets what is the same on every one of them -- the
+ * breadcrumb off, the order control, the field's place -- so that a change to the band is made once and every board has it.
+ * Catch-up, whose band has no field and no way back of its own to offer, is the one that calls this directly.
  *
  * **The way back is at the band's far end, on the right, in every language** ([withBack]), first from that edge,
  * then the clock and the date to its left, then the field. The application hides the system bars, so a viewer
@@ -617,8 +559,9 @@ private fun BoardHeader(
  */
 @Composable
 internal fun BoardBand(
-    section: String,
-    list: String,
+    /** What the breadcrumb says the board is and which list of it is open: drawn only where [hideLeading] is off -- Catch-up's band. */
+    section: String = "",
+    list: String = "",
     m: ChannelsMetrics,
     searchText: String,
     onSearch: (String) -> Unit,

@@ -6,9 +6,7 @@
     <string name="radio_source_subscription">プロバイダ</string>
     <string name="radio_source_world">世界</string>
     <string name="radio_source_label">ラジオのソース</string>
-    <string name="radio_world_in">世界 · %1$s</string>
     <string name="radio_world_top">よく聴かれている</string>
-    <string name="radio_world_results">「%1$s」の結果</string>
     <string name="radio_world_countries">国</string>
     <string name="radio_world_genres">ジャンル</string>
     <string name="radio_world_search_countries">国を検索</string>

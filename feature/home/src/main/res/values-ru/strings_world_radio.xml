@@ -6,9 +6,7 @@
     <string name="radio_source_subscription">Провайдер</string>
     <string name="radio_source_world">Мир</string>
     <string name="radio_source_label">Источник радио</string>
-    <string name="radio_world_in">Мир · %1$s</string>
     <string name="radio_world_top">Самые слушаемые</string>
-    <string name="radio_world_results">Результаты по запросу «%1$s»</string>
     <string name="radio_world_countries">Страны</string>
     <string name="radio_world_genres">Жанры</string>
     <string name="radio_world_search_countries">Поиск стран</string>

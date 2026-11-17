@@ -6,9 +6,7 @@
     <string name="radio_source_subscription">Sağlayıcı</string>
     <string name="radio_source_world">Dünya</string>
     <string name="radio_source_label">Radyo kaynağı</string>
-    <string name="radio_world_in">Dünya · %1$s</string>
     <string name="radio_world_top">En çok dinlenenler</string>
-    <string name="radio_world_results">“%1$s” için sonuçlar</string>
     <string name="radio_world_countries">Ülkeler</string>
     <string name="radio_world_genres">Türler</string>
     <string name="radio_world_search_countries">Ülke ara</string>

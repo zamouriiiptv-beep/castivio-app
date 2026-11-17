@@ -6,9 +6,7 @@
     <string name="radio_source_subscription">Abonnement</string>
     <string name="radio_source_world">Monde</string>
     <string name="radio_source_label">Source de la radio</string>
-    <string name="radio_world_in">Monde · %1$s</string>
     <string name="radio_world_top">Les plus écoutées</string>
-    <string name="radio_world_results">Résultats pour « %1$s »</string>
     <string name="radio_world_countries">Pays</string>
     <string name="radio_world_genres">Genres</string>
     <string name="radio_world_search_countries">Rechercher un pays</string>

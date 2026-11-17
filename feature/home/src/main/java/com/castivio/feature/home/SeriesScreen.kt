@@ -130,18 +130,13 @@ fun SeriesScreen(
                 .padding(horizontal = m.edge)
                 .padding(top = m.boardTop, bottom = m.boardBottom),
         ) {
-            BoardBand(
-                section = stringResource(R.string.browse_series),
-                list = seriesListName(state),
+            BoardHeader(
                 m = m,
                 searchText = typed,
                 onSearch = model::search,
-                onSearchFocus = {},
                 hint = stringResource(R.string.series_search_hint),
-                hideLeading = true,
-                alignSearchToPane = true,
-                // Match the shared films header: branding stays visible; the breadcrumb slot remains reserved but empty.
-                trailing = { SortChip(state.sort, m) { model.sortBy(state.sort.next()) } },
+                order = state.bandOrder,
+                onOrder = model::nextOrder,
             )
 
             Spacer(Modifier.height(m.headerGap))
@@ -158,15 +153,6 @@ fun SeriesScreen(
             )
         }
     }
-}
-
-/** What the band calls the list that is open: the category's name, or one of the viewer's own lists, or all of them. */
-@Composable
-private fun seriesListName(state: BrowseState): String = when (val list = state.movieList()) {
-    MovieList.All -> stringResource(R.string.series_all)
-    MovieList.Favorites -> stringResource(R.string.channels_favorites)
-    MovieList.Recent -> stringResource(R.string.channels_recent)
-    is MovieList.Category -> state.categoryNames[list.id] ?: stringResource(R.string.series_all)
 }
 
 /**

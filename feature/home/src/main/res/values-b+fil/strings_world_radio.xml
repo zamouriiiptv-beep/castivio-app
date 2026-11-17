@@ -6,9 +6,7 @@
     <string name="radio_source_subscription">Provider</string>
     <string name="radio_source_world">Mundo</string>
     <string name="radio_source_label">Pinagmumulan ng radyo</string>
-    <string name="radio_world_in">Mundo · %1$s</string>
     <string name="radio_world_top">Pinakapinakikinggan</string>
-    <string name="radio_world_results">Mga resulta para sa “%1$s”</string>
     <string name="radio_world_countries">Mga bansa</string>
     <string name="radio_world_genres">Mga genre</string>
     <string name="radio_world_search_countries">Maghanap ng bansa</string>

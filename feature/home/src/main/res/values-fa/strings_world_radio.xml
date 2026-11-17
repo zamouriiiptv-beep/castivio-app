@@ -6,9 +6,7 @@
     <string name="radio_source_subscription">اشتراک</string>
     <string name="radio_source_world">جهان</string>
     <string name="radio_source_label">منبع رادیو</string>
-    <string name="radio_world_in">جهان · %1$s</string>
     <string name="radio_world_top">پرشنیده‌ترین</string>
-    <string name="radio_world_results">نتایج برای «%1$s»</string>
     <string name="radio_world_countries">کشورها</string>
     <string name="radio_world_genres">ژانرها</string>
     <string name="radio_world_search_countries">جستجوی کشور</string>

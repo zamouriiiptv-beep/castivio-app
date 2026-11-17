@@ -6,9 +6,7 @@
     <string name="radio_source_subscription">Penyedia</string>
     <string name="radio_source_world">Dunia</string>
     <string name="radio_source_label">Sumber radio</string>
-    <string name="radio_world_in">Dunia · %1$s</string>
     <string name="radio_world_top">Paling banyak didengar</string>
-    <string name="radio_world_results">Hasil untuk “%1$s”</string>
     <string name="radio_world_countries">Negara</string>
     <string name="radio_world_genres">Genre</string>
     <string name="radio_world_search_countries">Cari negara</string>

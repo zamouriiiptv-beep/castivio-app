@@ -6,9 +6,7 @@
     <string name="radio_source_subscription">Leverantör</string>
     <string name="radio_source_world">Världen</string>
     <string name="radio_source_label">Radiokälla</string>
-    <string name="radio_world_in">Världen · %1$s</string>
     <string name="radio_world_top">Mest lyssnade</string>
-    <string name="radio_world_results">Resultat för ”%1$s”</string>
     <string name="radio_world_countries">Länder</string>
     <string name="radio_world_genres">Genrer</string>
     <string name="radio_world_search_countries">Sök länder</string>

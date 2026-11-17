@@ -6,9 +6,7 @@
     <string name="radio_source_subscription">Aanbieder</string>
     <string name="radio_source_world">Wereld</string>
     <string name="radio_source_label">Radiobron</string>
-    <string name="radio_world_in">Wereld · %1$s</string>
     <string name="radio_world_top">Meest beluisterd</string>
-    <string name="radio_world_results">Resultaten voor “%1$s”</string>
     <string name="radio_world_countries">Landen</string>
     <string name="radio_world_genres">Genres</string>
     <string name="radio_world_search_countries">Landen zoeken</string>

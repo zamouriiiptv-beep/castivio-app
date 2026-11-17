@@ -6,9 +6,7 @@
     <string name="radio_source_subscription">Furnizor</string>
     <string name="radio_source_world">Lumea</string>
     <string name="radio_source_label">Sursa radioului</string>
-    <string name="radio_world_in">Lumea · %1$s</string>
     <string name="radio_world_top">Cele mai ascultate</string>
-    <string name="radio_world_results">Rezultate pentru „%1$s”</string>
     <string name="radio_world_countries">Țări</string>
     <string name="radio_world_genres">Genuri</string>
     <string name="radio_world_search_countries">Caută țări</string>

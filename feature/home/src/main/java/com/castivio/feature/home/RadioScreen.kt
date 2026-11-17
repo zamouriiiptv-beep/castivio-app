@@ -180,18 +180,13 @@ fun RadioScreen(
                 .padding(horizontal = m.edge)
                 .padding(top = m.boardTop, bottom = m.boardBottom),
         ) {
-            BoardBand(
-                section = stringResource(R.string.browse_radio),
-                list = radioListName(state),
+            BoardHeader(
                 m = m,
                 searchText = typed,
                 onSearch = model::search,
-                onSearchFocus = {},
                 hint = stringResource(R.string.radio_search_hint),
-                hideLeading = true,
-                alignSearchToPane = true,
-                // Match the shared films header: branding stays visible; the breadcrumb slot remains reserved but empty.
-                trailing = { SortChip(state.sort, m) { model.sortBy(state.sort.next()) } },
+                order = state.bandOrder,
+                onOrder = model::nextOrder,
             )
 
             Spacer(Modifier.height(m.headerGap))
@@ -228,15 +223,6 @@ fun RadioScreen(
             )
         }
     }
-}
-
-/** What the band calls the list that is open: the category's name, or one of the viewer's own lists, or all. */
-@Composable
-private fun radioListName(state: BrowseState): String = when (val list = state.movieList()) {
-    MovieList.All -> stringResource(R.string.radio_all)
-    MovieList.Favorites -> stringResource(R.string.channels_favorites)
-    MovieList.Recent -> stringResource(R.string.radio_recent)
-    is MovieList.Category -> state.categoryNames[list.id] ?: stringResource(R.string.radio_all)
 }
 
 /** The station after [by] places in the open list, asked for by the plate's controls: nothing if there is none. */

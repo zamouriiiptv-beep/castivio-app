@@ -156,6 +156,8 @@ internal fun TestScope.browseBoard(
     store: ViewModelStore? = null,
     /** What was hidden while the board is open. */
     hidden: HiddenItems = HiddenItems.None,
+    /** The section the holder is shown on: the live board's unless a test asks for another. */
+    section: CatalogSection = CatalogSection.Live,
 ): Board {
     val pager = FakePager()
     val catalogue = FakeCatalogue(groups)
@@ -171,7 +173,7 @@ internal fun TestScope.browseBoard(
         ViewModelProvider(store, factory)["live", BrowseViewModel::class.java]
     }
     val board = Board(model, pager, catalogue, order)
-    model.show(CatalogSection.Live)
+    model.show(section)
     backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { model.items.collect { } }
     backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { model.state.collect { board.states += it } }
     runCurrent()

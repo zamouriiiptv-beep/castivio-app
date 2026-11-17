@@ -6,9 +6,7 @@
     <string name="radio_source_subscription">Předplatné</string>
     <string name="radio_source_world">Svět</string>
     <string name="radio_source_label">Zdroj rádia</string>
-    <string name="radio_world_in">Svět · %1$s</string>
     <string name="radio_world_top">Nejposlouchanější</string>
-    <string name="radio_world_results">Výsledky pro „%1$s“</string>
     <string name="radio_world_countries">Země</string>
     <string name="radio_world_genres">Žánry</string>
     <string name="radio_world_search_countries">Hledat země</string>

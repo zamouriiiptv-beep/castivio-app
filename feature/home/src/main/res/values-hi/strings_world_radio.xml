@@ -6,9 +6,7 @@
     <string name="radio_source_subscription">प्रदाता</string>
     <string name="radio_source_world">दुनिया</string>
     <string name="radio_source_label">रेडियो स्रोत</string>
-    <string name="radio_world_in">दुनिया · %1$s</string>
     <string name="radio_world_top">सबसे ज़्यादा सुने गए</string>
-    <string name="radio_world_results">“%1$s” के नतीजे</string>
     <string name="radio_world_countries">देश</string>
     <string name="radio_world_genres">शैलियाँ</string>
     <string name="radio_world_search_countries">देश खोजें</string>

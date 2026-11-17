@@ -6,9 +6,7 @@
     <string name="radio_source_subscription">Előfizetés</string>
     <string name="radio_source_world">Világ</string>
     <string name="radio_source_label">Rádióforrás</string>
-    <string name="radio_world_in">Világ · %1$s</string>
     <string name="radio_world_top">Legtöbbet hallgatott</string>
-    <string name="radio_world_results">Találatok: „%1$s”</string>
     <string name="radio_world_countries">Országok</string>
     <string name="radio_world_genres">Műfajok</string>
     <string name="radio_world_search_countries">Országok keresése</string>

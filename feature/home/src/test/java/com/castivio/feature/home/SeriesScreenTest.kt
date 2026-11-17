@@ -33,8 +33,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 /**
- * The shows' screen, composed with the films' board over the holder's state: the band names the section and its field
- * narrows the shows, the rail lists the viewer's own lists -- the favourites and the shows watched -- and the categories
+ * The shows' screen, composed with the films' board over the holder's state: the band's field narrows the shows, the rail lists the viewer's own lists -- the favourites and the shows watched -- and the categories
  * with their totals, and the wall carries what the provider sent, a poster and a name, and a press opens the show's page.
  */
 @OptIn(ExperimentalTestApi::class)
@@ -78,10 +77,10 @@ class SeriesScreenTest {
     }
 
     @Test
-    fun `the band names the section, and its field says what it searches`() {
+    fun `the band's field says what it searches`() {
         show(holder())
 
-        compose.onNodeWithText("Series").assertIsDisplayed()
+        // The band does not name the section: the rail says which list is open.
         compose.onNodeWithText("Search series").assertIsDisplayed()
     }
 

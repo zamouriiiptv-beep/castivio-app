@@ -6,9 +6,7 @@
     <string name="radio_source_subscription">Ofruesi</string>
     <string name="radio_source_world">Bota</string>
     <string name="radio_source_label">Burimi i radios</string>
-    <string name="radio_world_in">Bota · %1$s</string>
     <string name="radio_world_top">Më të dëgjuarat</string>
-    <string name="radio_world_results">Rezultate për «%1$s»</string>
     <string name="radio_world_countries">Vendet</string>
     <string name="radio_world_genres">Zhanret</string>
     <string name="radio_world_search_countries">Kërko vende</string>

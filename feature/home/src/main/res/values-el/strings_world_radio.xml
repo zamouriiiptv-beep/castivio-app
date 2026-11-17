@@ -6,9 +6,7 @@
     <string name="radio_source_subscription">Πάροχος</string>
     <string name="radio_source_world">Κόσμος</string>
     <string name="radio_source_label">Πηγή ραδιοφώνου</string>
-    <string name="radio_world_in">Κόσμος · %1$s</string>
     <string name="radio_world_top">Πιο δημοφιλή</string>
-    <string name="radio_world_results">Αποτελέσματα για «%1$s»</string>
     <string name="radio_world_countries">Χώρες</string>
     <string name="radio_world_genres">Είδη</string>
     <string name="radio_world_search_countries">Αναζήτηση χωρών</string>

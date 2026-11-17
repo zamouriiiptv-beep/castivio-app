@@ -6,9 +6,7 @@
     <string name="radio_source_subscription">服務商</string>
     <string name="radio_source_world">全球</string>
     <string name="radio_source_label">電台來源</string>
-    <string name="radio_world_in">全球 · %1$s</string>
     <string name="radio_world_top">收聽最多</string>
-    <string name="radio_world_results">「%1$s」的結果</string>
     <string name="radio_world_countries">國家與地區</string>
     <string name="radio_world_genres">類型</string>
     <string name="radio_world_search_countries">搜尋國家</string>

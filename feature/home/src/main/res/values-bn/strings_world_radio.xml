@@ -6,9 +6,7 @@
     <string name="radio_source_subscription">প্রদানকারী</string>
     <string name="radio_source_world">বিশ্ব</string>
     <string name="radio_source_label">রেডিওর উৎস</string>
-    <string name="radio_world_in">বিশ্ব · %1$s</string>
     <string name="radio_world_top">সবচেয়ে বেশি শোনা</string>
-    <string name="radio_world_results">“%1$s”-এর ফলাফল</string>
     <string name="radio_world_countries">দেশ</string>
     <string name="radio_world_genres">ধরন</string>
     <string name="radio_world_search_countries">দেশ খুঁজুন</string>

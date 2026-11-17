@@ -6,9 +6,7 @@
     <string name="radio_source_subscription">Pružatelj</string>
     <string name="radio_source_world">Svijet</string>
     <string name="radio_source_label">Izvor radija</string>
-    <string name="radio_world_in">Svijet · %1$s</string>
     <string name="radio_world_top">Najslušanije</string>
-    <string name="radio_world_results">Rezultati za „%1$s”</string>
     <string name="radio_world_countries">Države</string>
     <string name="radio_world_genres">Žanrovi</string>
     <string name="radio_world_search_countries">Traži države</string>

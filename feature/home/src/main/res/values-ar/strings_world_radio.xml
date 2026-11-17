@@ -7,9 +7,7 @@
     <string name="radio_source_subscription">الاشتراك</string>
     <string name="radio_source_world">العالم</string>
     <string name="radio_source_label">مصدر الراديو</string>
-    <string name="radio_world_in">العالم · %1$s</string>
     <string name="radio_world_top">الأكثر استماعًا</string>
-    <string name="radio_world_results">نتائج «%1$s»</string>
     <string name="radio_world_countries">الدول</string>
     <string name="radio_world_genres">الأنواع</string>
     <string name="radio_world_search_countries">البحث في الدول</string>

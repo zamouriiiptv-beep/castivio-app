@@ -6,9 +6,7 @@
     <string name="radio_source_subscription">سبسکرپشن</string>
     <string name="radio_source_world">دنیا</string>
     <string name="radio_source_label">ریڈیو کا ذریعہ</string>
-    <string name="radio_world_in">دنیا · %1$s</string>
     <string name="radio_world_top">سب سے زیادہ سنے گئے</string>
-    <string name="radio_world_results">“%1$s” کے نتائج</string>
     <string name="radio_world_countries">ممالک</string>
     <string name="radio_world_genres">اصناف</string>
     <string name="radio_world_search_countries">ممالک تلاش کریں</string>

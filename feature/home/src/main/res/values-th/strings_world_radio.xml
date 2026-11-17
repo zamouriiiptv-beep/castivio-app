@@ -6,9 +6,7 @@
     <string name="radio_source_subscription">สมาชิก</string>
     <string name="radio_source_world">ทั่วโลก</string>
     <string name="radio_source_label">แหล่งวิทยุ</string>
-    <string name="radio_world_in">ทั่วโลก · %1$s</string>
     <string name="radio_world_top">ฟังมากที่สุด</string>
-    <string name="radio_world_results">ผลลัพธ์สำหรับ “%1$s”</string>
     <string name="radio_world_countries">ประเทศ</string>
     <string name="radio_world_genres">แนวเพลง</string>
     <string name="radio_world_search_countries">ค้นหาประเทศ</string>

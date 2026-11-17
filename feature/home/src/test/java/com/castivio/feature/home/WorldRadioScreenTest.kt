@@ -38,9 +38,7 @@ import java.util.Locale
  * lists and the countries, a press on a station plays it in the world's session and puts it on the plate, and what listening says reaches
  * the store -- all without a network, a decoder or a subscription.
  *
- * **The band's second line -- "World · Morocco" -- is asserted to exist, not to be displayed.** Robolectric lays every `Text` out 35dp tall
- * whatever its style, and the band's cell holds two of them in a header 38dp high at this size, so the second is cut by its own cell here and
- * would not be on a device; the other screens' tests ask the same of that line (`onAllNodesWithText("All movies")`).
+ * The band is the one every board has, and does not name the list that is open: the rail says which, and that is where the tests look.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(qualifiers = "w960dp-h540dp-land")
@@ -99,12 +97,12 @@ class WorldRadioScreenTest {
     // ----------------------------------------------------------------------------- the band and the rail
 
     @Test
-    fun `the band names the section and the world, and its field says what it searches`() {
+    fun `the band's field says what it searches, and has no order to offer`() {
         show()
 
-        compose.onNodeWithText("Radio").assertIsDisplayed()
-        compose.onNodeWithText("World · Most listened").assertExists()
         compose.onNodeWithText("Search stations").assertIsDisplayed()
+        // The directory has no order to put its stations in, and a control that did nothing would be a promise.
+        assertTrue(compose.onAllNodesWithText("Sort:", substring = true).fetchSemanticsNodes().isEmpty())
     }
 
     @Test
@@ -159,14 +157,13 @@ class WorldRadioScreenTest {
     }
 
     @Test
-    fun `a country opens its own stations, and the band says which`() {
+    fun `a country opens its own stations`() {
         show()
         awaitStation("Medi 1 Radio")
 
         compose.onNode(hasText("France") and hasText("Total: 640", substring = true)).performClick()
         awaitStation("RFI Monde")
 
-        compose.onNodeWithText("World · France").assertExists()
         assertEquals(WorldListing.OfCountry("FR"), directory.pageAsks.last().first)
         assertTrue("the stations of another country are not on it", compose.onAllNodesWithText("Hit Radio").fetchSemanticsNodes().isEmpty())
     }
@@ -193,7 +190,6 @@ class WorldRadioScreenTest {
         compose.waitForIdle()
 
         compose.onNodeWithText("No favourite stations yet").assertIsDisplayed()
-        compose.onNodeWithText("World · Favorites").assertExists()
     }
 
     // ----------------------------------------------------------------------------- the plate

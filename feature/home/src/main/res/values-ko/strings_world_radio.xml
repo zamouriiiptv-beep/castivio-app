@@ -6,9 +6,7 @@
     <string name="radio_source_subscription">제공업체</string>
     <string name="radio_source_world">전 세계</string>
     <string name="radio_source_label">라디오 소스</string>
-    <string name="radio_world_in">전 세계 · %1$s</string>
     <string name="radio_world_top">가장 많이 들은</string>
-    <string name="radio_world_results">“%1$s” 검색 결과</string>
     <string name="radio_world_countries">국가</string>
     <string name="radio_world_genres">장르</string>
     <string name="radio_world_search_countries">국가 검색</string>
