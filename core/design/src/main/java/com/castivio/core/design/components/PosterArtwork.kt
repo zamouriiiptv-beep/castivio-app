@@ -16,6 +16,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,6 +41,7 @@ import coil.size.Scale
 import com.castivio.core.common.artwork.ArtworkKick
 import com.castivio.core.common.artwork.ArtworkMetrics
 import com.castivio.core.common.artwork.PosterRetry
+import com.castivio.core.common.artwork.PosterTimeline
 import com.castivio.core.design.theme.CastivioTheme
 import com.castivio.core.design.theme.CastivioType
 import com.castivio.core.design.theme.Radius
@@ -104,12 +106,19 @@ internal fun PosterArtwork(
         failedNow = false
     }
 
+    // Told to the poster timeline -- which holds nothing until a load of a debuggable build begins -- so that when a card asked and
+    // when it had its picture can be set against what the connection was doing. The first time counts; a card asking again is one.
+    SideEffect { PosterTimeline.cardAsked(url) }
+
     if (failedNow) return
     AsyncImage(
         model = pictureRequest(context, url),
         contentDescription = null,
         contentScale = contentScale,
-        onSuccess = { onLoaded() },
+        onSuccess = {
+            PosterTimeline.cardShown(url)
+            onLoaded()
+        },
         onError = { error ->
             failures += 1
             refused = !PosterRetry.retryable(PosterRetry.statusOf(error.result.throwable.message))

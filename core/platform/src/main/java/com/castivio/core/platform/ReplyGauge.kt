@@ -1,5 +1,6 @@
 package com.castivio.core.platform
 
+import com.castivio.core.common.artwork.ReplySpan
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
 
@@ -22,7 +23,7 @@ import java.util.concurrent.atomic.AtomicLong
  */
 class ReplyGauge(private val clock: () -> Long = System::nanoTime) {
 
-    private class Reply(val encoding: String?, val declaredBytes: Long?) {
+    private class Reply(val encoding: String?, val declaredBytes: Long?, val startedAt: Long) {
         val bytes = AtomicLong()
 
         @Volatile
@@ -30,6 +31,10 @@ class ReplyGauge(private val clock: () -> Long = System::nanoTime) {
 
         @Volatile
         var lastAt = 0L
+
+        /** When the body ended, or [NOT_ENDED] while it goes on. */
+        @Volatile
+        var endedAt = NOT_ENDED
     }
 
     private val replies = ConcurrentHashMap<String, Reply>()
@@ -41,13 +46,22 @@ class ReplyGauge(private val clock: () -> Long = System::nanoTime) {
      * A reply asked for again -- a retry -- starts from nothing: what is read is the one in hand.
      */
     fun started(action: String, encoding: String?, declaredBytes: Long?) {
-        replies[action] = Reply(encoding?.trim()?.takeIf { it.isNotEmpty() }, declaredBytes?.takeIf { it >= 0 })
+        replies[action] = Reply(encoding?.trim()?.takeIf { it.isNotEmpty() }, declaredBytes?.takeIf { it >= 0 }, startedAt = clock())
+    }
+
+    /**
+     * The body of [action]'s reply has ended -- read to its end, or closed. The first word is the last: a reply is over once, and
+     * a reply asked for again is another entry.
+     */
+    fun finished(action: String) {
+        val reply = replies[action] ?: return
+        if (reply.endedAt == NOT_ENDED) reply.endedAt = clock()
     }
 
     /** [count] more bytes of [action]'s reply have passed. */
     fun bytes(action: String, count: Long) {
         if (count <= 0) return
-        val reply = replies.getOrPut(action) { Reply(encoding = null, declaredBytes = null) }
+        val reply = replies.getOrPut(action) { Reply(encoding = null, declaredBytes = null, startedAt = clock()) }
         val now = clock()
         if (reply.firstAt == 0L) reply.firstAt = now
         reply.lastAt = now
@@ -69,11 +83,36 @@ class ReplyGauge(private val clock: () -> Long = System::nanoTime) {
         )
     }
 
+    /**
+     * The largest reply as a span of this gauge's clock: when its headers came, the latest byte, and when it ended -- null while it
+     * has not. Null before a byte of any has come.
+     *
+     * The clock is the one the posters' timeline reads ([System.nanoTime] for both in the application), so that a poster that began
+     * at one instant and a reply that ended at another can be set side by side without converting either.
+     */
+    fun window(): ReplySpan? {
+        var largest: Reply? = null
+        for (reply in replies.values) {
+            if (reply.bytes.get() > (largest?.bytes?.get() ?: 0L)) largest = reply
+        }
+        val reply = largest ?: return null
+        val ended = reply.endedAt
+        return ReplySpan(
+            bytes = reply.bytes.get(),
+            startedAt = reply.startedAt,
+            lastByteAt = reply.lastAt,
+            endedAt = if (ended == NOT_ENDED) null else ended,
+        )
+    }
+
     /** Forgets every reply, for a run that is beginning. */
     fun clear() = replies.clear()
 
     private companion object {
         const val NANOS_PER_MS = 1_000_000L
+
+        /** No reading of a clock is this one. */
+        const val NOT_ENDED = Long.MIN_VALUE
     }
 }
 

@@ -461,6 +461,11 @@ class CallMetricsListener : EventListener() {
     override fun responseBodyEnd(call: Call, byteCount: Long) {
         bytesRead = byteCount
         bodyEndAt = System.nanoTime()
+        // The provider's reply that was arriving has ended -- read to its end, or closed -- which the strip sets the posters'
+        // times against. Told by the listener, which already told when it began, and not by the importer: nothing the import
+        // does is asked to say anything more.
+        val action = CallMetrics.label(call.request().url)
+        if (action != "other") PerformanceLog.replyEnded(action)
     }
 
     /*

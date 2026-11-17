@@ -126,6 +126,103 @@ class ReplyGaugeTest {
         assertNull(gauge.reading())
     }
 
+    // ------------------------------------------------------------------ when it began and when it ended
+
+    @Test
+    fun `no span is told before a byte has come`() {
+        assertNull(gauge.window())
+        gauge.started("get_vod_streams", null, null)
+
+        assertNull("headers are not bytes", gauge.window())
+    }
+
+    @Test
+    fun `the span runs from the headers to the latest byte and has no end while the reply goes on`() {
+        later(1_000)
+        gauge.started("get_vod_streams", null, null)
+        later(500)
+        gauge.bytes("get_vod_streams", 2 * mb)
+        later(700)
+        gauge.bytes("get_vod_streams", 3 * mb)
+
+        val span = gauge.window()!!
+
+        assertEquals(5 * mb, span.bytes)
+        assertEquals(1_000L * 1_000_000L, span.startedAt)
+        assertEquals(2_200L * 1_000_000L, span.lastByteAt)
+        assertNull("it has not ended", span.endedAt)
+    }
+
+    @Test
+    fun `a reply that ended says when`() {
+        later(1_000)
+        gauge.started("get_vod_streams", null, null)
+        gauge.bytes("get_vod_streams", 2 * mb)
+        later(40_000)
+        gauge.finished("get_vod_streams")
+
+        val span = gauge.window()!!
+
+        assertEquals(41_000L * 1_000_000L, span.endedAt)
+    }
+
+    @Test
+    fun `the first word of an end is the last`() {
+        gauge.started("a", null, null)
+        gauge.bytes("a", 10)
+        later(1_000)
+        gauge.finished("a")
+        later(9_000)
+        gauge.finished("a")
+
+        assertEquals(1_000L * 1_000_000L, gauge.window()!!.endedAt)
+    }
+
+    @Test
+    fun `an end that nothing began is nobody's`() {
+        gauge.finished("never-started")
+
+        assertNull(gauge.window())
+    }
+
+    @Test
+    fun `a reply asked for again is not ended by the end of the one before it`() {
+        gauge.started("a", null, null)
+        gauge.bytes("a", 10)
+        gauge.finished("a")
+        later(1_000)
+        gauge.started("a", null, null)
+        gauge.bytes("a", 10)
+
+        assertNull("the reply in hand has not ended", gauge.window()!!.endedAt)
+    }
+
+    @Test
+    fun `the span is the largest reply's, as the reading is`() {
+        gauge.started("get_vod_streams", null, null)
+        gauge.bytes("get_vod_streams", 30 * mb)
+        later(5_000)
+        gauge.started("get_vod_categories", null, null)
+        gauge.bytes("get_vod_categories", 2_000L)
+        gauge.finished("get_vod_categories")
+
+        val span = gauge.window()!!
+
+        assertEquals(30 * mb, span.bytes)
+        assertNull("the small reply that ended is not the one told", span.endedAt)
+    }
+
+    @Test
+    fun `clear forgets the span`() {
+        gauge.started("a", null, null)
+        gauge.bytes("a", 100)
+        gauge.finished("a")
+
+        gauge.clear()
+
+        assertNull(gauge.window())
+    }
+
     // ------------------------------------------------------------------ how it is said
 
     @Test

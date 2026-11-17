@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.os.SystemClock
 import android.util.Log
+import com.castivio.core.common.artwork.ReplySpan
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
@@ -146,6 +147,17 @@ object PerformanceLog {
     fun replyBytes(action: String, count: Long) {
         replyGauge.bytes(action, count)
     }
+
+    /** The body of the provider's reply to [action] has ended, read to its end or closed: told by the client's listener. */
+    fun replyEnded(action: String) {
+        replyGauge.finished(action)
+    }
+
+    /**
+     * The largest reply of the load as a span of the clock -- when it began, when its last byte came, and when it ended if it
+     * has -- for the posters' times to be set against. Null while no byte of any has come.
+     */
+    fun replySpan(): ReplySpan? = replyGauge.window()
 
     /** The replies counted so far are forgotten: a run begins, and its replies are the ones the strip is to say. */
     fun forgetReplies() {

@@ -5,6 +5,7 @@ import com.castivio.core.common.artwork.ArtworkFigures
 import com.castivio.core.common.artwork.ArtworkHost
 import com.castivio.core.common.artwork.ArtworkMetrics
 import com.castivio.core.common.artwork.ArtworkTally
+import com.castivio.core.common.artwork.PosterTimeline
 import com.castivio.core.common.metadata.IdCoverage
 import com.castivio.core.common.metadata.IdCoverageFigures
 import kotlinx.coroutines.flow.first
@@ -619,6 +620,101 @@ class LoadTraceTest {
         }
 
         assertTrue(seen.toString(), seen.any { it.text.startsWith("artwork: 1 calls") })
+    }
+
+    // ------------------------------------------------- when each poster did what, against the provider's reply
+
+    @Test
+    fun `a press begins the timeline of the posters, counted from the press`() {
+        assertFalse("nothing is recorded before a load of a measuring build begins", PosterTimeline.recording)
+
+        LoadTrace.pressed(PerfSection.MOVIES, earlier(), LoadPress.OPEN)
+
+        assertTrue(PosterTimeline.recording)
+        val sincePressMs = (PosterTimeline.now() - PosterTimeline.snapshot().origin) / 1_000_000L
+        assertTrue("the press was at least five milliseconds ago: $sincePressMs", sincePressMs >= 5L)
+    }
+
+    @Test
+    fun `with the instruments off a press records nothing of the posters`() {
+        DevDiagnostics.enable(false)
+
+        LoadTrace.pressed(PerfSection.MOVIES, 1_000L, LoadPress.OPEN)
+
+        assertFalse(PosterTimeline.recording)
+    }
+
+    @Test
+    fun `a load nobody pressed Home for begins the timeline too`() {
+        LoadTrace.runStarted(PerfSection.SERIES)
+
+        assertTrue(PosterTimeline.recording)
+    }
+
+    @Test
+    fun `the load a press asked for does not begin the timeline a second time`() {
+        LoadTrace.pressed(PerfSection.MOVIES, earlier(), LoadPress.FIRST_OPENS)
+        PosterTimeline.cardAsked("https://host.example/a.jpg")
+
+        LoadTrace.runStarted(PerfSection.MOVIES)
+
+        assertEquals("the card the wall asked for while the load waited its turn is still there", 1, PosterTimeline.snapshot().cards.size)
+    }
+
+    @Test
+    fun `forgetting the sessions stops the timeline`() {
+        LoadTrace.pressed(PerfSection.MOVIES, earlier(), LoadPress.OPEN)
+
+        LoadTrace.reset()
+
+        assertFalse(PosterTimeline.recording)
+    }
+
+    @Test
+    fun `what the posters did is told in lines of their own, muted, and the first line is not one of them`() {
+        val said = listOf("posters: 3 cards asked from 3.00 s · 2 shown", "posters: no picture call yet")
+
+        val lines = LoadTrace.render(loadingMovies(), 5_000_000_000L, report = null, pulse = null, posters = said)
+        val posters = lines.filter { it.text.startsWith("posters:") }
+
+        assertEquals(said, posters.map { it.text })
+        assertTrue(posters.all { it.tone == StripTone.MUTED })
+        assertFalse("the first line is the card's: ${lines.first().text}", lines.first().text.startsWith("posters"))
+    }
+
+    @Test
+    fun `a session with no posters said has no poster lines`() {
+        val lines = LoadTrace.render(loadingMovies(), 1_000_000_000L, report = null, pulse = null)
+
+        assertTrue(lines.none { it.text.startsWith("posters") })
+    }
+
+    @Test
+    fun `only the last session tells of the posters, which were counted from its press`() = runBlocking {
+        LoadTrace.pressed(PerfSection.RADIO, earlier(), LoadPress.OPEN)
+        LoadTrace.pressed(PerfSection.CHANNELS, earlier(), LoadPress.OPEN)
+        PosterTimeline.cardAsked("https://host.example/a.jpg")
+
+        val older = withTimeout(5_000) { LoadTrace.lines(PerfSection.RADIO, runningOnly = false).first() }
+        val last = withTimeout(5_000) { LoadTrace.lines(PerfSection.CHANNELS, runningOnly = false).first() }
+
+        assertTrue("an older section's strip does not tell of posters it did not ask for", older.none { it.text.startsWith("posters:") })
+        assertTrue(last.toString(), last.any { it.text.startsWith("posters: 1 card asked") })
+    }
+
+    @Test
+    fun `the provider's reply is what the posters' lines are told against`() = runBlocking {
+        PerformanceLog.forgetReplies()
+        LoadTrace.pressed(PerfSection.MOVIES, earlier(), LoadPress.FIRST_OPENS)
+        PerformanceLog.replyStarted("get_vod_streams", encoding = null, declaredBytes = null)
+        PerformanceLog.replyBytes("get_vod_streams", 5L * 1_048_576L)
+        PerformanceLog.replyEnded("get_vod_streams")
+        PosterTimeline.cardAsked("https://host.example/a.jpg")
+
+        val lines = withTimeout(5_000) { LoadTrace.lines(PerfSection.MOVIES, runningOnly = false).first() }
+        PerformanceLog.forgetReplies()
+
+        assertTrue(lines.toString(), lines.any { it.text.startsWith("posters: reply 5.0 MB · began ") && " · ended " in it.text })
     }
 
     // ------------------------------------------------- how often the provider says what a title is at TMDB

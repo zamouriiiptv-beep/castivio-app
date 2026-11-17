@@ -11,6 +11,7 @@ import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
@@ -90,6 +91,27 @@ class ArtworkCallsTest {
         val seen = server.takeRequest(5, TimeUnit.SECONDS)!!
         assertNull(seen.getHeader(marker))
         assertEquals("image/*", seen.getHeader("Accept"))
+    }
+
+    // ------------------------------------------------------------------ the note for the client's own listener
+
+    @Test
+    fun `a picture's request carries the note that it is a picture, and a logo's does not`() {
+        val factory = calls()
+
+        assertTrue(ArtworkCalls.isPicture(factory.newCall(request(marked = true)).request()))
+        assertFalse(ArtworkCalls.isPicture(factory.newCall(request(marked = false)).request()))
+    }
+
+    @Test
+    fun `the note stays on this side of the wire`() {
+        server.enqueue(MockResponse().setBody("poster"))
+
+        fetch(calls(), request(marked = true))
+
+        val seen = server.takeRequest(5, TimeUnit.SECONDS)!!
+        assertNull("the marker is gone: ${seen.headers}", seen.getHeader(marker))
+        assertFalse("a tag is no header: ${seen.headers}", seen.headers.toString().contains("PictureTag"))
     }
 
     // ------------------------------------------------------------------ the two limits

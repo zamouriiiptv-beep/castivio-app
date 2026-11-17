@@ -31,13 +31,28 @@ class ArtworkCalls(
 
     override fun newCall(request: Request): Call {
         val marked = request.header(markerHeader) != null
-        val sent = if (marked) request.newBuilder().removeHeader(markerHeader).build() else request
+        val sent = if (marked) {
+            // The word comes off; a tag takes its place, for the client's own listener to read and for nobody else. A tag is not
+            // sent, cached or keyed on: it is a note on the request that stays on this side of the wire.
+            request.newBuilder().removeHeader(markerHeader).tag(PictureTag::class.java, PictureTag).build()
+        } else {
+            request
+        }
         val call = client.newCall(sent)
         call.timeout().timeout(if (marked) markedLimitMs else limitMs, TimeUnit.MILLISECONDS)
         return call
     }
 
+    /**
+     * The note a picture's request carries once the marker header is taken off: it is a poster or a backdrop, and not a logo.
+     * Read by [ArtworkListener], which counts what the pictures did apart from what the logos did.
+     */
+    internal object PictureTag
+
     companion object {
+
+        /** Whether [request] was made as a picture -- asked for by a poster card -- and not as a logo. */
+        internal fun isPicture(request: Request): Boolean = request.tag(PictureTag::class.java) != null
 
         /**
          * The application's client, derived for the pictures.

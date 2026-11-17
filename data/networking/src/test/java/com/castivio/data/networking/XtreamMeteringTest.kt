@@ -150,6 +150,23 @@ class XtreamMeteringTest {
     }
 
     @Test
+    fun `a reply that is being read has not ended, and one that was read to its end has`() {
+        PerformanceLog.forgetReplies()
+        server.enqueue(MockResponse().setBody(json))
+        val reader = api(metered = true).allStreams(MediaKind.LIVE)!!
+
+        reader.read(CharArray(100))
+        val whileReading = PerformanceLog.replySpan()!!
+        reader.readText()
+        reader.close()
+        val afterwards = PerformanceLog.replySpan()!!
+
+        assertNull("some of it has come and the rest has not", whileReading.endedAt)
+        assertTrue("the end is a moment at or after the first byte", afterwards.endedAt!! >= afterwards.startedAt)
+        assertEquals(json.toByteArray().size.toLong(), afterwards.bytes)
+    }
+
+    @Test
     fun `a reply sent in chunks has no declared length`() {
         PerformanceLog.forgetReplies()
         server.enqueue(MockResponse().setChunkedBody(json, 4_096))

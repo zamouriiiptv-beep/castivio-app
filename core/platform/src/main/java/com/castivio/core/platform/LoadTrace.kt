@@ -4,6 +4,8 @@ import android.os.SystemClock
 import android.util.Log
 import com.castivio.core.common.artwork.ArtworkFigures
 import com.castivio.core.common.artwork.ArtworkMetrics
+import com.castivio.core.common.artwork.PosterTimeline
+import com.castivio.core.common.artwork.PosterTimelineReport
 import com.castivio.core.common.metadata.IdCoverage
 import com.castivio.core.common.metadata.IdCoverageFigures
 import java.util.Locale
@@ -80,6 +82,7 @@ object LoadTrace {
         synchronized(lock) {
             _sessions.value = emptyMap()
             counter = 0
+            PosterTimeline.stop()
         }
     }
 
@@ -108,8 +111,10 @@ object LoadTrace {
             )
             _sessions.value = _sessions.value + (section to session)
             // The pictures are counted from the press, as the viewer's wait is: the strip says what the posters did for
-            // this opening and not for the one before it.
+            // this opening and not for the one before it. Their timeline too, counted from the instant of the press on its own
+            // clock: the press was read on the one that counts from boot, and the two differ by a constant.
             ArtworkMetrics.reset()
+            PosterTimeline.begin(originAt = PosterTimeline.now() - (SystemClock.elapsedRealtimeNanos() - pressedAtNanos))
         }
     }
 
@@ -140,6 +145,7 @@ object LoadTrace {
                         )
                         )
                     ArtworkMetrics.reset()
+                    PosterTimeline.begin()
                 }
             }
         }
@@ -249,7 +255,12 @@ object LoadTrace {
                             val report = session.settledReport ?: PerformanceLog.current.value
                                 ?.takeIf { it.section == session.section && it.run == session.run }
                             val pulse = if (session.run != null && session.settledReport == null) PerformanceLog.pulse() else null
-                            emit(render(session, SystemClock.elapsedRealtimeNanos(), report, pulse, picturesOf(session), idsOf(session)))
+                            emit(
+                                render(
+                                    session, SystemClock.elapsedRealtimeNanos(), report, pulse,
+                                    artwork = picturesOf(session), ids = idsOf(session), posters = postersOf(session),
+                                ),
+                            )
                             delay(TICK_MS)
                         }
                     }
@@ -261,7 +272,7 @@ object LoadTrace {
                             emit(
                                 render(
                                     session, session.pressedAtNanos, session.settledReport, pulse = null,
-                                    artwork = picturesOf(session), ids = idsOf(session),
+                                    artwork = picturesOf(session), ids = idsOf(session), posters = postersOf(session),
                                 ),
                             )
                             delay(AFTER_TICK_MS)
@@ -278,6 +289,20 @@ object LoadTrace {
      */
     private fun picturesOf(session: LoadSession): ArtworkFigures? =
         if (isLatest(session)) ArtworkMetrics.figures() else null
+
+    /**
+     * What each poster did and when, for [session]'s strip -- or nothing, for a session that is not the last one -- set against the
+     * provider's reply: see [PosterTimelineReport]. Counted from the last press like the tally above, and for the same reason.
+     *
+     * Read from a copy of what the recorder holds, a few hundred entries at most, and only where the instruments are on: nothing is
+     * recorded in any other build, and a snapshot of nothing says nothing.
+     */
+    private fun postersOf(session: LoadSession): List<String> =
+        if (isLatest(session)) {
+            PosterTimelineReport.describe(PosterTimeline.snapshot(), nowAt = PosterTimeline.now(), reply = PerformanceLog.replySpan())
+        } else {
+            emptyList()
+        }
 
     /**
      * How often the provider has said what a film or a show is at TMDB, for [session]'s strip -- or nothing, for a session that
@@ -297,7 +322,8 @@ object LoadTrace {
      * Pure: the clock, the import's report and its live figures are given, so what a line says can be checked
      * without a device. [report] is the run's -- the settled one once it is over -- and null for a session with
      * no load; [pulse] is the live figures of a load that is still running; [artwork] is what the pictures have done, for
-     * the session that has been counting them; [ids] is how often the provider has said what a film or a show is at TMDB.
+     * the session that has been counting them; [ids] is how often the provider has said what a film or a show is at TMDB;
+     * [posters] is what each poster did and when, already said, for the same session.
      */
     internal fun render(
         session: LoadSession,
@@ -306,6 +332,7 @@ object LoadTrace {
         pulse: LivePulse?,
         artwork: ArtworkFigures? = null,
         ids: IdCoverageFigures? = null,
+        posters: List<String> = emptyList(),
     ): List<StripLine> {
         val total = if (session.running) (nowNanos - session.pressedAtNanos) / NANOS_PER_MS else session.endedMs ?: 0L
         val tone = when (session.state) {
@@ -361,6 +388,8 @@ object LoadTrace {
         wire(report).forEach { lines += StripLine(it, StripTone.MUTED) }
 
         artwork?.describe()?.forEach { lines += StripLine(it, StripTone.MUTED) }
+
+        posters.forEach { lines += StripLine(it, StripTone.MUTED) }
 
         ids?.describe()?.let { lines += StripLine(it, StripTone.MUTED) }
 
