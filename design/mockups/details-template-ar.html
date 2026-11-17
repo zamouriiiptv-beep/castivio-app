@@ -24,6 +24,7 @@
 
     ?frame=<name>   one frame: film, show, tv, bright, none, arriving
     ?frame=sheet    (the default) every frame with its caption
+    &clean=1        with ?frame=: the screen alone, no label on it (details-template-tv-1280x720.png, details-template-phone.png)
 -->
 <html lang="ar" dir="rtl">
 <head>
@@ -49,11 +50,13 @@ svg{display:block;flex:none}
 .tv{width:960px;height:540px}
 
 /* ---------- 1. the picture: small and stretched (soft on every device), under black, under the gradient ---------- */
-.bd{position:absolute;inset:-14px;filter:blur(5px) saturate(.85);transform:scale(1.04)}
+.bd{position:absolute;inset:-14px;filter:blur(4px) saturate(.9);transform:scale(1.04)}
 .bd.dusk{background:
-  radial-gradient(9% 22% at 22% 58%,#2a1820 0%,#2a1820 60%,rgba(42,24,32,0) 100%),
-  radial-gradient(8% 20% at 30% 60%,#3a2028 0%,#3a2028 60%,rgba(58,32,40,0) 100%),
-  linear-gradient(180deg,rgba(0,0,0,0) 62%,#2b1a24 62.5%,#1d1219 100%),
+  radial-gradient(5% 16% at 20% 62%,#1a0f14 0%,#1a0f14 70%,rgba(26,15,20,0) 100%),
+  radial-gradient(5% 15% at 26% 63%,#24131a 0%,#24131a 70%,rgba(36,19,26,0) 100%),
+  repeating-linear-gradient(90deg,rgba(0,0,0,0) 0 40px,rgba(30,18,26,.9) 40px 70px,rgba(0,0,0,0) 70px 95px),
+  linear-gradient(180deg,rgba(0,0,0,0) 58%,#2b1a24 58.5%,#1d1219 100%),
+  radial-gradient(14% 22% at 62% 52%,#ffd59a 0%,#ffb565 35%,rgba(255,181,101,0) 100%),
   radial-gradient(45% 60% at 35% 35%,#f0a35a 0%,rgba(240,163,90,0) 70%),
   radial-gradient(35% 45% at 75% 60%,#7b4a8f 0%,rgba(123,74,143,0) 70%),
   linear-gradient(200deg,#3b2a55 0%,#5a3420 60%,#1d1426 100%)}
@@ -71,7 +74,15 @@ svg{display:block;flex:none}
 
 /* ---------- the page ---------- */
 .page{position:absolute;inset:0;display:flex;gap:28px;padding:17px 40px}
-.tv .page{padding:28px 48px;gap:34px}
+.tv .page{padding:30px 48px;gap:36px}
+.tv .facts{height:38px;border-radius:19px;font-size:13.5px;margin-top:12px}
+.tv .facts svg{width:16px;height:16px}
+.tv .btns{margin-top:16px}
+.tv .btn{height:54px;font-size:17px;padding:0 30px}
+.tv .rrow{margin-top:14px}
+.tv .imdb,.tv .chip{height:32px;font-size:13.5px;border-radius:16px}
+.tv .head{margin-top:16px;font-size:15px}
+.tv .more{font-size:14px}
 .poster{flex:none;border-radius:12px;border:1px solid var(--edgeSoft);overflow:hidden;position:relative;box-shadow:0 10px 30px rgba(0,0,0,.5)}
 .poster.dusk{background:linear-gradient(170deg,#f2b56b 0%,#c5683a 45%,#4a2a3c 100%)}
 .poster.ice{background:radial-gradient(60% 50% at 50% 55%,#e8f1fa 0%,#9fb6cf 45%,#2a3b55 100%)}
@@ -83,7 +94,7 @@ svg{display:block;flex:none}
 .prov{direction:ltr;text-align:right;unicode-bidi:plaintext}
 .trow{display:flex;align-items:center;gap:8px}
 .name{flex:1;font-weight:700;font-size:24px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--strong);text-shadow:0 1px 10px rgba(0,0,0,.6)}
-.tv .name{font-size:28px}
+.tv .name{font-size:34px}
 .back{flex:none;width:40px;height:40px;border-radius:10px;background:var(--solid);border:1px solid var(--glassBorder);display:flex;align-items:center;justify-content:center}
 .back svg{width:20px;height:20px;fill:var(--azure)}
 /* 3. dark, near-opaque grounds */
@@ -109,10 +120,11 @@ svg{display:block;flex:none}
 .more svg{width:14px;height:14px;fill:var(--azure)}
 /* 4. strong words */
 .plot{margin-top:3px;font-size:12.5px;line-height:1.55;color:var(--strong);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-shadow:0 1px 6px rgba(0,0,0,.55)}
-.tv .plot{font-size:14px;-webkit-line-clamp:3}
+.tv .plot{font-size:16px;-webkit-line-clamp:4;margin-top:6px}
 .people{margin-top:6px;font-size:12px;color:var(--strong);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .people b{font:600 12px "Noto Sans Arabic",sans-serif;color:var(--label)}
-.tv .people{font-size:13px}
+.tv .people{font-size:15px;margin-top:10px}
+.tv .people b{font-size:15px}
 
 /* ---------- 5. what is a show's own, below: on the plain ground ---------- */
 .below{position:absolute;left:40px;right:40px;top:322px}
@@ -144,7 +156,7 @@ const bar=(xs)=>`<div class="facts">${xs.join('<i></i>')}</div>`;
 
 /* the one template: every page fills the same slots, and a slot it has nothing for is left out */
 function template(d,{tv,focus,pic}){
-  const pw=tv?200:165, ph=Math.round(pw*1.5);
+  const pw=tv?300:165, ph=Math.round(pw*1.5);
   return `<div class="page">
     <div class="poster ${pic}" style="width:${pw}px;height:${ph}px"><b>${d.posterWord}</b></div>
     <div class="info">
@@ -194,6 +206,8 @@ const q=new URLSearchParams(location.search).get('frame')||'sheet';
 const out=document.getElementById('out');
 if(q==='sheet'){document.body.classList.add('sheet');out.innerHTML=Object.values(frames).map(f=>`<div class="cap">${f.c}</div>${f.h}`).join('');}
 else out.innerHTML=frames[q].h;
+// ?clean=1: the screen alone, with no label of the drawing's own on it.
+if(new URLSearchParams(location.search).get('clean')) document.querySelectorAll('.tag,.legend').forEach(e=>e.remove());
 </script>
 </body>
 </html>
