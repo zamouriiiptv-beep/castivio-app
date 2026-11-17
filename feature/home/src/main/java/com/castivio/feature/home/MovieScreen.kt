@@ -26,8 +26,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.rounded.CalendarMonth
 import androidx.compose.material.icons.rounded.Category
-import androidx.compose.material.icons.rounded.Favorite
-import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.Groups
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.PlayArrow
@@ -279,14 +277,12 @@ fun MovieScreen(
                             enabled = selection != null,
                             modifier = Modifier.focusRequester(playFocus),
                         )
-                        CastivioButton(
+                        PageFavorite(
+                            favorite = favorite,
                             text = stringResource(
                                 if (favorite) R.string.movie_favorite_remove else R.string.movie_favorite_add,
                             ),
                             onClick = { favorites.flip(movie.id) },
-                            weight = ButtonWeight.Secondary,
-                            icon = if (favorite) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
-                            iconTint = if (favorite) colors.secondary else null,
                         )
                     }
                     val rating = known?.rating

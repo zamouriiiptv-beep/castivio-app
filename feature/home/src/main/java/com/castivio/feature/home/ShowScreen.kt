@@ -33,8 +33,6 @@ import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.material.icons.rounded.CalendarToday
 import androidx.compose.material.icons.rounded.CheckCircle
-import androidx.compose.material.icons.rounded.Favorite
-import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Layers
 import androidx.compose.material.icons.rounded.Person
@@ -486,11 +484,10 @@ private fun ShowTop(
                         enabled = target != null,
                         modifier = Modifier.focusRequester(playFocus),
                     )
-                    CastivioButton(
+                    PageFavorite(
+                        favorite = state.favorite,
                         text = stringResource(if (state.favorite) R.string.show_favorite_remove else R.string.show_favorite_add),
                         onClick = onFavorite,
-                        weight = ButtonWeight.Secondary,
-                        icon = if (state.favorite) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
                     )
                 }
             }
