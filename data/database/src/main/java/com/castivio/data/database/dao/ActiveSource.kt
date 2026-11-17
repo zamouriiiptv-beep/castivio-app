@@ -57,13 +57,13 @@ internal const val NOT_HIDDEN_M =
 internal const val HIDDEN_IN_KIND =
     "((SELECT COUNT(*) FROM media m WHERE m.source_id = $ACTIVE_SOURCE AND m.kind = :kind " +
         "AND m.group_id IN (SELECT item_id FROM hidden_item WHERE type = 'BOUQUET')) " +
-        "+ (SELECT COUNT(*) FROM hidden_item h INNER JOIN media m ON m.id = h.item_id " +
+        "+ (SELECT COUNT(*) FROM hidden_item h CROSS JOIN media m ON m.id = h.item_id " +
         "WHERE h.type = 'CHANNEL' AND m.source_id = $ACTIVE_SOURCE AND m.kind = :kind " +
         "AND (m.group_id IS NULL OR m.group_id NOT IN (SELECT item_id FROM hidden_item WHERE type = 'BOUQUET'))))"
 
 /** The channels of `:groupId` the viewer hid one by one, counted from the hidden items -- see [HIDDEN_IN_KIND]. */
 internal const val HIDDEN_IN_GROUP =
-    "(SELECT COUNT(*) FROM hidden_item h INNER JOIN media m ON m.id = h.item_id " +
+    "(SELECT COUNT(*) FROM hidden_item h CROSS JOIN media m ON m.id = h.item_id " +
         "WHERE h.type = 'CHANNEL' AND m.source_id = $ACTIVE_SOURCE AND m.kind = :kind AND m.group_id = :groupId)"
 
 /**

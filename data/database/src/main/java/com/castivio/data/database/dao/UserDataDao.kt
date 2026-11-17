@@ -58,7 +58,7 @@ interface FavoriteDao {
     @Query(
         """
         SELECT m.* FROM favorite f
-        INNER JOIN media m ON m.id = f.media_id
+        CROSS JOIN media m ON m.id = f.media_id
         WHERE m.source_id = $ACTIVE_SOURCE AND $NOT_HIDDEN_M
         ORDER BY f.added_at DESC, m.id
         """,
@@ -111,7 +111,7 @@ interface ProgressDao {
         SELECT m.*, p.media_id AS p_media_id, p.position_ms AS p_position_ms,
                p.duration_ms AS p_duration_ms, p.updated_at AS p_updated_at
         FROM playback_progress p
-        INNER JOIN media m ON m.id = p.media_id
+        CROSS JOIN media m ON m.id = p.media_id
         WHERE m.source_id = $ACTIVE_SOURCE
           AND p.position_ms > 0
           AND (p.duration_ms IS NULL OR p.position_ms * 100 < p.duration_ms * 95)
@@ -130,7 +130,7 @@ interface ProgressDao {
         SELECT m.*, p.media_id AS p_media_id, p.position_ms AS p_position_ms,
                p.duration_ms AS p_duration_ms, p.updated_at AS p_updated_at
         FROM playback_progress p
-        INNER JOIN media m ON m.id = p.media_id
+        CROSS JOIN media m ON m.id = p.media_id
         WHERE m.source_id = $ACTIVE_SOURCE
         ORDER BY p.updated_at DESC, m.id
         """,
@@ -147,7 +147,7 @@ interface ProgressDao {
         SELECT m.*, p.media_id AS p_media_id, p.position_ms AS p_position_ms,
                p.duration_ms AS p_duration_ms, p.updated_at AS p_updated_at
         FROM playback_progress p
-        INNER JOIN media m ON m.id = p.media_id
+        CROSS JOIN media m ON m.id = p.media_id
         WHERE m.source_id = $ACTIVE_SOURCE AND $NOT_HIDDEN_M AND m.kind = :kind
         ORDER BY p.updated_at DESC, m.id
         LIMIT 1

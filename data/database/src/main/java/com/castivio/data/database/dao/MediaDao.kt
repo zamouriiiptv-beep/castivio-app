@@ -252,7 +252,7 @@ interface MediaDao {
     @Query(
         """
         SELECT m.* FROM favorite f
-        INNER JOIN media m ON m.id = f.media_id
+        CROSS JOIN media m ON m.id = f.media_id
         WHERE m.source_id = $ACTIVE_SOURCE AND $NOT_HIDDEN_M AND m.kind = :kind
         ORDER BY m.provider_order, m.id LIMIT :limit OFFSET :offset
         """,
@@ -268,7 +268,7 @@ interface MediaDao {
     @Query(
         """
         SELECT m.* FROM playback_progress p
-        INNER JOIN media m ON m.id = p.media_id
+        CROSS JOIN media m ON m.id = p.media_id
         WHERE m.source_id = $ACTIVE_SOURCE AND $NOT_HIDDEN_M AND m.kind = :kind
         ORDER BY p.updated_at DESC, m.id LIMIT :limit OFFSET :offset
         """,
@@ -283,7 +283,7 @@ interface MediaDao {
     @Query(
         """
         SELECT m.* FROM playback_progress p
-        INNER JOIN media m ON m.id = p.media_id
+        CROSS JOIN media m ON m.id = p.media_id
         WHERE m.source_id = $ACTIVE_SOURCE AND $NOT_HIDDEN_M AND m.kind = :kind
         ORDER BY p.updated_at DESC, m.id LIMIT :limit
         """,
@@ -328,7 +328,7 @@ interface MediaDao {
     @Query(
         """
         SELECT COUNT(*) FROM favorite f
-        INNER JOIN media m ON m.id = f.media_id
+        CROSS JOIN media m ON m.id = f.media_id
         WHERE m.source_id = $ACTIVE_SOURCE AND $NOT_HIDDEN_M AND m.kind = :kind
         AND (m.provider_order < :providerOrder OR (m.provider_order = :providerOrder AND m.id < :id))
         """,
@@ -339,7 +339,7 @@ interface MediaDao {
     @Query(
         """
         SELECT COUNT(*) FROM favorite f
-        INNER JOIN media m ON m.id = f.media_id
+        CROSS JOIN media m ON m.id = f.media_id
         WHERE m.source_id = $ACTIVE_SOURCE AND $NOT_HIDDEN_M AND m.kind = :kind
         """,
     )
@@ -349,7 +349,7 @@ interface MediaDao {
     @Query(
         """
         SELECT COUNT(*) FROM playback_progress p
-        INNER JOIN media m ON m.id = p.media_id
+        CROSS JOIN media m ON m.id = p.media_id
         WHERE m.source_id = $ACTIVE_SOURCE AND $NOT_HIDDEN_M AND m.kind = :kind
         """,
     )
@@ -623,7 +623,7 @@ interface MediaDao {
                (SELECT COUNT(DISTINCT e.season_number) FROM media e WHERE e.series_id = m.series_id AND e.source_id = m.source_id) AS seasonCount,
                m.provider_order AS providerOrder
         FROM favorite f
-        INNER JOIN media m ON m.id = f.media_id
+        CROSS JOIN media m ON m.id = f.media_id
         WHERE m.source_id = $ACTIVE_SOURCE AND m.kind = 'SERIES' AND m.series_id IS NOT NULL AND m.episode_number IS NULL
         ORDER BY m.provider_order, m.id
         LIMIT :limit OFFSET :offset
@@ -656,7 +656,7 @@ interface MediaDao {
         INNER JOIN (
             SELECT w.series_id AS showId, MAX(p.updated_at) AS watchedAt
             FROM playback_progress p
-            INNER JOIN media w ON w.id = p.media_id
+            CROSS JOIN media w ON w.id = p.media_id
             WHERE w.source_id = $ACTIVE_SOURCE AND w.kind = 'SERIES' AND w.series_id IS NOT NULL
               AND w.episode_number IS NOT NULL
             GROUP BY w.series_id

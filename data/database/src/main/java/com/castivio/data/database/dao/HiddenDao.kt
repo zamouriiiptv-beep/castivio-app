@@ -34,7 +34,7 @@ interface HiddenDao {
         """
         SELECT m.group_id AS groupId, COUNT(*) AS hidden
         FROM hidden_item h
-        INNER JOIN media m ON m.id = h.item_id
+        CROSS JOIN media m ON m.id = h.item_id
         WHERE h.type = 'CHANNEL' AND m.source_id = $ACTIVE_SOURCE
         GROUP BY m.group_id
         """,

@@ -956,6 +956,30 @@ PYSWITCH
   fi
 fi
 
+# ------------------------------------------- a small table joined to the catalogue
+# The viewer's own tables -- favourites, what was watched, what was hidden -- hold a
+# few rows; `media` holds the whole subscription. Written `FROM favorite f INNER JOIN
+# media m`, SQLite chose to walk every row of the subscription through the source's
+# index and look each one up in the small table: 150 to 270 ms a run against 0.03 to
+# 0.2 ms the other way round, on a copy of the tables at 246,000 rows, and these
+# queries run again on every write of an import. `CROSS JOIN` is how SQLite is told
+# to keep the order as written (LOCAL_CHANGES.md section 133).
+hits=$(grep -rn --include='*.kt' -A1 -E 'FROM (playback_progress|favorite|hidden_item) [a-z]+ *("|$)' data/ \
+        | grep -E 'INNER JOIN media ' || true)
+if [ -n "$hits" ]; then
+  fail "A small table is joined to media with INNER JOIN, which lets SQLite walk the whole catalogue" \
+       "$hits
+
+  Write CROSS JOIN, so the small table drives the join."
+fi
+same_line=$(grep -rn --include='*.kt' -E 'FROM (playback_progress|favorite|hidden_item) [a-z]+ +INNER JOIN media ' data/ || true)
+if [ -n "$same_line" ]; then
+  fail "A small table is joined to media with INNER JOIN, which lets SQLite walk the whole catalogue" \
+       "$same_line
+
+  Write CROSS JOIN, so the small table drives the join."
+fi
+
 # ------------------------------------------------------------------------ report
 if [ "$failures" -eq 0 ]; then
   echo "Design invariants: all mechanical checks pass."
