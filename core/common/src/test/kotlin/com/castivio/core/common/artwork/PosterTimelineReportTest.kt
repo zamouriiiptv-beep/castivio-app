@@ -140,7 +140,7 @@ class PosterTimelineReportTest {
         assertEquals(
             listOf(
                 "posters: 21 cards asked from 3.00 s · 20 shown · 1st 5.00 s · 10th 14.00 s · 20th 24.00 s",
-                "posters: a card waited, asked to shown, 10.91/18.83/20.81 s (median/p90/longest) · 1 still without one",
+                "posters: a card waited on screen, came to shown, 10.91/18.83/20.81 s (median/p90/longest) · 1 still without one",
                 "posters: reply 78.0 MB · began 1.90 s · ended 52.40 s · the 20th poster came 28.40 s before it ended",
                 "posters: 8 calls · ok 4 · cache 1 · cancelled 1 · failed 1 · going 1 · first began 1.00 s" +
                     " · peak at once: open 3, running 2, waiting 2",
@@ -290,6 +290,44 @@ class PosterTimelineReportTest {
         } finally {
             java.util.Locale.setDefault(saved)
         }
+    }
+
+    @Test
+    fun `a card scrolled past and back waits from its return, and the empty departures are told`() {
+        recorder.begin(originAt = 0L)
+        // a: on screen at 1 s, shown at 1.5 s.
+        at(1_000); recorder.cardAsked("https://host.example/a.jpg")
+        at(1_500); recorder.cardShown("https://host.example/a.jpg")
+        // b: on screen at 1 s, scrolled past empty at 1.2 s, back at 11 s, shown at 11.8 s -- it waited 0.8 s, not 10.8.
+        at(1_000); recorder.cardAsked("https://host.example/b.jpg")
+        at(1_200); recorder.cardLeft("https://host.example/b.jpg")
+        at(11_000); recorder.cardAsked("https://host.example/b.jpg")
+        at(11_800); recorder.cardShown("https://host.example/b.jpg")
+        // c: on screen at 2 s, scrolled past empty at 2.1 s, never back.
+        at(2_000); recorder.cardAsked("https://host.example/c.jpg")
+        at(2_100); recorder.cardLeft("https://host.example/c.jpg")
+
+        val lines = describe(reply = null)
+
+        assertTrue(lines.toString(), lines.contains("posters: 3 cards asked from 1.00 s · 2 shown · 1st 1.50 s"))
+        assertTrue(
+            lines.toString(),
+            lines.contains(
+                "posters: a card waited on screen, came to shown, 0.50/0.80/0.80 s (median/p90/longest)" +
+                    " · 1 still without one · left the screen empty 2 times",
+            ),
+        )
+    }
+
+    @Test
+    fun `cards that all left empty are still told`() {
+        recorder.begin(originAt = 0L)
+        at(1_000); recorder.cardAsked("https://host.example/a.jpg")
+        at(1_100); recorder.cardLeft("https://host.example/a.jpg")
+
+        val lines = describe(reply = null)
+
+        assertTrue(lines.toString(), lines.contains("posters: no card has its picture yet · 1 still without one · left the screen empty 1 time"))
     }
 
     private companion object {

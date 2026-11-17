@@ -218,8 +218,15 @@ class CallFigures internal constructor(
     private fun earliest(vararg instants: Long): Long? = instants.filter { it != NEVER }.minOrNull()
 }
 
-/** A card of the wall: when its poster was asked for, and when the picture was handed to it. */
-class CardFigures internal constructor(val askedAt: Long, val shownAt: Long) {
+/**
+ * A card of the wall: when its poster was first asked for, when the picture was handed to it, and what the viewer waited.
+ *
+ * [waitNanos] is counted from the card's **last coming on screen** before its picture came, not from its first: a card the
+ * viewer scrolled past, whose call was given up, and that came back ten seconds later waited for as long as it was back, and
+ * not for the ten seconds it was off the screen. [leftEmpty] is how many times it left the screen with no picture -- a wait the
+ * viewer abandoned, told apart rather than folded into a time.
+ */
+class CardFigures internal constructor(val askedAt: Long, val shownAt: Long, val waitNanos: Long, val leftEmpty: Int) {
     val shown: Boolean get() = shownAt != NEVER
 }
 
@@ -291,6 +298,15 @@ open class PosterTimelineRecorder(
 
     private class Card(val askedAt: Long) {
         @Volatile var shownAt = NEVER
+
+        /** When it last came on screen: the start of the wait that counts. */
+        @Volatile var visitAt = askedAt
+
+        @Volatile var onScreen = true
+
+        @Volatile var waitNanos = NEVER
+
+        @Volatile var leftEmpty = 0
     }
 
     /** True from [begin] on: what the hooks check first, and the only thing they do when it is false. */
@@ -342,12 +358,23 @@ open class PosterTimelineRecorder(
         }
     }
 
-    /** The card for the poster at [url] has asked for it. The first time counts: a card scrolled away and back is the same card. */
+    /**
+     * The card for the poster at [url] is on screen and has asked for it. Said on every composition; only the first after the
+     * card came on screen counts. A card scrolled away and back is the same card -- counted once, its first ask kept -- and its
+     * wait begins again from its return.
+     */
     fun cardAsked(url: String) {
         if (!recording) return
         val key = keyOf(url)
         synchronized(lock) {
-            if (cardsByKey.containsKey(key)) return
+            val known = cardsByKey[key]
+            if (known != null) {
+                if (!known.onScreen) {
+                    known.onScreen = true
+                    known.visitAt = clock()
+                }
+                return
+            }
             if (cards.size >= cardCapacity) {
                 droppedCards++
                 return
@@ -364,7 +391,22 @@ open class PosterTimelineRecorder(
         val key = keyOf(url)
         synchronized(lock) {
             val card = cardsByKey[key] ?: return
-            if (card.shownAt == NEVER) card.shownAt = clock()
+            if (card.shownAt == NEVER) {
+                card.shownAt = clock()
+                card.waitNanos = card.shownAt - card.visitAt
+            }
+        }
+    }
+
+    /** The card for the poster at [url] left the screen. Without its picture, that is a wait the viewer gave up on. */
+    fun cardLeft(url: String) {
+        if (!recording) return
+        val key = keyOf(url)
+        synchronized(lock) {
+            val card = cardsByKey[key] ?: return
+            if (!card.onScreen) return
+            card.onScreen = false
+            if (card.shownAt == NEVER) card.leftEmpty++
         }
     }
 
@@ -373,7 +415,7 @@ open class PosterTimelineRecorder(
         PosterTimelineSnapshot(
             origin = origin,
             calls = calls.map { it.figures() },
-            cards = cards.map { CardFigures(it.askedAt, it.shownAt) },
+            cards = cards.map { CardFigures(it.askedAt, it.shownAt, it.waitNanos, it.leftEmpty) },
             droppedCalls = droppedCalls,
             droppedCards = droppedCards,
         )

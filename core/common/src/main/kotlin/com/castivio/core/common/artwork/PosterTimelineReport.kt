@@ -18,7 +18,8 @@ import java.util.Locale
  *     share (the public picture host) is the control for the one it does.
  *
  * And the viewer's own question, from the card: when the first, the tenth and the twentieth poster had its picture, against when
- * the reply ended, and how long a card waited between asking and having it.
+ * the reply ended, and how long a card waited **on screen** for it -- from its last coming on screen to its picture, so a card
+ * scrolled past and back is not charged for the time it was away -- and how often a card left the screen still empty.
  *
  * Every time is in seconds from the press. A figure that has no call to be made of is a dash and never a zero. **Trios** are the
  * median, the 90th percentile and the slowest -- nearest rank, so that each is a time a call really had -- because a mean said
@@ -64,11 +65,16 @@ object PosterTimelineReport {
                 .joinToString("") { " · ${ordinal(it)} ${secs(shown[it - 1] - origin)}" }
             lines += "posters: ${if (cards.size == 1) "1 card" else "${cards.size} cards"} asked$notRecorded$firstAsked" +
                 " · ${shown.size} shown$marks"
-            val waits = cards.filter { it.shown }.map { it.shownAt - it.askedAt }
-            trio(waits)?.let {
-                val empty = cards.size - shown.size
-                lines += "posters: a card waited, asked to shown, $it s (median/p90/longest)" +
-                    if (empty > 0) " · $empty still without one" else ""
+            val waits = cards.filter { it.shown }.map { it.waitNanos }
+            val empty = cards.size - shown.size
+            val left = cards.sumOf { it.leftEmpty }
+            val tail = (if (empty > 0) " · $empty still without one" else "") +
+                (if (left > 0) " · left the screen empty $left ${if (left == 1) "time" else "times"}" else "")
+            val waited = trio(waits)
+            if (waited != null) {
+                lines += "posters: a card waited on screen, came to shown, $waited s (median/p90/longest)$tail"
+            } else if (tail.isNotEmpty()) {
+                lines += "posters: no card has its picture yet$tail"
             }
         }
         lines += replyLine(origin, reply, shown)

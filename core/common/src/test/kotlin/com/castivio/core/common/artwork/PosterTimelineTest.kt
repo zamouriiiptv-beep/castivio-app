@@ -191,6 +191,48 @@ class PosterTimelineTest {
     }
 
     @Test
+    fun `a card's wait is from its last coming on screen, and an empty departure is counted once`() {
+        recorder.begin(originAt = 0L)
+        at(100)
+        recorder.cardAsked("https://host/a.jpg")
+        at(300)
+        recorder.cardLeft("https://host/a.jpg")
+        at(350)
+        recorder.cardLeft("https://host/a.jpg") // said twice, one departure
+        at(5_000)
+        recorder.cardAsked("https://host/a.jpg")
+        at(5_100)
+        recorder.cardAsked("https://host/a.jpg") // a recomposition, not a return
+        at(5_400)
+        recorder.cardShown("https://host/a.jpg")
+        at(6_000)
+        recorder.cardLeft("https://host/a.jpg") // left with its picture: not an abandoned wait
+
+        val card = recorder.snapshot().cards.single()
+
+        assertEquals(ms(100), card.askedAt)
+        assertEquals(ms(5_400), card.shownAt)
+        assertEquals(ms(400), card.waitNanos)
+        assertEquals(1, card.leftEmpty)
+    }
+
+    @Test
+    fun `a card shown on its first visit waits from its first ask, and leaving before a load is nothing`() {
+        recorder.cardLeft("https://host/a.jpg")
+        recorder.begin(originAt = 0L)
+        recorder.cardLeft("https://host/never-asked.jpg")
+        at(100)
+        recorder.cardAsked("https://host/a.jpg")
+        at(700)
+        recorder.cardShown("https://host/a.jpg")
+
+        val card = recorder.snapshot().cards.single()
+
+        assertEquals(ms(600), card.waitNanos)
+        assertEquals(0, card.leftEmpty)
+    }
+
+    @Test
     fun `a picture that was handed to a card nobody asked about is nobody's`() {
         recorder.begin(originAt = 0L)
         recorder.cardShown("https://host/never-asked.jpg")

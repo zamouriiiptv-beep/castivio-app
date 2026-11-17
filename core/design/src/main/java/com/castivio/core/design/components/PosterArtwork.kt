@@ -15,6 +15,7 @@ import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
@@ -109,6 +110,9 @@ internal fun PosterArtwork(
     // Told to the poster timeline -- which holds nothing until a load of a debuggable build begins -- so that when a card asked and
     // when it had its picture can be set against what the connection was doing. The first time counts; a card asking again is one.
     SideEffect { PosterTimeline.cardAsked(url) }
+    // And when the card leaves the screen, so that a card scrolled past and back waits from its return, and a card left empty is
+    // counted as one. Keyed to the url: a recycled cell that shows another title has left the first.
+    DisposableEffect(url) { onDispose { PosterTimeline.cardLeft(url) } }
 
     if (failedNow) return
     AsyncImage(
