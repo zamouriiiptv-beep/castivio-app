@@ -1,0 +1,229 @@
+<!doctype html>
+<!--
+  One page for a film and a show, over the title's own wide picture. Drawn before code, at the owner's order
+  ("صمم الشكل الموحد بالخلفية") after he set his two pages side by side and asked which was better.
+
+  What each page had:
+    - The film's page (movie-page-rtl-ar.html, built): the clearer order -- the name with the way back, ONE bar of facts,
+      the two buttons, the rating and the date, the plot with "Show all", the people -- and the large poster at the start.
+      No picture behind it.
+    - The show's page (series-page.html, built): the provider's wide picture behind the hero, which reads as a cinema
+      app -- but drawn as a box that stops two thirds across with a hard edge, the plot set straight on the picture with
+      nothing to keep it legible, and its facts as loose words rather than the film's bar.
+
+  What this drawing settles: ONE page for both. The film's order, unchanged. Behind it, the title's wide picture across
+  the WHOLE screen -- no box, no edge -- dimmed, softened a little, and darkened by a gradient that is deepest under the
+  text (the end side in Arabic, the left) and opens toward the poster, and that closes to the ground colour at the foot,
+  so what follows (a show's seasons and episodes) stands on the plain ground as before. The text never sits on raw
+  picture: the scrim is drawn in every frame, and the bright picture below is the case that proves it.
+
+  Not the picture's job:
+    - The page never waits for it. The page is drawn on the ground first (the frame "arriving"); the picture fades in
+      when it has come, over 300 ms, or not at all at the lowest motion level. A title with no wide picture is the
+      film's page as it is today (the frame "none").
+    - It is asked for at the screen's size, not the provider's: w1280 on TMDB (PosterSize's rule, one step), so a
+      phone does not pull an original of several megabytes for a picture it dims to a third.
+
+  Colours are Color.kt tokens. The pictures are stand-ins drawn in CSS; the names, facts and plots are examples.
+
+    ?frame=<name>   one frame: film, show, show-scrolled, tv, bright, arriving, none
+    ?frame=sheet    (the default) every frame with its caption
+-->
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Unified details page</title>
+<style>
+:root{
+  --ground:#111327; --panel:#20223A; --edgeSoft:rgba(255,255,255,.08);
+  --glass:rgba(255,255,255,.07); --glassBorder:rgba(255,255,255,.16);
+  --azure:#4C9BFF; --azureDeep:#2F6FE0; --gold:#F5C518; --ink:#D6D3E8; --strong:#FFFFFF; --muted:#9A9AB6;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#05040E;color:var(--strong);font-family:Inter,"Noto Sans Arabic","DejaVu Sans",sans-serif}
+body.sheet{padding:22px;width:max-content;direction:ltr}
+svg{display:block;flex:none}
+.cap{direction:rtl;text-align:right;width:960px;font:15px/1.6 "Noto Sans Arabic",Inter,sans-serif;color:#a4a4c0;margin:22px 0 10px}
+.cap b{color:#fff}
+
+.screen{position:relative;overflow:hidden;direction:rtl;background:var(--ground)}
+.phone{width:833px;height:385px}
+.tv{width:960px;height:540px}
+
+/* ---------- the picture behind: whole screen, dimmed, softened, under a scrim ---------- */
+.bd{position:absolute;inset:-12px;filter:blur(1.5px) saturate(1) brightness(.85);transform:scale(1.03)}
+.bd.ice{background:
+  radial-gradient(6% 26% at 28% 52%,#e9eef5 0%,#c9d6e6 55%,rgba(201,214,230,0) 100%),
+  linear-gradient(180deg,rgba(0,0,0,0) 70%,#8fa6c2 70.5%,#3c536f 100%),
+  radial-gradient(40% 55% at 70% 45%,#cfe0ef 0%,rgba(207,224,239,0) 70%),
+  radial-gradient(30% 40% at 30% 70%,#6d8bb0 0%,rgba(109,139,176,0) 70%),
+  linear-gradient(160deg,#28405f 0%,#16243a 55%,#0b1222 100%)}
+.bd.dusk{background:
+  radial-gradient(9% 22% at 22% 58%,#2a1820 0%,#2a1820 60%,rgba(42,24,32,0) 100%),
+  radial-gradient(8% 20% at 30% 60%,#3a2028 0%,#3a2028 60%,rgba(58,32,40,0) 100%),
+  linear-gradient(180deg,rgba(0,0,0,0) 62%,#2b1a24 62.5%,#1d1219 100%),
+  radial-gradient(45% 60% at 35% 35%,#f0a35a 0%,rgba(240,163,90,0) 70%),
+  radial-gradient(35% 45% at 75% 60%,#7b4a8f 0%,rgba(123,74,143,0) 70%),
+  linear-gradient(200deg,#3b2a55 0%,#5a3420 60%,#1d1426 100%)}
+.bd.snow{filter:blur(1.5px) brightness(.9);background:
+  radial-gradient(60% 70% at 40% 40%,#ffffff 0%,#f2f4f8 40%,rgba(242,244,248,0) 80%),
+  linear-gradient(180deg,#e8ecf2,#cfd6e0)}
+/* deepest under the text (the end side, left in Arabic), open toward the poster, closed at the foot */
+.scrim{position:absolute;inset:0;background:
+  linear-gradient(to right,rgba(17,19,39,.90) 0%,rgba(17,19,39,.70) 40%,rgba(17,19,39,.25) 75%,rgba(17,19,39,.05) 100%),
+  linear-gradient(to bottom,rgba(17,19,39,0) 55%,var(--ground) 100%)}
+.fading .bd{opacity:.35}
+
+/* ---------- the page: the film's order, unchanged ---------- */
+.page{position:absolute;inset:0;display:flex;gap:28px;padding:17px 40px}
+.tv .page{padding:28px 48px;gap:34px}
+.poster{flex:none;border-radius:12px;border:1px solid var(--edgeSoft);overflow:hidden;position:relative;
+  box-shadow:0 10px 30px rgba(0,0,0,.45)}
+.poster.ice{background:radial-gradient(60% 50% at 50% 55%,#e8f1fa 0%,#9fb6cf 45%,#2a3b55 100%)}
+.poster.dusk{background:linear-gradient(170deg,#f2b56b 0%,#c5683a 45%,#4a2a3c 100%)}
+.poster.snow{background:linear-gradient(170deg,#ffffff 0%,#dfe5ee 60%,#9aa7b8 100%)}
+.poster.flat{background:linear-gradient(170deg,#e6c970 0%,#c99d3c 45%,#8a6422 100%)}
+.poster b{position:absolute;left:0;right:0;top:9%;text-align:center;font:800 12px/1 Inter,sans-serif;letter-spacing:4px;
+  color:rgba(255,255,255,.9);direction:ltr}
+.poster.snow b{color:#3a4250}
+.info{flex:1;min-width:0;display:flex;flex-direction:column}
+.prov{direction:ltr;text-align:right;unicode-bidi:plaintext}
+.trow{display:flex;align-items:center;gap:8px}
+.name{flex:1;font-weight:700;font-size:25px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  text-shadow:0 1px 8px rgba(0,0,0,.5)}
+.tv .name{font-size:28px}
+.back{flex:none;width:40px;height:40px;border-radius:10px;background:var(--glass);border:1px solid var(--glassBorder);
+  display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
+.back svg{width:20px;height:20px;fill:var(--azure)}
+.facts{margin-top:8px;height:32px;border-radius:16px;background:rgba(17,19,39,.55);border:1px solid var(--edgeSoft);
+  display:flex;align-items:center;padding:0 14px;font-size:11.5px;white-space:nowrap;overflow:hidden;align-self:flex-start;
+  backdrop-filter:blur(6px)}
+.facts i{flex:none;width:1px;height:16px;background:var(--glassBorder);margin:0 10px}
+.facts span{display:flex;align-items:center;gap:6px;flex:none;color:var(--ink)}
+.facts svg{width:14px;height:14px;fill:var(--ink)}
+.facts .star svg{fill:var(--gold)}
+.btns{margin-top:12px;display:flex;gap:10px}
+.btn{height:48px;border-radius:12px;display:flex;align-items:center;gap:8px;padding:0 24px;font:600 15px "Noto Sans Arabic",Inter,sans-serif}
+.btn svg{width:20px;height:20px}
+.btn.p{background:linear-gradient(180deg,#4C9BFF,#2F6FE0);color:#fff;box-shadow:0 6px 18px rgba(47,111,224,.35)} .btn.p svg{fill:#fff}
+.btn.s{background:rgba(17,19,39,.55);border:1px solid var(--glassBorder);color:var(--ink);backdrop-filter:blur(6px)} .btn.s svg{fill:var(--ink)}
+.btn.focus{outline:3px solid #6FB2FF;outline-offset:2px}
+.rrow{margin-top:10px;display:flex;gap:10px;align-items:center}
+.imdb{display:flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:14px;border:1.5px solid var(--gold);
+  font:700 12px Inter,sans-serif;background:rgba(17,19,39,.55)}
+.imdb small{background:var(--gold);color:#000;font:900 10px Inter,sans-serif;padding:2px 5px;border-radius:4px}
+.imdb svg{width:13px;height:13px;fill:var(--gold)}
+.chip{height:28px;padding:0 12px;border-radius:14px;background:rgba(17,19,39,.55);border:1px solid var(--edgeSoft);
+  display:flex;align-items:center;gap:6px;font:12px "Noto Sans Arabic",Inter,sans-serif;color:var(--ink)}
+.chip svg{width:13px;height:13px;fill:var(--ink)}
+.head{margin-top:12px;display:flex;justify-content:space-between;align-items:center;font:700 13px "Noto Sans Arabic",sans-serif}
+.more{color:var(--azure);font:600 12px "Noto Sans Arabic",sans-serif;display:flex;gap:4px;align-items:center;white-space:nowrap}
+.more svg{width:14px;height:14px;fill:var(--azure)}
+.plot{margin-top:4px;font-size:12.5px;line-height:1.55;color:var(--ink);display:-webkit-box;-webkit-line-clamp:3;
+  -webkit-box-orient:vertical;overflow:hidden;text-shadow:0 1px 6px rgba(0,0,0,.45)}
+.tv .plot{font-size:14px;-webkit-line-clamp:4}
+.people{margin-top:8px;font-size:12px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.people b{font-family:"Noto Sans Arabic",sans-serif;font-weight:600;color:var(--muted)}
+
+/* ---------- a show's seasons and episodes, on the plain ground below the hero ---------- */
+.below{position:absolute;left:40px;right:40px;top:310px}
+.season{height:48px;border-radius:14px;background:var(--panel);border:1px solid var(--edgeSoft);display:flex;align-items:center;
+  justify-content:space-between;padding:0 16px;font:600 14px "Noto Sans Arabic",sans-serif}
+.season small{color:var(--muted);font-weight:400}
+.ep{margin-top:10px;height:66px;border-radius:14px;background:var(--panel);border:1px solid var(--edgeSoft);display:flex;align-items:center;
+  gap:14px;padding:0 14px;font-size:13px}
+.ep .n{width:18px;text-align:center;color:var(--muted);font:700 15px Inter}
+.ep .still{width:96px;height:52px;border-radius:9px;background:linear-gradient(150deg,#2a4b78,#152742)}
+.ep .t{flex:1;font-weight:600}
+.ep .d{height:24px;padding:0 9px;border-radius:12px;border:1px solid var(--glassBorder);font:12px Inter;display:flex;align-items:center;direction:ltr}
+.scrolled .hero{transform:translateY(-230px)}
+.scrolled .below{top:80px}
+
+/* the frame's own label, never part of the page */
+.tag{position:absolute;bottom:8px;left:10px;font:11px Inter;color:rgba(255,255,255,.45);direction:ltr}
+</style>
+</head>
+<body>
+<template id="icons">
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M4 11h12.2l-5.6-5.6L12 4l8 8-8 8-1.4-1.4 5.6-5.6H4z"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 21l-1.5-1.3C5.4 15.1 2 12.1 2 8.4 2 5.4 4.4 3 7.4 3c1.7 0 3.4.8 4.6 2.1C13.2 3.8 14.9 3 16.6 3 19.6 3 22 5.4 22 8.4c0 3.7-3.4 6.7-8.5 11.3z"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 17.3l6.2 3.7-1.6-7 5.4-4.7-7.2-.6L12 2 9.2 8.7 2 9.3l5.4 4.7-1.6 7z"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2zm0 16H5V9h14z"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16zm.5-13H11v6l5.2 3.2.8-1.3-4.5-2.7z"/></symbol>
+  <symbol id="i-mask" viewBox="0 0 24 24"><path d="M3 3h10v6c0 3-2.2 5.5-5 5.5S3 12 3 9zm2 3v1h2V6zm4 0v1h2V6zM11 10h10v6c0 3-2.2 5.5-5 5.5S11 19 11 16z"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 2l10 6-10 6L2 8zm0 14.5l8.3-5 1.7 1-10 6-10-6 1.7-1z"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="M15.4 7.4L14 6l-6 6 6 6 1.4-1.4L10.8 12z"/></symbol>
+</template>
+<div id="out"></div>
+<script>
+const icons=document.getElementById('icons').innerHTML;
+const I=(id)=>`<svg viewBox="0 0 24 24"><use href="#${id}"/></svg>`;
+
+function hero({kind,pic,tv,focus}){
+  const film=kind==='film';
+  const name=film?'EN - Before Sunrise (1995)':'NL - SPINNING OUT';
+  const facts=film
+    ?`<span>${I('i-mask')}<span class="prov">Drama | Romance</span></span><i></i><span>${I('i-clock')}<span class="prov">1h 41m</span></span><i></i><span>${I('i-cal')}1995</span>`
+    :`<span>${I('i-layers')}موسم واحد</span><i></i><span class="star">${I('i-star')}8.0</span><i></i><span>${I('i-mask')}<span class="prov">Drama</span></span><i></i><span>${I('i-cal')}2020</span>`;
+  const play=film?'تشغيل الفيلم':'تشغيل S1 E1';
+  const plot=film
+    ?'An unexpected meeting on a train leads two travelers to spend an evening wandering through Vienna. As the night unfolds, they share stories and conversations about life and love, knowing it may be their only night.'
+    :'Nadat een val bijna haar carrière eindigt, grijpt een opkomende single skater een kans om door te gaan als een paar-schaatser met een getalenteerde bad boy-partner, ze riskeert een felbewaard geheim.';
+  const rating=film
+    ?`<div class="rrow"><div class="imdb"><small>IMDb</small>${I('i-star')}8.0</div><div class="chip">${I('i-cal')}أُضيف في 23/10/2025</div></div>`
+    :'';
+  const people=film?`<div class="people prov"><b>المخرج:</b> Richard Linklater</div>`:'';
+  const pw=tv?190:(film?170:150), ph=Math.round(pw*1.5);
+  return `<div class="page hero">
+    <div class="poster ${pic}" style="width:${pw}px;height:${ph}px"><b>${film?'BEFORE SUNRISE':'SPINNING OUT'}</b></div>
+    <div class="info">
+      <div class="trow"><div class="name prov">${name}</div><div class="back">${I('i-back')}</div></div>
+      <div class="facts">${facts}</div>
+      <div class="btns"><div class="btn p ${focus?'focus':''}">${I('i-play')}${play}</div><div class="btn s">${I('i-heart')}إضافة إلى المفضلة</div></div>
+      ${rating}
+      <div class="head"><span>القصة</span><span class="more">عرض الكل ${I('i-chev')}</span></div>
+      <div class="plot prov">${plot}</div>
+      ${people}
+    </div></div>`;
+}
+function below(){
+  return `<div class="below">
+    <div class="season"><span>10 حلقات</span><span>الموسم 1 <small>(10 حلقات)</small></span></div>
+    <div class="ep"><span class="n">1</span><span class="still"></span><span class="t prov">NL - SPINNING OUT - S01E01 - Aflevering 1</span><span class="d">53m</span></div>
+    <div class="ep"><span class="n">2</span><span class="still"></span><span class="t prov">NL - SPINNING OUT - S01E02 - Aflevering 2</span><span class="d">50m</span></div>
+  </div>`;
+}
+function screen({size,kind,pic,backdrop=true,fading=false,scrolled=false,focus=false,label}){
+  const tv=size==='tv';
+  return `<div class="screen ${size} ${fading?'fading':''} ${scrolled?'scrolled':''}">
+    ${backdrop?`<div class="bd ${pic}"></div><div class="scrim"></div>`:''}
+    ${hero({kind,pic:backdrop?pic:'flat',tv,focus})}
+    ${kind==='show'?below():''}
+    <div class="tag">${label}</div></div>`;
+}
+const frames={
+  film:{c:'<b>الفيلم على الهاتف (833×385).</b> ترتيب صفحة الفيلم كما هو، وخلف الصفحة كلها صورة الفيلم العريضة: معتّمة ومليّنة، وتدرّج أغمق ما يكون تحت النص (اليسار في العربية) ويخفّ نحو البوستر. لا مربّع ولا حافة.',
+        h:screen({size:'phone',kind:'film',pic:'dusk',label:'film · phone 833x385'})},
+  show:{c:'<b>المسلسل على الهاتف، بالترتيب نفسه.</b> شريط معلومات واحد (المواسم، التقييم، النوع، السنة) بدل الكلمات المتفرقة، والزرّان، والقصة. أسفل الشاشة يُغلق التدرّج إلى لون الخلفية، فالمواسم والحلقات تقف على الأرضية العادية كما كانت.',
+        h:screen({size:'phone',kind:'show',pic:'ice',label:'show · phone 833x385'})},
+  'show-scrolled':{c:'<b>المسلسل بعد التمرير إلى الحلقات.</b> الصورة تبقى خلف الصفحة، والقوائم على ألواحها الداكنة فلا تُقرأ فوق صورة أبدًا.',
+        h:screen({size:'phone',kind:'show',pic:'ice',scrolled:true,label:'show scrolled · phone'})},
+  tv:{c:'<b>التلفاز (960×540)، والتركيز على «تشغيل».</b> المقاسات أكبر، والقصة أربعة أسطر، والحلقة المركّزة تأخذ حلقة الضوء كما في بقية التطبيق.',
+        h:screen({size:'tv',kind:'film',pic:'dusk',focus:true,label:'film · tv 960x540 · remote on Play'})},
+  bright:{c:'<b>صورة فاتحة جدًا (أصعب حالة).</b> التدرّج نفسه يكفي: النص الأبيض يبقى مقروءًا لأن ما تحته معتّم دائمًا، والشريط والأزرار على أرضية زجاجية داكنة خاصة بها.',
+        h:screen({size:'phone',kind:'film',pic:'snow',label:'bright picture · phone'})},
+  arriving:{c:'<b>الصورة لم تصل بعد.</b> الصفحة لا تنتظرها: تُرسم على الأرضية العادية فورًا، والصورة تظهر بتلاشٍ (300 ms) حين تصل، وبلا حركة في أدنى مستوى للحركة. تُطلب بحجم الشاشة (w1280) لا بحجمها الأصلي.',
+        h:screen({size:'phone',kind:'film',pic:'dusk',fading:true,label:'picture arriving · fades in'})},
+  none:{c:'<b>عنوان بلا صورة عريضة.</b> الصفحة هي صفحة الفيلم كما هي اليوم، بلا فراغ ولا مربّع فارغ.',
+        h:screen({size:'phone',kind:'film',pic:'flat',backdrop:false,label:'no wide picture'})},
+};
+const q=new URLSearchParams(location.search).get('frame')||'sheet';
+const out=document.getElementById('out');
+document.body.insertAdjacentHTML('afterbegin',`<svg width="0" height="0" style="position:absolute">${icons}</svg>`);
+if(q==='sheet'){document.body.classList.add('sheet');
+  out.innerHTML=Object.values(frames).map(f=>`<div class="cap">${f.c}</div>${f.h}`).join('');
+}else{out.innerHTML=frames[q].h;}
+</script>
+</body>
+</html>
