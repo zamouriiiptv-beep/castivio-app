@@ -256,7 +256,9 @@ class WorldRadioScreenTest {
         assertEquals(listOf("m1"), library.listenedUuids)
         compose.onNodeWithText("Recently played").performClick()
         compose.waitForIdle()
-        compose.onNodeWithText("World \u00B7 Recently played").assertExists()
+        // The list the rail opened is the one listened from: the station that sounded is on it, and the directory's others are not.
+        compose.waitUntil(timeoutMillis = 5_000) { compose.onAllNodesWithText("Hit Radio").fetchSemanticsNodes().isEmpty() }
+        assertTrue(compose.onAllNodesWithText("Medi 1 Radio").fetchSemanticsNodes().isNotEmpty())
     }
 
     @Test
@@ -286,7 +288,9 @@ class WorldRadioScreenTest {
         assertEquals(listOf("m1"), library.keptUuids)
         compose.onNodeWithText("Favorites").performClick()
         compose.waitForIdle()
-        compose.onNodeWithText("World \u00B7 Favorites").assertExists()
+        // The list the rail opened is the favourites: the station kept is on it, and the directory's others are not.
+        compose.waitUntil(timeoutMillis = 5_000) { compose.onAllNodesWithText("Hit Radio").fetchSemanticsNodes().isEmpty() }
+        assertTrue(compose.onAllNodesWithText("Medi 1 Radio").fetchSemanticsNodes().isNotEmpty())
         assertFalse(compose.onAllNodesWithText("No favourite stations yet").fetchSemanticsNodes().isNotEmpty())
     }
 
