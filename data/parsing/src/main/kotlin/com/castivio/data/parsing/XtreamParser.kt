@@ -168,6 +168,7 @@ object XtreamParser {
         var tmdbId: Long? = null
         var tmdbAlias: Long? = null
         var imdbId: String? = null
+        var backdrop: String? = null
 
         val scanner = JsonScanner(reader)
         scanner.readObject { section ->
@@ -187,6 +188,12 @@ object XtreamParser {
                         "tmdb_id" -> tmdbId = ExternalIds.tmdb(scanner.string())
                         "tmdb" -> tmdbAlias = ExternalIds.tmdb(scanner.string())
                         "imdb_id" -> imdbId = ExternalIds.imdb(scanner.string())
+                        // An array of addresses; the first is the film's wide picture, drawn behind its page as a show's is.
+                        // A bare string, or nothing, is none -- the rule the show's reply is read by.
+                        "backdrop_path" -> scanner.readArray {
+                            val url = scanner.string()?.takeIf { it.isNotBlank() }
+                            if (backdrop == null) backdrop = url
+                        }
                     }
                 }
                 "movie_data" -> scanner.readObject { field ->
@@ -208,6 +215,7 @@ object XtreamParser {
             addedEpochSeconds = added,
             tmdbId = tmdbId ?: tmdbAlias,
             imdbId = imdbId,
+            backdropUrl = backdrop,
         ).takeIf { it.saysAnything }
     } catch (e: JsonFormatException) {
         null
@@ -634,6 +642,8 @@ data class XtreamVodInfo(
     val tmdbId: Long? = null,
     /** The film's IMDb id (`tt0133093`), when the panel sent one. */
     val imdbId: String? = null,
+    /** The first of the reply's `backdrop_path` addresses: the film's wide picture, drawn behind its page. */
+    val backdropUrl: String? = null,
 ) {
     /**
      * Whether the reply held a single fact. One that held none -- `"info":[]`, which panels send for a film
@@ -645,7 +655,7 @@ data class XtreamVodInfo(
     val saysAnything: Boolean
         get() = rating != null || plot != null || director != null || cast.isNotEmpty() || genres.isNotEmpty() ||
             releaseYear != null || durationSeconds != null || addedEpochSeconds != null ||
-            tmdbId != null || imdbId != null
+            tmdbId != null || imdbId != null || backdropUrl != null
 }
 
 private const val YEAR_DIGITS = 4

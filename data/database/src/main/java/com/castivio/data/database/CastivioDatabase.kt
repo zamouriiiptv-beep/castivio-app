@@ -73,7 +73,10 @@ import com.castivio.data.database.entity.VodDetailEntity
     // 12: columns added to the two detail tables, the ids a provider gives a film or a show at TMDB and IMDb -- see
     //    `CastivioMigrations.ADD_PROVIDER_IDS`. Nothing that was stored changed and no sync state is forgotten: a film kept
     //    before this has `ids_read` = 0 and is asked of its provider once more, behind its page.
-    version = 12,
+    // 13: one column added to `vod_detail`, `backdrop_url`, the film's wide picture -- see
+    //    `CastivioMigrations.ADD_FILM_BACKDROP`. Every kept film is set back to `ids_read` = 0, so it is asked of its
+    //    provider once more, behind its page, and gets its picture. No sync state is forgotten.
+    version = 13,
     exportSchema = true,
 )
 abstract class CastivioDatabase : RoomDatabase() {

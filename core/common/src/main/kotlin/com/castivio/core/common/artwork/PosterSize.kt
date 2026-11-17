@@ -27,8 +27,21 @@ object PosterSize {
 
     private const val PATH = "/t/p/"
 
+    /** TMDB's width for a picture that fills a screen: a wide picture behind a title's page, dimmed to a third. */
+    const val SCREEN_SIZE = "w1280"
+
+    private const val SCREEN_WIDTH = 1280
+
     /** [url] as the card should ask for it. */
-    fun forCard(url: String): String {
+    fun forCard(url: String): String = atMost(url, CARD_SIZE, CARD_WIDTH)
+
+    /**
+     * [url] as a title's page should ask for its wide picture: `w1280` in place of an `original` of several megabytes, by the
+     * same rule as [forCard] -- anything not a TMDB picture address, or already at that width or under it, is left as it came.
+     */
+    fun forScreen(url: String): String = atMost(url, SCREEN_SIZE, SCREEN_WIDTH)
+
+    private fun atMost(url: String, sizeName: String, width: Int): String {
         val hostAt = url.indexOf("://")
         if (hostAt < 0) return url
         val scheme = url.substring(0, hostAt)
@@ -43,9 +56,9 @@ object PosterSize {
         // A size and then a file: "/t/p/w500/abc.jpg". Without a file after it there is nothing to ask for at another size.
         if (sizeEnd <= sizeAt || sizeEnd == url.length - 1) return url
         val size = url.substring(sizeAt, sizeEnd)
-        if (widthOf(size)?.let { it <= CARD_WIDTH } == true) return url
+        if (widthOf(size)?.let { it <= width } == true) return url
         if (!isSize(size)) return url
-        return url.substring(0, sizeAt) + CARD_SIZE + url.substring(sizeEnd)
+        return url.substring(0, sizeAt) + sizeName + url.substring(sizeEnd)
     }
 
     /** The width of a plain `w<n>` size, or null for anything else. */

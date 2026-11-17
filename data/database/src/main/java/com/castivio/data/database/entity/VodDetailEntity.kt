@@ -64,4 +64,12 @@ data class VodDetailEntity(
      */
     @ColumnInfo(name = "ids_read", defaultValue = "0")
     val idsRead: Boolean = false,
+
+    /**
+     * The film's wide picture, as the provider's reply gave it; null when it gave none. Null for every row written before the
+     * column existed -- `CastivioMigrations.ADD_FILM_BACKDROP`, which also sets those rows' [idsRead] to 0, so each film is
+     * asked of its provider once more, behind its page, and the reply brings the picture.
+     */
+    @ColumnInfo(name = "backdrop_url")
+    val backdropUrl: String? = null,
 )

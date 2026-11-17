@@ -52,7 +52,7 @@ object CastivioMigrations {
         get() = arrayOf(
             REKEY_SOURCES, SCOPE_TO_SOURCE, KEY_SEARCH_BY_ROW, ADD_CUSTOM_ORDER, ADD_HIDDEN_ITEM, ADD_VOD_DETAIL,
             ADD_SERIES_DETAIL, guarded(DROP_EPG_INDEX), guarded(ADD_CATCH_UP), guarded(ADD_RATING),
-            guarded(ADD_PROVIDER_IDS),
+            guarded(ADD_PROVIDER_IDS), guarded(ADD_FILM_BACKDROP),
         )
 
     /** The first version a database may be in with the sort-title index out: see [guarded]. */
@@ -394,6 +394,22 @@ object CastivioMigrations {
             db.execSQL("ALTER TABLE `vod_detail` ADD COLUMN `ids_read` INTEGER NOT NULL DEFAULT 0")
             db.execSQL("ALTER TABLE `series_detail` ADD COLUMN `tmdb_id` INTEGER")
             db.execSQL("ALTER TABLE `series_detail` ADD COLUMN `imdb_id` TEXT")
+        }
+    }
+
+    /**
+     * 12 → 13: `vod_detail.backdrop_url`, the film's wide picture, drawn behind its page as a show's is
+     * (`design/mockups/details-backdrop-ar.html`). A nullable text column, which is what Room maps a `String?` to.
+     *
+     * Every row kept before it holds no picture, and `vod_detail` has no expiry, so `ids_read` is set back to 0 for all of
+     * them: the rule [ADD_PROVIDER_IDS] made -- a film whose row says 0 is drawn from what is kept and asked of its provider
+     * once more, behind its page, and the reply replaces the row -- brings each one its picture the next time its page opens.
+     * Nothing else that was stored changes, and no sync state is forgotten.
+     */
+    private val ADD_FILM_BACKDROP = object : Migration(12, 13) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE `vod_detail` ADD COLUMN `backdrop_url` TEXT")
+            db.execSQL("UPDATE `vod_detail` SET `ids_read` = 0")
         }
     }
 

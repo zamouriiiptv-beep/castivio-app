@@ -51,4 +51,15 @@ class PosterSizeTest {
         )
         for (url in untouched) assertEquals(url, url, card(url))
     }
+
+    @Test
+    fun `a wide picture is asked for at a screen's width, and one already at it or under is left`() {
+        assertEquals("https://image.tmdb.org/t/p/w1280/b.jpg", PosterSize.forScreen("https://image.tmdb.org/t/p/original/b.jpg"))
+        assertEquals("https://image.tmdb.org/t/p/w1280/b.jpg", PosterSize.forScreen("https://image.tmdb.org/t/p/w1920/b.jpg"))
+        for (size in listOf("w1280", "w780", "w300")) {
+            val url = "https://image.tmdb.org/t/p/$size/b.jpg"
+            assertEquals(url, PosterSize.forScreen(url))
+        }
+        assertEquals("http://cdn.example/back1.jpg", PosterSize.forScreen("http://cdn.example/back1.jpg"))
+    }
 }

@@ -29,6 +29,7 @@ class RoomMovieDetailsCache(private val dao: VodDetailDao) : MovieDetailsCache {
                 imdbId = details.imdbId,
                 // What is put here came from a reply read now, and a reply read now is read for its ids.
                 idsRead = true,
+                backdropUrl = details.backdropUrl,
             ),
         )
     }
@@ -46,6 +47,7 @@ class RoomMovieDetailsCache(private val dao: VodDetailDao) : MovieDetailsCache {
         imdbId = imdbId,
         // A row written before the ids were read, or by a portal's list, says so: see `MovieDetails.idsRead`.
         idsRead = idsRead,
+        backdropUrl = backdropUrl,
     )
 }
 

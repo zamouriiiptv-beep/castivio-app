@@ -77,6 +77,7 @@ import com.castivio.core.design.components.CastivioButton
 import com.castivio.core.design.components.CastivioNoticeDialog
 import com.castivio.core.design.components.PosterFrame
 import com.castivio.core.design.components.RatingBadge
+import com.castivio.core.design.components.ShowBackdrop
 import com.castivio.core.design.components.castivioBodyStyle
 import com.castivio.core.design.components.castivioChipStyle
 import com.castivio.core.design.components.castivioTitleStyle
@@ -408,6 +409,10 @@ fun MovieScreen(
         // the name's row beside the poster, and in the page's corner when the page is a column. The show's page
         // draws the same arrow in the same corner: `PageBack` is the one function that draws it.
         val back: @Composable (Modifier) -> Unit = { backModifier -> PageBack(onBack, backModifier) }
+
+        // The film's wide picture behind the whole page, under its scrim -- the show's page's own (`ShowBackdrop`,
+        // design/mockups/details-backdrop-ar.html). Nothing until it comes; the page never waits for it.
+        known?.backdropUrl?.let { url -> ShowBackdrop(url, Modifier.fillMaxSize()) }
 
         if (side) {
             Box(Modifier.fillMaxSize().castivioStage(m.frame)) {

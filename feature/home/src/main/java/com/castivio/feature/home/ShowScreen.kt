@@ -190,6 +190,10 @@ fun ShowScreen(
         // The wall's metrics, for the poster cards of the similar shows: the same card, the same sizes.
         val board = channelsMetricsFor(tv = tv, width = maxWidth, height = maxHeight)
 
+        // The show's wide picture behind the whole page, under its scrim: see `ShowBackdrop` and
+        // design/mockups/details-backdrop-ar.html. Nothing until it comes; the page never waits for it.
+        details?.backdropUrl?.let { url -> ShowBackdrop(url, Modifier.fillMaxSize()) }
+
         Row(
             Modifier.fillMaxSize().castivioStage(m.frame),
             horizontalArrangement = Arrangement.spacedBy(m.paneGap),
@@ -408,12 +412,6 @@ private fun ShowTop(
     var plotCut by remember(details?.plot) { mutableStateOf(false) }
 
     Box(Modifier.fillMaxWidth()) {
-        details?.backdropUrl?.let { url ->
-            // As wide as the page and as tall as this part of it, however tall the words make it.
-            Box(Modifier.matchParentSize()) {
-                ShowBackdrop(url, Modifier.align(Alignment.TopEnd).fillMaxWidth(BACKDROP_SHARE).fillMaxHeight())
-            }
-        }
         val heroShape = RoundedCornerShape(Radius.md)
         Row(
             Modifier
@@ -446,6 +444,29 @@ private fun ShowTop(
                     PageBack(onBack)
                 }
                 ShowFacts(state, waiting, m)
+                // The film page's order: the facts, the two buttons, then the plot (details-backdrop-ar.html).
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(m.rowGap),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    CastivioButton(
+                        text = when {
+                            target == null -> stringResource(R.string.show_play)
+                            target.resume -> stringResource(R.string.show_continue, episodeText(target.episode))
+                            else -> stringResource(R.string.show_play_episode, episodeText(target.episode))
+                        },
+                        onClick = onPlay,
+                        weight = ButtonWeight.Primary,
+                        icon = Icons.Rounded.PlayArrow,
+                        enabled = target != null,
+                        modifier = Modifier.focusRequester(playFocus),
+                    )
+                    PageFavorite(
+                        favorite = state.favorite,
+                        text = stringResource(if (state.favorite) R.string.show_favorite_remove else R.string.show_favorite_add),
+                        onClick = onFavorite,
+                    )
+                }
                 val plot = details?.plot
                 if (plot != null) {
                     Text(
@@ -473,28 +494,6 @@ private fun ShowTop(
                 } else if (waiting) {
                     PlotPlaceholder(m, tv)
                 }
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(m.rowGap),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    CastivioButton(
-                        text = when {
-                            target == null -> stringResource(R.string.show_play)
-                            target.resume -> stringResource(R.string.show_continue, episodeText(target.episode))
-                            else -> stringResource(R.string.show_play_episode, episodeText(target.episode))
-                        },
-                        onClick = onPlay,
-                        weight = ButtonWeight.Primary,
-                        icon = Icons.Rounded.PlayArrow,
-                        enabled = target != null,
-                        modifier = Modifier.focusRequester(playFocus),
-                    )
-                    PageFavorite(
-                        favorite = state.favorite,
-                        text = stringResource(if (state.favorite) R.string.show_favorite_remove else R.string.show_favorite_add),
-                        onClick = onFavorite,
-                    )
-                }
             }
         }
     }
@@ -507,7 +506,21 @@ private fun ShowFacts(state: ShowState, waiting: Boolean, m: CatalogMetrics) {
     val details = state.details
     val iconSize = m.frame.fsBody * FACT_ICON_OF_BODY
     val style = castivioBodyStyle(m.frame.fsBody)
+    val anything = details?.releaseYear != null || details?.genres?.any { it.isNotBlank() } == true ||
+        details?.rating != null || state.seasons.isNotEmpty()
+    // On the film page's ground: one pill of glass, as its facts bar is, so the facts read over the wide picture.
+    val shape = RoundedCornerShape(Radius.pill)
+    val colors = CastivioTheme.colors
     FlowRow(
+        modifier = if (anything) {
+            Modifier
+                .clip(shape)
+                .background(colors.glassFill)
+                .border(1.dp, colors.glassBorderSoft, shape)
+                .padding(horizontal = m.entryPadH, vertical = m.entryPadV)
+        } else {
+            Modifier
+        },
         horizontalArrangement = Arrangement.spacedBy(m.paneGap),
         verticalArrangement = Arrangement.spacedBy(m.rowGap / 2),
     ) {
@@ -982,9 +995,6 @@ private const val SHOW_TITLE_LINES = 3
 /** The plot's lines: a television has the room for three, a handset two. */
 private const val PLOT_LINES = 2
 private const val PLOT_LINES_TV = 3
-
-/** How much of the page's width the wide picture takes, from its end edge. */
-private const val BACKDROP_SHARE = 0.62f
 
 /** A quiet glass ground that groups the show's identity and actions without obscuring its backdrop. */
 private const val HERO_PANEL_ALPHA = 0.72f

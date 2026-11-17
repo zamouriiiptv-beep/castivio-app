@@ -205,6 +205,8 @@ class ProviderIdsTest {
         toVersionEleven(db)
         db.execSQL("INSERT INTO `vod_detail` (`source_id`, `provider_ref`, `plot`, `fetched_at`) VALUES ('src', 'before', 'Old.', 1)")
         CastivioMigrations.ALL.single { it.startVersion == 11 }.migrate(db)
+        // And on to the entity as it is now, whose table has the film's wide picture too (version 13: `FilmBackdropTest`).
+        CastivioMigrations.ALL.single { it.startVersion == 12 }.migrate(db)
 
         films.put("src", "after", MovieDetails(plot = "New."), now = 2L)
 
@@ -212,14 +214,12 @@ class ProviderIdsTest {
         assertTrue("kept after: its reply was read for ids", films.get("src", "after")!!.idsRead)
     }
 
-    /** That the chain is unbroken to the database's version is `MigrationGuardTest`'s; this says the step to 12 is there, and last. */
+    /** That the chain is unbroken to the database's version is `MigrationGuardTest`'s; this says the step to 12 is there. */
     @Test
-    fun `the migration to version 12 is the last of the chain, and the database is at 12`() {
-        val last = CastivioMigrations.ALL.maxByOrNull { it.startVersion }!!
+    fun `the migration to version 12 is in the chain`() {
+        val step = CastivioMigrations.ALL.single { it.startVersion == 11 }
 
-        assertEquals(11, last.startVersion)
-        assertEquals(12, last.endVersion)
-        assertEquals(12, database.openHelper.readableDatabase.version)
+        assertEquals(12, step.endVersion)
     }
 
     // ------------------------------------------------------------------ helpers

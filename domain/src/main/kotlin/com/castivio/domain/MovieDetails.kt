@@ -33,6 +33,8 @@ data class MovieDetails(
      * film be asked of its provider once more -- behind its page, which is drawn from what is kept.
      */
     val idsRead: Boolean = true,
+    /** The film's wide picture, drawn behind its page (`ShowBackdrop`); null when the provider sent none. */
+    val backdropUrl: String? = null,
 )
 
 /** The details a film's page has been given before, so opening it again asks the provider nothing. */

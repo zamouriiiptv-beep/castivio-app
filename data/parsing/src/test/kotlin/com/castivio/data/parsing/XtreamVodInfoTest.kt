@@ -143,5 +143,16 @@ class XtreamVodInfoTest {
         assertNull(info.tmdbId)
         assertNull(info.imdbId)
     }
-}
 
+    @Test
+    fun `the first of a reply's wide pictures is the film's, and a bare string or an empty one is none`() {
+        fun backdrop(value: String) =
+            XtreamParser.parseVodInfo(StringReader("""{"info":{"plot":"A story.","backdrop_path":$value}}"""))!!.backdropUrl
+
+        assertEquals("https://image.tmdb.org/t/p/original/b1.jpg", backdrop("""["https://image.tmdb.org/t/p/original/b1.jpg","https://cdn/b2.jpg"]"""))
+        assertNull(backdrop("\"https://cdn/not-an-array.jpg\""))
+        assertNull(backdrop("[]"))
+        assertNull(backdrop("[\"\"]"))
+        assertNull(backdrop("null"))
+    }
+}

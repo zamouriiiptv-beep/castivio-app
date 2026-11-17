@@ -203,6 +203,7 @@ class DefaultMovieDetails(
         addedEpochSeconds = addedEpochSeconds,
         tmdbId = tmdbId,
         imdbId = imdbId,
+        backdropUrl = backdropUrl,
     )
 }
 
