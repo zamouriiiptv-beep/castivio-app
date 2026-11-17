@@ -23,7 +23,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.rounded.CalendarMonth
 import androidx.compose.material.icons.rounded.Category
@@ -76,7 +75,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.castivio.core.design.components.ButtonWeight
 import com.castivio.core.design.components.CastivioButton
-import com.castivio.core.design.components.CastivioIconButton
 import com.castivio.core.design.components.CastivioNoticeDialog
 import com.castivio.core.design.components.PosterFrame
 import com.castivio.core.design.components.RatingBadge
@@ -412,19 +410,9 @@ fun MovieScreen(
         }
 
         // The way back sits in the top corner opposite the poster, as the reference has it: at the end of
-        // the name's row beside the poster, and in the page's corner when the page is a column.
-        val tv = CastivioTheme.device.isTv
-        val back: @Composable (Modifier) -> Unit = { backModifier ->
-            CastivioIconButton(
-                icon = Icons.AutoMirrored.Rounded.ArrowBack,
-                contentDescription = stringResource(R.string.show_back),
-                onClick = onBack,
-                // A handset's button is smaller than its 48dp floor, by the owner's leave: the way back is also
-                // the hardware Back, and the page is not a place a thumb has to find it. A television keeps
-                // the remote's floor.
-                modifier = if (tv) backModifier else backModifier.size(BACK_SIZE),
-            )
-        }
+        // the name's row beside the poster, and in the page's corner when the page is a column. The show's page
+        // draws the same arrow in the same corner: `PageBack` is the one function that draws it.
+        val back: @Composable (Modifier) -> Unit = { backModifier -> PageBack(onBack, backModifier) }
 
         if (side) {
             Box(Modifier.fillMaxSize().castivioStage(m.frame)) {
@@ -860,9 +848,6 @@ internal const val PLOT_DIALOG_FRACTION = 0.7f
 
 /** The arrow after "Show all", as a share of the heading's step. */
 private const val PLOT_MORE_ARROW = 1.2f
-
-/** The way back's side on a handset: under the 48dp floor, which a television keeps. */
-private val BACK_SIZE = 40.dp
 
 /** A mark's size as a share of the body type, so the marks scale with the page's own type. */
 private const val ICON_OF_BODY = 1.4f

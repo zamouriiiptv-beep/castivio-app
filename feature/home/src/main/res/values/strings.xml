@@ -43,7 +43,6 @@
         <item quantity="other">%d episodes</item>
     </plurals>
     <string name="show_back">Back</string>
-    <string name="show_brand" translatable="false">Castivio</string>
     <string name="show_nav_overview">Overview</string>
     <string name="show_nav_seasons">Seasons</string>
     <string name="show_nav_cast">Cast</string>

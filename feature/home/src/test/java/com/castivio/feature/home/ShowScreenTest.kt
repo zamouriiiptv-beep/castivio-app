@@ -46,7 +46,7 @@ import org.robolectric.annotation.Config
 /**
  * A show's page composed over the real state holder, with the provider, the catalogue and the viewer's marks as fakes:
  * the rail names the parts that have something in them, the facts the provider sent are drawn and no others, Play and
- * an episode start what they say, the heart flips, and a similar show opens.
+ * an episode start what they say, the heart flips, a similar show opens, and the way back stands where the film's does.
  *
  * What the holder does with the provider's reply is `ShowViewModelTest`'s; here the details are given and the page is
  * asked what it draws. A cut plot and the shapes the words take are the screenshot's: the test environment lays out
@@ -132,6 +132,7 @@ class ShowScreenTest {
 
     private val played = mutableListOf<CatalogSelection>()
     private val opened = mutableListOf<SeriesSummary>()
+    private var backed = 0
     private val marks = Marks()
 
     /** [direction] is the reader's, where a test needs the page turned round; the harness's own (left to right) where it is null. */
@@ -148,7 +149,7 @@ class ShowScreenTest {
                     ShowScreen(
                         show = SeriesSummary("show-1", "Chicago Med", null, 3, 2),
                         onPlay = { played += it },
-                        onBack = {},
+                        onBack = { backed++ },
                         onOpenShow = { opened += it },
                         model = model,
                     )
@@ -178,7 +179,7 @@ class ShowScreenTest {
 
     /**
      * The page used to be drawn left to right in every language, as the film's was. It follows the reader's direction
-     * now: in Arabic, Persian and Urdu the rail -- the way back and the parts of the page -- stands at the right.
+     * now: in Arabic, Persian and Urdu the rail -- the parts of the page -- stands at the right.
      */
     @Test
     fun `right to left the rail stands at the right of the page`() {
@@ -186,6 +187,55 @@ class ShowScreenTest {
 
         val (rail, middle) = railAndMiddle()
         assertTrue("the rail begins at $rail, the middle is at $middle", rail > middle)
+    }
+
+    // ------------------------------------------------------------------------------------------------ the way back
+
+    /** The left of the way back and the middle of the screen, both measured from the left of the screen. */
+    private fun backAndMiddle(): Pair<Float, Float> {
+        val back = compose.onNodeWithContentDescription("Back").getUnclippedBoundsInRoot().left.value
+        val root = compose.onRoot().getUnclippedBoundsInRoot()
+        val middle = (root.left.value + root.right.value) / 2f
+        return back to middle
+    }
+
+    /**
+     * The way back is the film page's, in the film page's corner: at the end of the show's name row, opposite the poster --
+     * and so opposite the rail, which stands at the start. Left to right that is the right of the page.
+     */
+    @Test
+    fun `left to right the way back ends the name's row, at the right of the page`() {
+        show(direction = LayoutDirection.Ltr)
+
+        val (back, middle) = backAndMiddle()
+        assertTrue("the way back begins at $back, the middle is at $middle", back > middle)
+    }
+
+    @Test
+    fun `right to left the way back ends the name's row, at the left of the page`() {
+        show(direction = LayoutDirection.Rtl)
+
+        val (back, middle) = backAndMiddle()
+        assertTrue("the way back begins at $back, the middle is at $middle", back < middle)
+    }
+
+    @Test
+    fun `the rail holds the page's sections and not the way back`() {
+        show()
+
+        val rail = compose.onNodeWithContentDescription("Overview").getUnclippedBoundsInRoot().left.value
+        val back = compose.onNodeWithContentDescription("Back").getUnclippedBoundsInRoot().left.value
+        assertTrue("the rail begins at $rail and the way back at $back", back > rail)
+    }
+
+    @Test
+    fun `a press on the way back leaves the page`() {
+        show()
+
+        compose.onNodeWithContentDescription("Back").performClick()
+        compose.waitForIdle()
+
+        assertEquals(1, backed)
     }
 
     // ----------------------------------------------------------------------------------------------- the rail

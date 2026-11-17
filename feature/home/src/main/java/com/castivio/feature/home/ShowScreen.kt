@@ -29,7 +29,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.material.icons.rounded.CalendarToday
@@ -109,6 +108,9 @@ import kotlinx.coroutines.launch
  * a line of its plot, and its running time. Then the cast, and other shows of the same category. The rail names these
  * parts on a television and keeps their icons on a handset, takes the viewer to one with a press, and lights the one
  * the page has reached.
+ *
+ * The way back is the film page's, and no part of the rail: the same arrow, drawn by [PageBack], at the end of the
+ * show's name row, in the top corner opposite the poster.
  *
  * Play continues the show from the episode last started, or starts its first. A press on an episode plays it.
  *
@@ -199,7 +201,6 @@ fun ShowScreen(
                 lit = lit,
                 tv = tv,
                 m = m,
-                onBack = onBack,
                 onSection = { section ->
                     val at = sections.firstOrNull { it.section == section } ?: return@ShowRail
                     scope.launch { listState.animateScrollToItem(at.index) }
@@ -223,6 +224,7 @@ fun ShowScreen(
                         onPlay = { target?.let { start(it.episode) } },
                         onFavorite = model::toggleFavorite,
                         onMorePlot = { plotOpen = true },
+                        onBack = onBack,
                     )
                 }
                 state.times?.takeIf { instrumented }?.let { cost ->
@@ -294,41 +296,17 @@ fun ShowScreen(
     }
 }
 
-/** The rail: the way back with the application's name, and the page's sections, the one the page is at lit. */
+/** The rail: the page's sections, the one the page is at lit. The way back is not in it: see [PageBack]. */
 @Composable
 private fun ShowRail(
     sections: List<ShowSection>,
     lit: ShowSection,
     tv: Boolean,
     m: CatalogMetrics,
-    onBack: () -> Unit,
     onSection: (ShowSection) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val colors = CastivioTheme.colors
     Column(modifier, verticalArrangement = Arrangement.spacedBy(RAIL_GAP)) {
-        Row(
-            Modifier.padding(bottom = RAIL_GAP),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(RAIL_GAP),
-        ) {
-            CastivioIconButton(
-                icon = Icons.AutoMirrored.Rounded.ArrowBack,
-                contentDescription = stringResource(R.string.show_back),
-                onClick = onBack,
-                modifier = if (tv) Modifier else Modifier.size(BACK_SIZE),
-            )
-            // The name beside the arrow: a television has the width for it, a handset's rail has not.
-            if (tv) {
-                Text(
-                    text = stringResource(R.string.show_brand),
-                    style = castivioTitleStyle(m.frame.fsTitle * BRAND_OF_TITLE),
-                    color = colors.onBackground,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
-        }
         for (section in sections) {
             val label = stringResource(section.label)
             RailEntry(
@@ -368,8 +346,8 @@ private fun RailEntry(icon: ImageVector, label: String, m: CatalogMetrics, showL
     val tv = CastivioTheme.device.isTv
     Row(
         Modifier
-            .then(if (showLabel) Modifier.fillMaxWidth() else Modifier.size(BACK_SIZE))
-            .height(if (tv) Sizing.minTarget(true) else BACK_SIZE)
+            .then(if (showLabel) Modifier.fillMaxWidth() else Modifier.size(HANDSET_ENTRY))
+            .height(if (tv) Sizing.minTarget(true) else HANDSET_ENTRY)
             .clip(shape)
             .background(if (selected) colors.selectedFill else colors.glassFill.copy(alpha = 0f))
             .border(
@@ -417,6 +395,7 @@ private fun ShowTop(
     onPlay: () -> Unit,
     onFavorite: () -> Unit,
     onMorePlot: () -> Unit,
+    onBack: () -> Unit,
 ) {
     val colors = CastivioTheme.colors
     val details = state.details
@@ -446,14 +425,23 @@ private fun ShowTop(
                 modifier = Modifier.height(posterHeight).aspectRatio(CATALOG_POSTER_ASPECT),
             )
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(m.rowGap)) {
-                Text(
-                    text = show.title,
-                    style = castivioTitleStyle(m.frame.fsTitle * TITLE_OF_PANE),
-                    color = colors.onBackground,
-                    maxLines = SHOW_TITLE_LINES,
-                    overflow = TextOverflow.Ellipsis,
-                    textAlign = startEdgeAlign(show.title),
-                )
+                // The name, and at the end of the same row the way back: the film page's arrow, in the film page's
+                // corner -- opposite the poster, at the top of the page.
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(m.rowGap),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = show.title,
+                        style = castivioTitleStyle(m.frame.fsTitle * TITLE_OF_PANE),
+                        color = colors.onBackground,
+                        maxLines = SHOW_TITLE_LINES,
+                        overflow = TextOverflow.Ellipsis,
+                        textAlign = startEdgeAlign(show.title),
+                        modifier = Modifier.weight(1f),
+                    )
+                    PageBack(onBack)
+                }
                 ShowFacts(state, waiting, m)
                 val plot = details?.plot
                 if (plot != null) {
@@ -951,8 +939,8 @@ internal fun episodeText(episode: Episode): String = when {
     else -> episode.title
 }
 
-/** The way back's, and a handset's rail entries', side: under the 48dp floor, which a television keeps. */
-private val BACK_SIZE = 40.dp
+/** A handset's rail entries' side: under the 48dp floor, which a television keeps. */
+private val HANDSET_ENTRY = 40.dp
 
 /** The rail's width on a handset, icons only; a television's is a share of its width, between a floor and a ceiling. */
 private val HANDSET_RAIL = 56.dp
@@ -962,7 +950,6 @@ private val MAX_RAIL = 240.dp
 private val RAIL_GAP = 8.dp
 private val RAIL_PAD = 10.dp
 private val RAIL_ICON = 20.dp
-private const val BRAND_OF_TITLE = 0.7f
 
 /** An episode's picture is 16:9. */
 private const val THUMB_ASPECT = 16f / 9f
