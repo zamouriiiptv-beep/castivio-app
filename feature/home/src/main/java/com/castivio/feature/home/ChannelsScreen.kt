@@ -1546,9 +1546,9 @@ internal fun CategoryRail(
      */
     showFavorites: Boolean = true,
     /**
-     * Whether the ones played last are an entry of this rail. The shows' board has none yet -- no one records which
-     * episode of a show was watched when, as a film's or a channel's is -- and an entry that opened nothing would be
-     * a control that does nothing.
+     * Whether the ones played last are an entry of this rail. They are on every board that records what was watched --
+     * the shows' too, since an episode is recorded when it is started and again as it plays -- and an entry that opened
+     * nothing would be a control that does nothing.
      */
     showRecent: Boolean = true,
     /** What a section puts above the rail's field: the radio's choice between its two sources. Nothing for the others. */

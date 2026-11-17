@@ -317,6 +317,8 @@
     <!-- لوحة المسلسلات: لوحة الأفلام بكلماتها. -->
     <string name="series_favorites_empty_title">لا توجد مسلسلات مفضلة بعد</string>
     <string name="series_favorites_empty_detail">اضغط «إضافة للمفضلة» في صفحة مسلسل وسيظهر هنا.</string>
+    <string name="series_recent_empty_title">لم تشاهد أي مسلسل بعد</string>
+    <string name="series_recent_empty_detail">تظهر هنا المسلسلات التي تشغّلها، الأحدث أولًا.</string>
     <string name="series_all">جميع المسلسلات</string>
     <string name="series_search_hint">البحث في المسلسلات</string>
 

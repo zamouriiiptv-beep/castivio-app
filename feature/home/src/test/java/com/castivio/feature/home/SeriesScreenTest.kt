@@ -34,8 +34,8 @@ import org.robolectric.annotation.Config
 
 /**
  * The shows' screen, composed with the films' board over the holder's state: the band names the section and its field
- * narrows the shows, the rail lists the categories with their totals -- and none of the viewer's own lists, which a show
- * has not got -- and the wall carries what the provider sent, a poster and a name, and a press opens the show's page.
+ * narrows the shows, the rail lists the viewer's own lists -- the favourites and the shows watched -- and the categories
+ * with their totals, and the wall carries what the provider sent, a poster and a name, and a press opens the show's page.
  */
 @OptIn(ExperimentalTestApi::class)
 @RunWith(RobolectricTestRunner::class)
@@ -86,7 +86,7 @@ class SeriesScreenTest {
     }
 
     @Test
-    fun `the rail lists all the shows, the favourites and every category with its total, and no list of the ones watched`() {
+    fun `the rail lists all the shows, the viewer's own lists and every category with its total`() {
         show(holder())
 
         assertTrue(compose.onAllNodesWithText("All series").fetchSemanticsNodes().isNotEmpty())
@@ -94,9 +94,9 @@ class SeriesScreenTest {
         compose.onNodeWithText("Total: 310", substring = true).assertIsDisplayed()
         compose.onNodeWithText("COMEDY").assertIsDisplayed()
         compose.onNodeWithText("Favorites").assertIsDisplayed()
-        // No one records which show was watched when, as a film's or a channel's is: an entry that opened nothing is
-        // not drawn.
-        assertTrue(compose.onAllNodesWithText("Recently Watched").fetchSemanticsNodes().isEmpty())
+        // An episode is recorded when it is started and as it plays, so the shows have a list of the ones watched, as
+        // the films have.
+        compose.onNodeWithText("Recently Watched").assertIsDisplayed()
     }
 
     @Test
@@ -108,6 +108,22 @@ class SeriesScreenTest {
         compose.waitForIdle()
 
         assertTrue(model.state.value.favorites)
+    }
+
+    @Test
+    fun `a press on recently watched opens the shows watched last, and one on all the series leaves them`() {
+        val model = holder()
+        show(model)
+
+        compose.onNodeWithText("Recently Watched").performClick()
+        compose.waitForIdle()
+        assertTrue(model.state.value.recent)
+        assertTrue(!model.state.value.favorites)
+
+        compose.onAllNodesWithText("All series").onFirst().performClick()
+        compose.waitForIdle()
+        assertTrue(!model.state.value.recent)
+        assertEquals(null, model.state.value.selectedGroup)
     }
 
     @Test

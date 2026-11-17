@@ -631,6 +631,44 @@ interface MediaDao {
     )
     suspend fun windowFavoriteSeries(offset: Int, limit: Int): List<SeriesRow>
 
+    /**
+     * One window of the shows the viewer has watched, the one watched last first -- the list the series rail's
+     * Recently watched entry opens.
+     *
+     * **A show is watched through its episodes.** An episode's row in `playback_progress` is written when it is
+     * started from the show's page and again as it plays (see `ProgressDao.watched`), so the latest `updated_at`
+     * among a show's episodes is when the show was last watched. The inner query is that, once per show however many
+     * of its episodes were watched; the outer one is [windowSeries]'s own aggregate, so a show here has the name, the
+     * poster and the counts it has in the list of all of them -- and is found where that list finds it: a playlist's
+     * shows, made of episodes alone, have no row of their own for a join to stop at, which is why this is not
+     * [windowFavoriteSeries]'s join. The active subscription's, as every read here is. A film or a channel that was
+     * watched is not here: only a row of kind `SERIES` with an episode number is an episode.
+     */
+    @Query(
+        """
+        SELECT series_id AS seriesId,
+               series_title AS title,
+               $SHOW_POSTER AS artworkUrl,
+               COUNT(episode_number) AS episodeCount,
+               COUNT(DISTINCT season_number) AS seasonCount,
+               $SHOW_ORDER AS providerOrder
+        FROM media
+        INNER JOIN (
+            SELECT w.series_id AS showId, MAX(p.updated_at) AS watchedAt
+            FROM playback_progress p
+            INNER JOIN media w ON w.id = p.media_id
+            WHERE w.source_id = $ACTIVE_SOURCE AND w.kind = 'SERIES' AND w.series_id IS NOT NULL
+              AND w.episode_number IS NOT NULL
+            GROUP BY w.series_id
+        ) seen ON seen.showId = media.series_id
+        WHERE media.source_id = $ACTIVE_SOURCE AND media.kind = 'SERIES' AND media.series_id IS NOT NULL
+        GROUP BY media.series_id
+        ORDER BY seen.watchedAt DESC, seriesId
+        LIMIT :limit OFFSET :offset
+        """,
+    )
+    suspend fun windowRecentSeries(offset: Int, limit: Int): List<SeriesRow>
+
     @Query(
         """
         SELECT * FROM media WHERE series_id = :seriesId AND episode_number IS NOT NULL

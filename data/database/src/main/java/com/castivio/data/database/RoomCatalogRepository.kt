@@ -504,6 +504,19 @@ class RoomCatalogRepository(
                 ) { offset, limit -> mediaDao.windowFavoriteSeries(offset, limit) }
             }.map { data -> data.map { it.toDomain() } }
         }
+        // The shows with an episode watched, the one watched last first: a list of its own like the favourites, and
+        // read again when another episode is watched -- see [watchedChanged].
+        if (query.recent) {
+            return pager {
+                readingRecent(
+                    WindowPagingSource(
+                        database.invalidationTracker,
+                        database.queryExecutor,
+                        WindowPagingSource.RECENT_TABLES,
+                    ) { offset, limit -> mediaDao.windowRecentSeries(offset, limit) },
+                )
+            }.map { data -> data.map { it.toDomain() } }
+        }
         val group = query.groupId
         // Nothing searchable is no search, as for the channels: the list, not an empty one.
         val match = FtsQuery.build(query.search)

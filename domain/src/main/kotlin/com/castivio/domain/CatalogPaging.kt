@@ -40,7 +40,8 @@ data class CatalogQuery(
     val favorites: Boolean = false,
     /**
      * Only the channels the viewer has watched, the one watched last first -- the list the rail's
-     * Recently watched entry opens; see [ProgressRepository.watched]. Like [favorites], a list of its own:
+     * Recently watched entry opens; see [ProgressRepository.watched]. For the shows' list ([CatalogPager.series]) it
+     * is the shows with an episode watched, the one watched last first. Like [favorites], a list of its own:
      * no [groupId], [search] or [arranging], and never asked for with [favorites].
      */
     val recent: Boolean = false,
@@ -94,7 +95,11 @@ interface CatalogPager {
 
     fun items(query: CatalogQuery): Flow<PagingData<MediaItem>>
 
-    /** Shows, not episodes. [CatalogQuery.kind] is ignored — this is always series. */
+    /**
+     * Shows, not episodes. [CatalogQuery.kind] is ignored — this is always series. Of the query's own lists the shows have
+     * [CatalogQuery.favorites] -- the shows the viewer marked -- and [CatalogQuery.recent] -- the shows with an episode
+     * watched, the one watched last first; each is a list of its own, with no category or search beside it.
+     */
     fun series(query: CatalogQuery): Flow<PagingData<SeriesSummary>>
 
     /** Seasons of one show, small enough to read whole. */

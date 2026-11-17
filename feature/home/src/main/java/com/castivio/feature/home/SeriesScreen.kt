@@ -114,7 +114,9 @@ fun SeriesScreen(
     LaunchedEffect(hasShows) { if (hasShows) LoadTrace.contentShown(PerfSection.SERIES) }
     val gridState = rememberLazyGridState()
     // A new list starts at its first poster; the same list keeps its place.
-    LaunchedEffect(state.selectedGroup, state.search, state.sort) { gridState.scrollToItem(0) }
+    LaunchedEffect(state.selectedGroup, state.favorites, state.recent, state.search, state.sort) {
+        gridState.scrollToItem(0)
+    }
     val tv = CastivioTheme.device.isTv
 
     // Padded by the cutout and the status bar alone, as the channels' board is: the keyboard the field brings up is
@@ -171,11 +173,13 @@ fun SeriesScreen(
     }
 }
 
-/** What the band calls the list that is open: the category's name, or all of them. */
+/** What the band calls the list that is open: the category's name, or one of the viewer's own lists, or all of them. */
 @Composable
-private fun seriesListName(state: BrowseState): String {
-    val group = state.selectedGroup
-    return (if (group == null) null else state.categoryNames[group]) ?: stringResource(R.string.series_all)
+private fun seriesListName(state: BrowseState): String = when (val list = state.movieList()) {
+    MovieList.All -> stringResource(R.string.series_all)
+    MovieList.Favorites -> stringResource(R.string.channels_favorites)
+    MovieList.Recent -> stringResource(R.string.channels_recent)
+    is MovieList.Category -> state.categoryNames[list.id] ?: stringResource(R.string.series_all)
 }
 
 /**
@@ -216,8 +220,8 @@ private fun SeriesBoard(
                     onFilter = model::filterGroups,
                     onRefresh = model::refresh,
                     allLabel = stringResource(R.string.series_all),
-                    showRecent = false,
                     onFavorites = model::openFavorites,
+                    onRecent = model::openRecent,
                     modifier = Modifier.width(m.rail).fillMaxHeight(),
                 )
 
