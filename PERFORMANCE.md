@@ -232,16 +232,6 @@ reports the split so a slow provider is visibly the provider.
   the import's calls (`ArtworkPolicy`, `PosterRetry`, `ArtworkCalls`). The load strip of a
   development build says what the pictures did: how many calls, how each ended, how long
   they took and waited, and whose host they asked.
-- **The pictures are held to three calls while a section of films is imported.** The
-  films' first load takes one reply of tens of megabytes (78.5 MB, measured) while a
-  poster wall opened over it asks for 25 pictures, 24 of them at once at the peak. From
-  the moment the films' import is collected to the moment it ends -- completed, failed or
-  cancelled -- the image loader's dispatcher is held to 3 calls in all and to a host, and
-  then goes back to 32 and 12. Counted, so that two overlapping imports give the limits
-  back only when the last has ended; calls already running are left to finish. Only the
-  films: no other section's import holds them (`ArtworkPolicy`, `ArtworkConcurrency`,
-  `DefaultCatalogImporter.importKind`). **Not measured on a device yet**: what it does to
-  the time of the load is for the next measurement to say.
 
 ### The design system pays this tax too
 

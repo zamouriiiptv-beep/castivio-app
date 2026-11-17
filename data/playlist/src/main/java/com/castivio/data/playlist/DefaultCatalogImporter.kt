@@ -16,7 +16,6 @@ import com.castivio.core.platform.ProcParsers
 import com.castivio.core.platform.ProcStats
 import com.castivio.core.platform.RecordCounts
 import com.castivio.core.platform.RoomThreadSampler
-import com.castivio.data.networking.ArtworkConcurrency
 import com.castivio.data.networking.CallMetrics
 import com.castivio.data.networking.HttpStatusException
 import com.castivio.data.networking.HttpStreamSource
@@ -110,11 +109,6 @@ class DefaultCatalogImporter(
      * long as it runs. Nobody asks by default, which is every test of this class.
      */
     private val early: EarlyCategories = EarlyCategories.None,
-    /**
-     * The pictures' requests, which a films import holds to a few for as long as it runs: see [ArtworkConcurrency]. Null holds
-     * nothing back, which is every test of this class that is not about it.
-     */
-    private val pictures: ArtworkConcurrency? = null,
 ) : CatalogImporter {
 
     override fun import(source: PlaylistSource): Flow<ImportProgress> = channelFlow {
@@ -185,19 +179,6 @@ class DefaultCatalogImporter(
             // press already has its run, and one that started on its own -- a section
             // opened again after Refresh forgot its marks -- gets one, from zero.
             .onStart { importStarted(kind.perfSection) }
-            .holdingPicturesForFilms(kind)
-
-    /**
-     * The pictures held to a few requests at once for as long as a section of films arrives: from the moment this import is
-     * collected -- and a section that is already on the device is never collected, so nothing is held for it -- to the moment it
-     * ends, completed or failed or cancelled, which [ArtworkConcurrency.whileCollecting] gives back in each.
-     *
-     * Here, and not in each reader, because every films import comes through this one function: a panel's, a playlist's kept copy
-     * or its download, a portal's. And only the films: the channels', the shows' and the radio's imports are left as they were,
-     * and so is the whole catalogue's import that does not come through here -- [import], which activation calls.
-     */
-    private fun Flow<ImportProgress>.holdingPicturesForFilms(kind: MediaKind): Flow<ImportProgress> =
-        if (kind == MediaKind.MOVIE && pictures != null) pictures.whileCollecting(this) else this
 
     private fun importKindUnmeasured(source: PlaylistSource, kind: MediaKind, fresh: Boolean): Flow<ImportProgress> =
         when (source) {

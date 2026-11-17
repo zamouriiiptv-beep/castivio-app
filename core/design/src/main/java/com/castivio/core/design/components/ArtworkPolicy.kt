@@ -68,22 +68,6 @@ object ArtworkPolicy {
     const val MAX_REQUESTS = 32
     const val MAX_REQUESTS_PER_HOST = 12
 
-    /**
-     * What the image loader is held to *while a section of films is arriving*: three requests at once, in all and to any one host.
-     *
-     * A films section's first load takes one reply of tens of megabytes (78.5 MB, measured) and writes it as it reads it, and a poster
-     * wall opened over the load asks for its pictures at the same moment: 25 requests, 24 of them on their way together at the peak,
-     * 5.5 MB in all, over the connection the reply is using. The figure is the owner's, taken from that measurement. What it does to the
-     * time of the load is not known until it is measured on a device, and nothing here says it shortens it.
-     *
-     * Held for the films' import only -- from the moment it begins to the moment it ends, however it ends -- and never for the
-     * channels', the shows' or the radio's. Calls already on their way when it takes hold are left to finish, and only the calls that
-     * start after it wait their turn. [MAX_REQUESTS] and [MAX_REQUESTS_PER_HOST] are what the loader goes back to. See
-     * `ArtworkConcurrency`, which holds and gives back.
-     */
-    const val MAX_REQUESTS_WHILE_FILMS_ARRIVE = 3
-    const val MAX_REQUESTS_PER_HOST_WHILE_FILMS_ARRIVE = 3
-
     /** How long an address that failed is believed to have failed: ten minutes. */
     const val FAILURE_MEMORY_MS = 10 * 60 * 1_000L
 
