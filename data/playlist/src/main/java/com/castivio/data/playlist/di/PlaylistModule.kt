@@ -22,6 +22,7 @@ import com.castivio.data.parsing.StalkerItem
 import com.castivio.data.parsing.StalkerImportEngine
 import com.castivio.domain.MediaKind
 import com.castivio.domain.identity.DeviceIdentity
+import com.castivio.data.networking.ArtworkConcurrency
 import com.castivio.data.networking.XtreamHttpApi
 import com.castivio.data.parsing.ReplySpool
 import com.castivio.data.parsing.XtreamImportEngine
@@ -160,6 +161,9 @@ object PlaylistModule {
         copies: PlaylistCopyStore,
         early: EarlyCategories,
         spool: ReplySpool,
+        // The image loader's limits, which the films' import lowers while it runs. Provided by the application, which owns the
+        // numbers and the loader: this module only reports when the import begins and ends.
+        pictures: ArtworkConcurrency,
     ): CatalogImporter = DefaultCatalogImporter(
         http = http,
         writerFactory = { writers.get() },
@@ -173,6 +177,7 @@ object PlaylistModule {
         portalApiFactory = { source -> source.toApi(client, identity.current().macAddress.value) },
         dispatchers = dispatchers,
         early = early,
+        pictures = pictures,
     )
 
     /**

@@ -51,6 +51,25 @@ class ArtworkPolicyTest {
     }
 
     @Test
+    fun `the loader is held to three requests while films arrive, and goes back to thirty-two and twelve`() {
+        assertEquals(3, ArtworkPolicy.MAX_REQUESTS_WHILE_FILMS_ARRIVE)
+        assertEquals(3, ArtworkPolicy.MAX_REQUESTS_PER_HOST_WHILE_FILMS_ARRIVE)
+        assertEquals(32, ArtworkPolicy.MAX_REQUESTS)
+        assertEquals(12, ArtworkPolicy.MAX_REQUESTS_PER_HOST)
+    }
+
+    @Test
+    fun `the lower limits are lower, and keep a host within the whole`() {
+        assertTrue(ArtworkPolicy.MAX_REQUESTS_WHILE_FILMS_ARRIVE >= 1)
+        assertTrue(
+            "a limit that is not lower than the normal one holds nothing back",
+            ArtworkPolicy.MAX_REQUESTS_WHILE_FILMS_ARRIVE < ArtworkPolicy.MAX_REQUESTS,
+        )
+        assertTrue(ArtworkPolicy.MAX_REQUESTS_PER_HOST_WHILE_FILMS_ARRIVE in 1..ArtworkPolicy.MAX_REQUESTS_WHILE_FILMS_ARRIVE)
+        assertTrue(ArtworkPolicy.MAX_REQUESTS_PER_HOST_WHILE_FILMS_ARRIVE <= ArtworkPolicy.MAX_REQUESTS_PER_HOST)
+    }
+
+    @Test
     fun `the header that names a picture is one of the application's own and says what the call factory reads`() {
         assertTrue(ArtworkPolicy.KIND_HEADER.startsWith("X-Castivio-"))
         assertEquals("picture", ArtworkPolicy.KIND_PICTURE)

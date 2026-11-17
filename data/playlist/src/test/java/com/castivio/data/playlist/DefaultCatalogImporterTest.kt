@@ -3,6 +3,7 @@ package com.castivio.data.playlist
 import com.castivio.core.common.AppDispatchers
 import com.castivio.core.common.AppError
 import com.castivio.data.networking.HttpStatusException
+import com.castivio.data.networking.ArtworkConcurrency
 import com.castivio.data.networking.HttpStreamSource
 import com.castivio.data.parsing.SourceIds
 import com.castivio.data.parsing.XtreamImportEngine
@@ -476,6 +477,85 @@ class DefaultCatalogImporterTest {
         assertEquals("the whole live list was asked for", emptyList<MediaKind>(), panel.wholeSectionAsks)
         assertEquals(listOf("2"), panel.categoryAsks.map { it.second })
         assertEquals(listOf(MediaKind.RADIO), writer.items.map { it.kind })
+    }
+
+    // ------------------------------------------------------------------ the pictures, while the films arrive
+
+    private val normalPictures = ArtworkConcurrency.Limits(maxRequests = 32, maxRequestsPerHost = 12)
+    private val heldPictures = ArtworkConcurrency.Limits(maxRequests = 3, maxRequestsPerHost = 3)
+
+    /** The image loader's dispatcher, as the application would hand it over, and what governs it. */
+    private val pictureDispatcher = okhttp3.Dispatcher()
+    private val pictures = ArtworkConcurrency(normalPictures, heldPictures).also { it.attach(pictureDispatcher) }
+
+    private fun pictureLimits() = ArtworkConcurrency.Limits(pictureDispatcher.maxRequests, pictureDispatcher.maxRequestsPerHost)
+
+    /**
+     * [delegate], noting what the pictures' limits are each time the importer asks the panel for something: what they are *while the
+     * import runs*, which the figures after it cannot say.
+     */
+    private inner class WatchingApi(private val delegate: XtreamImportEngine.Api) : XtreamImportEngine.Api by delegate {
+        val seen: MutableList<ArtworkConcurrency.Limits> = java.util.Collections.synchronizedList(mutableListOf())
+
+        override fun categories(kind: MediaKind): Reader {
+            seen += pictureLimits()
+            return delegate.categories(kind)
+        }
+
+        override fun allStreams(kind: MediaKind): Reader? {
+            seen += pictureLimits()
+            return delegate.allStreams(kind)
+        }
+    }
+
+    /**
+     * The films' import is the one that holds the pictures to a few: from the moment it begins to the moment it ends, and not a
+     * moment after. The panel is asked while it runs, and what the limits are at each ask is what the pictures had while the films
+     * arrived.
+     */
+    @Test
+    fun `the pictures are held to a few requests while the films arrive, and have their places back when they are in`() = runBlocking {
+        val panel = WatchingApi(OneReplyXtreamApi())
+        val account = PlaylistSource.Xtream("http://panel:8080", "user", "pass")
+        assertEquals("before the import, the pictures have the normal limits", normalPictures, pictureLimits())
+
+        importer(xtreamApi = panel, pictures = pictures).importKind(account, MediaKind.MOVIE).toList()
+
+        assertTrue("the panel was asked for something", panel.seen.isNotEmpty())
+        assertEquals("held to the few at every ask of the import", setOf(heldPictures), panel.seen.toSet())
+        assertEquals("given back when it ended", normalPictures, pictureLimits())
+        assertEquals("no hold left open", 0, pictures.holds)
+    }
+
+    @Test
+    fun `the channels', the shows' and the radio's imports leave the pictures as they were`() = runBlocking {
+        val account = PlaylistSource.Xtream("http://panel:8080", "user", "pass")
+        val imports = listOf(
+            MediaKind.LIVE to WatchingApi(OneReplyXtreamApi()),
+            MediaKind.SERIES to WatchingApi(OneReplyShowsApi()),
+            MediaKind.RADIO to WatchingApi(OneReplyXtreamApi()),
+        )
+
+        for ((kind, panel) in imports) {
+            importer(xtreamApi = panel, pictures = pictures).importKind(account, kind).toList()
+
+            assertTrue("$kind: the panel was asked for something", panel.seen.isNotEmpty())
+            assertEquals("$kind: the pictures were never held", setOf(normalPictures), panel.seen.toSet())
+            assertEquals("$kind: and are as they were", normalPictures, pictureLimits())
+        }
+    }
+
+    @Test
+    fun `a films import that fails gives the pictures their places back`() = runBlocking {
+        val panel = WatchingApi(FailingXtreamApi(java.io.IOException("connection reset")))
+        val account = PlaylistSource.Xtream("http://panel:8080", "user", "pass")
+
+        val progress = importer(xtreamApi = panel, pictures = pictures).importKind(account, MediaKind.MOVIE).toList()
+
+        assertTrue("the import failed", progress.any { it is ImportProgress.Failed })
+        assertEquals("held while it ran", setOf(heldPictures), panel.seen.toSet())
+        assertEquals("and given back when it failed", normalPictures, pictureLimits())
+        assertEquals(0, pictures.holds)
     }
 
     /**
@@ -1039,6 +1119,7 @@ class DefaultCatalogImporterTest {
         xtreamApi: XtreamImportEngine.Api = FakeXtreamApi(),
         writer: CatalogWriter = this.writer,
         copies: KeptPlaylists? = null,
+        pictures: ArtworkConcurrency? = null,
     ) = DefaultCatalogImporter(
         http = HttpStreamSource(
             OkHttpClient.Builder()
@@ -1062,6 +1143,7 @@ class DefaultCatalogImporterTest {
         // Watched rather than handed to the stopwatch, for the same reason: its clock is
         // Android's.
         importStarted = { started += it },
+        pictures = pictures,
     )
 
     /** The importer's one-line outcome. Exactly one per playlist import. */

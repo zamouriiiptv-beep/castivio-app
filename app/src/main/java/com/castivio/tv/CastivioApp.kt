@@ -10,6 +10,7 @@ import com.castivio.core.design.components.ArtworkPolicy
 import com.castivio.core.platform.DeviceCapabilities
 import com.castivio.core.platform.MemoryClass
 import com.castivio.data.networking.ArtworkCalls
+import com.castivio.data.networking.ArtworkConcurrency
 import com.castivio.data.networking.ArtworkListener
 import com.castivio.tv.debug.CrashReport
 import dagger.hilt.EntryPoint
@@ -66,7 +67,7 @@ class CastivioApp : Application(), ImageLoaderFactory {
         val graph = EntryPointAccessors.fromApplication(this, ImageGraph::class.java)
         val memoryClass = graph.capabilities().memoryClass
         return ImageLoader.Builder(this)
-            .callFactory { pictureCalls(graph.httpClient()) }
+            .callFactory { pictureCalls(graph.httpClient(), graph.artworkConcurrency()) }
             .memoryCache {
                 MemoryCache.Builder(this)
                     .maxSizePercent(
@@ -116,19 +117,28 @@ class CastivioApp : Application(), ImageLoaderFactory {
      * frame. The request says which it is ([ArtworkPolicy.KIND_HEADER]) and [ArtworkCalls] gives the call
      * [ArtworkPolicy.PICTURE_CALL_TIMEOUT_MS] for a picture and the logo's limit for the rest. The client's own limits --
      * twelve seconds to connect, twenty between packets -- are left as they are.
+     *
+     * **Its limits are [concurrency]'s.** The dispatcher is built with [ArtworkPolicy.MAX_REQUESTS] and
+     * [ArtworkPolicy.MAX_REQUESTS_PER_HOST], and handed to [concurrency] at once, which holds it to
+     * [ArtworkPolicy.MAX_REQUESTS_WHILE_FILMS_ARRIVE] while a section of films is being imported and gives the first two back when
+     * it ends. The import can have begun before the first picture was asked for, and then the dispatcher is held from the start.
      */
-    private fun pictureCalls(shared: OkHttpClient): Call.Factory = ArtworkCalls(
-        client = ArtworkCalls.deriveClient(
+    private fun pictureCalls(shared: OkHttpClient, concurrency: ArtworkConcurrency): Call.Factory {
+        val client = ArtworkCalls.deriveClient(
             shared = shared,
             listenerFactory = ArtworkListener.FACTORY,
             maxRequests = ArtworkPolicy.MAX_REQUESTS,
             maxRequestsPerHost = ArtworkPolicy.MAX_REQUESTS_PER_HOST,
             callTimeoutMs = ArtworkPolicy.CALL_TIMEOUT_MS,
-        ),
-        markerHeader = ArtworkPolicy.KIND_HEADER,
-        markedLimitMs = ArtworkPolicy.PICTURE_CALL_TIMEOUT_MS,
-        limitMs = ArtworkPolicy.CALL_TIMEOUT_MS,
-    )
+        )
+        concurrency.attach(client.dispatcher)
+        return ArtworkCalls(
+            client = client,
+            markerHeader = ArtworkPolicy.KIND_HEADER,
+            markedLimitMs = ArtworkPolicy.PICTURE_CALL_TIMEOUT_MS,
+            limitMs = ArtworkPolicy.CALL_TIMEOUT_MS,
+        )
+    }
 
     /** What [newImageLoader] needs off the graph, fetched when it is needed and not before. */
     @EntryPoint
@@ -136,6 +146,7 @@ class CastivioApp : Application(), ImageLoaderFactory {
     interface ImageGraph {
         fun httpClient(): OkHttpClient
         fun capabilities(): DeviceCapabilities
+        fun artworkConcurrency(): ArtworkConcurrency
     }
 
     override fun onCreate() {
