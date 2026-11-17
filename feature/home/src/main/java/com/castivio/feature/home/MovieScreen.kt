@@ -337,6 +337,7 @@ fun MovieScreen(
                                     iconSize = iconSize,
                                     padH = m.entryPadH,
                                     padV = m.entryPadV,
+                                    modifier = Modifier.clip(RoundedCornerShape(Radius.pill)).background(detailsGround()),
                                 )
                             }
                             added?.let {
@@ -379,7 +380,8 @@ fun MovieScreen(
                         // Provider plot text is laid out as its own LTR paragraph. Left alignment
                         // is physical here: the Arabic page must not pull an English paragraph to its right edge.
                         style = bodyStyle.copy(textDirection = TextDirection.Ltr),
-                        color = colors.onBackgroundVariant,
+                        // The strong ink: the plot is read over the wide picture (details-template-ar.html).
+                        color = colors.onBackground,
                         maxLines = lines,
                         overflow = TextOverflow.Clip,
                         textAlign = TextAlign.Left,
@@ -602,7 +604,7 @@ private fun Fact(text: String, m: CatalogMetrics, icon: ImageVector? = null, ico
     Row(
         Modifier
             .clip(shape)
-            .background(colors.glassFill)
+            .background(detailsGround())
             .border(1.dp, colors.glassBorderSoft, shape)
             .padding(horizontal = m.entryPadH, vertical = m.entryPadV),
         verticalAlignment = Alignment.CenterVertically,
@@ -612,7 +614,7 @@ private fun Fact(text: String, m: CatalogMetrics, icon: ImageVector? = null, ico
         Text(
             text = text,
             style = castivioChipStyle(m.frame.fsChip),
-            color = colors.onBackgroundVariant,
+            color = colors.onBackground,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
@@ -654,7 +656,7 @@ private fun FactsBar(
         Modifier
             .fillMaxWidth()
             .clip(shape)
-            .background(colors.glassFill)
+            .background(detailsGround())
             .border(1.dp, colors.glassBorderSoft, shape)
             .padding(horizontal = m.entryPadH, vertical = m.entryPadV),
     ) {
@@ -743,8 +745,9 @@ internal fun shareWidths(natural: List<Int>, shrinks: List<Boolean>, available: 
  * A credit as the page's line and the dialog both set it: its label in bold, and the names after it.
  */
 @Composable
-private fun creditText(label: String, names: String): AnnotatedString {
-    val ink = CastivioTheme.colors.onBackground
+internal fun creditText(label: String, names: String): AnnotatedString {
+    // The label a step quieter than the names, so the names stand out over the wide picture (details-template-ar.html).
+    val ink = CastivioTheme.colors.onBackgroundVariant
     return remember(label, names, ink) {
         buildAnnotatedString {
             withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = ink)) { append(label) }
@@ -784,7 +787,7 @@ private fun Credit(
         Text(
             text = creditText(label, names),
             style = style,
-            color = colors.onBackgroundVariant,
+            color = colors.onBackground,
             maxLines = lines,
             overflow = TextOverflow.Clip,
             onTextLayout = { cut = it.hasVisualOverflow },

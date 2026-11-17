@@ -1,5 +1,6 @@
 package com.castivio.feature.home
 
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
@@ -24,6 +25,8 @@ internal fun PageFavorite(favorite: Boolean, text: String, onClick: () -> Unit, 
         onClick = onClick,
         modifier = modifier,
         weight = ButtonWeight.Secondary,
+        // On the details' dark ground, not glass: it stands over the wide picture (details-template-ar.html).
+        fill = SolidColor(detailsGround()),
         icon = if (favorite) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
         iconTint = if (favorite) CastivioTheme.colors.secondary else null,
     )

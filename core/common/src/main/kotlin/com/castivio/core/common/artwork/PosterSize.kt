@@ -38,6 +38,17 @@ object PosterSize {
      */
     fun forPage(url: String): String = atMost(url, PAGE_SIZE, PAGE_WIDTH)
 
+    /**
+     * TMDB's width for a wide picture behind a title's page: small on purpose. Stretched across the screen it is soft on every
+     * device -- a blur effect does nothing under Android 12, which is most television boxes -- and it is a tenth of a w1280.
+     */
+    const val SOFT_SIZE = "w300"
+
+    private const val SOFT_WIDTH = 300
+
+    /** [url] as a title's page asks for the wide picture behind it: `w300`, by the same rule as [forCard]. */
+    fun forSoftBackdrop(url: String): String = atMost(url, SOFT_SIZE, SOFT_WIDTH)
+
     /** TMDB's width for a picture that fills a screen: a wide picture behind a title's page, dimmed to a third. */
     const val SCREEN_SIZE = "w1280"
 

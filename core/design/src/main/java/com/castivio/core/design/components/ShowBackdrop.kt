@@ -39,7 +39,7 @@ import com.castivio.core.design.theme.Motion
  * **The page never waits for it.** Nothing is drawn while it is on its way or when it failed: the ground is under it, so
  * the page is the page it always was. When it comes it fades in over [Motion.fast], or at once at the lowest motion level.
  *
- * **Asked for at a screen's size** ([PosterSize.forScreen]): `w1280` in place of TMDB's `original` of several megabytes.
+ * **Asked for small** ([PosterSize.forSoftBackdrop]): `w300`, stretched across the screen, so it is soft on every device.
  * Like [PosterArtwork] this file is where the loader is seen: a feature hands over a url and does not import Coil.
  */
 @Composable
@@ -65,7 +65,8 @@ fun ShowBackdrop(
         AsyncImage(
             // A wide picture: asked for as a picture, and given a picture's limit and not a logo's.
             model = ImageRequest.Builder(LocalContext.current)
-                .data(PosterSize.forScreen(url))
+                // Small, and stretched: soft on every device (see `PosterSize.SOFT_SIZE`, details-template-ar.html).
+                .data(PosterSize.forSoftBackdrop(url))
                 .addHeader(ArtworkPolicy.KIND_HEADER, ArtworkPolicy.KIND_PICTURE)
                 .crossfade(false)
                 .build(),
@@ -78,7 +79,8 @@ fun ShowBackdrop(
             onError = { failed = true },
             modifier = Modifier.fillMaxSize(),
         )
-        Box(Modifier.fillMaxSize().background(ground.copy(alpha = DIM)))
+        // Black over the whole picture, then the gradient: the picture is a mood behind the words, not something to read.
+        Box(Modifier.fillMaxSize().background(CastivioTheme.colors.scrim.copy(alpha = BLACK)))
         Box(
             Modifier
                 .fillMaxSize()
@@ -104,15 +106,15 @@ fun ShowBackdrop(
 }
 
 /** The gradient's stops, from the text's side to the poster's: deep under the words, open toward the poster. */
-private const val START_ALPHA = 0.90f
+private const val START_ALPHA = 0.92f
 private const val START_HALF = 0.40f
-private const val HALF_ALPHA = 0.70f
-private const val OPENS = 0.75f
-private const val OPEN_ALPHA = 0.25f
-private const val END_ALPHA = 0.05f
+private const val HALF_ALPHA = 0.80f
+private const val OPENS = 0.72f
+private const val OPEN_ALPHA = 0.40f
+private const val END_ALPHA = 0.20f
 
-/** The ground over the whole picture, under the gradient. */
-private const val DIM = 0.15f
+/** The black over the whole picture, under the gradient. */
+private const val BLACK = 0.28f
 
 /** Where the foot's fade to the ground begins, as a share of the height. */
 private const val FOOT_BEGINS = 0.55f

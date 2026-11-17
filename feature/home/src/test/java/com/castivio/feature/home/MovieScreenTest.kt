@@ -341,6 +341,35 @@ class MovieScreenTest {
         assertTrue("the name spans the whole screen, as the page does: $nameWidth of $pageWidth", nameWidth < pageWidth)
     }
 
+    /**
+     * The wide picture is never a condition of the page (details-template-ar.html): with one that cannot be fetched, the
+     * page is drawn whole on the application's own ground, as it is with none.
+     */
+    @Test
+    fun `a wide picture that cannot come leaves the page whole, as no picture does`() {
+        show(details = WithBackdrop("http://unreachable.invalid/wide.jpg", plot = "A desert war."))
+
+        compose.onNodeWithText("Dune: Part Two").assertIsDisplayed()
+        compose.onNodeWithText("Play movie").assertIsDisplayed()
+        compose.onNodeWithText("Add to favourites").assertIsDisplayed()
+        compose.onNodeWithText("A desert war.").assertIsDisplayed()
+    }
+
+    @Test
+    fun `a film with no wide picture is the same page`() {
+        show(details = WithPlot("A desert war."))
+
+        compose.onNodeWithText("Dune: Part Two").assertIsDisplayed()
+        compose.onNodeWithText("Play movie").assertIsDisplayed()
+        compose.onNodeWithText("A desert war.").assertIsDisplayed()
+    }
+
+    /** A provider that gives a plot and a wide picture. */
+    private class WithBackdrop(private val url: String, private val plot: String) : MovieDetailsRepository {
+        override suspend fun details(movie: Movie, onTimes: (RequestTimes) -> Unit): MovieDetails? =
+            MovieDetails(plot = plot, backdropUrl = url)
+    }
+
     /** A provider that gives a director and a cast and nothing else. */
     private class WithCredits(private val director: String, private val cast: List<String>) : MovieDetailsRepository {
         override suspend fun details(movie: Movie, onTimes: (RequestTimes) -> Unit): MovieDetails? =

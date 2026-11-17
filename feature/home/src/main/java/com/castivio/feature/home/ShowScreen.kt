@@ -64,9 +64,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -74,6 +77,7 @@ import com.castivio.core.common.artwork.ArtworkShown
 import com.castivio.core.common.artwork.PageOpen
 import com.castivio.core.common.artwork.PageOpenLine
 import com.castivio.core.common.artwork.PageOpenTimes
+import com.castivio.core.design.components.RatingBadge
 import com.castivio.core.design.components.ButtonWeight
 import com.castivio.core.design.components.CardShape
 import com.castivio.core.design.components.CastivioButton
@@ -82,7 +86,6 @@ import com.castivio.core.design.components.CastivioNoticeDialog
 import com.castivio.core.design.components.EmptyState
 import com.castivio.core.design.components.MediaCard
 import com.castivio.core.design.components.PosterFrame
-import com.castivio.core.design.components.RatingStar
 import com.castivio.core.design.components.ShowBackdrop
 import com.castivio.core.design.components.castivioBodyStyle
 import com.castivio.core.design.components.castivioChipStyle
@@ -524,12 +527,39 @@ private fun ShowTop(
                         onClick = onFavorite,
                     )
                 }
+                // The rating on a row of its own, as the film page draws it (details-template-ar.html).
+                details?.rating?.let {
+                    RatingBadge(
+                        rating = ratingText(it),
+                        labelStyle = castivioChipStyle(m.frame.fsChip),
+                        iconSize = m.frame.fsBody * FACT_ICON_OF_BODY,
+                        padH = m.entryPadH,
+                        padV = m.entryPadV,
+                        modifier = Modifier.clip(RoundedCornerShape(Radius.pill)).background(detailsGround()),
+                    )
+                }
                 val plot = details?.plot
                 if (plot != null) {
+                    // The plot's heading, and at its end the link to the whole of it where the page had to cut it: the
+                    // film page's own row.
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = stringResource(R.string.movie_plot_title),
+                            style = castivioChipStyle(m.frame.fsLabel).copy(fontWeight = FontWeight.Bold),
+                            color = colors.onBackground,
+                        )
+                        if (plotCut) PlotMore(m, onClick = onMorePlot)
+                    }
                     Text(
                         text = plot,
-                        style = castivioBodyStyle(m.frame.fsBody),
-                        color = colors.onBackgroundVariant,
+                        // The strong ink, and the plot's own direction from its first letter, so a Dutch or English
+                        // plot on an Arabic page keeps its full stop at its end.
+                        style = castivioBodyStyle(m.frame.fsBody).copy(textDirection = TextDirection.Content),
+                        color = colors.onBackground,
                         maxLines = if (tv) PLOT_LINES_TV else PLOT_LINES,
                         overflow = TextOverflow.Ellipsis,
                         textAlign = startEdgeAlign(plot),
@@ -545,11 +575,21 @@ private fun ShowTop(
                             Modifier
                         },
                     )
-                    // Where the plot was cut, the link to the whole of it: a press on the text is for a thumb, and
-                    // the remote reaches this.
-                    if (plotCut) PlotMore(m, onClick = onMorePlot)
                 } else if (waiting) {
                     PlotPlaceholder(m, tv)
+                }
+                // The cast in one line, as the film page sets a credit: the label quieter, the names in the strong ink.
+                details?.cast?.filter { it.isNotBlank() }?.takeIf { it.isNotEmpty() }?.let { cast ->
+                    Text(
+                        text = creditText(
+                            stringResource(R.string.movie_cast),
+                            creditNames(cast, rtl = LocalLayoutDirection.current == LayoutDirection.Rtl),
+                        ),
+                        style = castivioBodyStyle(m.frame.fsBody).copy(textDirection = TextDirection.Content),
+                        color = colors.onBackground,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
                 }
             }
         }
@@ -564,7 +604,7 @@ private fun ShowFacts(state: ShowState, waiting: Boolean, m: CatalogMetrics) {
     val iconSize = m.frame.fsBody * FACT_ICON_OF_BODY
     val style = castivioBodyStyle(m.frame.fsBody)
     val anything = details?.releaseYear != null || details?.genres?.any { it.isNotBlank() } == true ||
-        details?.rating != null || state.seasons.isNotEmpty()
+        state.seasons.isNotEmpty()
     // On the film page's ground: one pill of glass, as its facts bar is, so the facts read over the wide picture.
     val shape = RoundedCornerShape(Radius.pill)
     val colors = CastivioTheme.colors
@@ -572,7 +612,7 @@ private fun ShowFacts(state: ShowState, waiting: Boolean, m: CatalogMetrics) {
         modifier = if (anything) {
             Modifier
                 .clip(shape)
-                .background(colors.glassFill)
+                .background(detailsGround())
                 .border(1.dp, colors.glassBorderSoft, shape)
                 .padding(horizontal = m.entryPadH, vertical = m.entryPadV)
         } else {
@@ -585,7 +625,6 @@ private fun ShowFacts(state: ShowState, waiting: Boolean, m: CatalogMetrics) {
         details?.genres?.filter { it.isNotBlank() }?.takeIf { it.isNotEmpty() }?.let { genres ->
             Fact(Icons.Rounded.TheaterComedy, genres.joinToString(" | "), iconSize, style)
         }
-        details?.rating?.let { RatingStar(ltrToken(ratingText(it)), style, iconSize) }
         if (state.seasons.isNotEmpty()) {
             val count = state.seasons.size
             Fact(Icons.Rounded.Layers, plural(R.plurals.show_seasons, count), iconSize, style)
@@ -599,7 +638,7 @@ private fun Fact(icon: ImageVector, text: String, iconSize: Dp, style: androidx.
     val colors = CastivioTheme.colors
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(FACT_GAP)) {
         Icon(icon, contentDescription = null, tint = colors.onBackgroundMuted, modifier = Modifier.size(iconSize))
-        Text(text = text, style = style, color = colors.onBackgroundVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(text = text, style = style, color = colors.onBackground, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 

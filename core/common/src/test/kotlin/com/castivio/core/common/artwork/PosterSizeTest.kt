@@ -72,4 +72,12 @@ class PosterSizeTest {
         }
         assertEquals("http://cdn.example/p.jpg", PosterSize.forPage("http://cdn.example/p.jpg"))
     }
+
+    @Test
+    fun `the wide picture behind a page is asked for small, to be stretched soft`() {
+        assertEquals("https://image.tmdb.org/t/p/w300/b.jpg", PosterSize.forSoftBackdrop("https://image.tmdb.org/t/p/original/b.jpg"))
+        assertEquals("https://image.tmdb.org/t/p/w300/b.jpg", PosterSize.forSoftBackdrop("https://image.tmdb.org/t/p/w1280/b.jpg"))
+        assertEquals("https://image.tmdb.org/t/p/w300/b.jpg", PosterSize.forSoftBackdrop("https://image.tmdb.org/t/p/w300/b.jpg"))
+        assertEquals("http://cdn.example/b.jpg", PosterSize.forSoftBackdrop("http://cdn.example/b.jpg"))
+    }
 }
