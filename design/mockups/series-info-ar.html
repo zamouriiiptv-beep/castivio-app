@@ -1,0 +1,237 @@
+<!doctype html>
+<!--
+  A show's page, third drawing, at the owner's order (2026-11-17) -- the SERIES page only; the film's page is not touched:
+
+    1. The show's information on a screen of its own. Beside the IMDb badge an "معلومات" (Info) button on the same dark
+       ground; a press opens a screen over the same softened picture with the whole plot, the director, the cast, the
+       genres, the year, the rating and the seasons and episodes counted. Back returns to the page, to the Info button.
+       The page itself no longer carries the plot or the cast, so the seasons and the episodes are on the first screen.
+    2. Under the IMDb row, a BAR of seasons (two-line chips: the season, its episode count), not a drop-down window; the
+       chosen one lit and kept in view, left and right on the remote moving between them; and the episodes directly under
+       it. A show of one season keeps the plain line "الموسم 1 (N حلقات)" in place of a bar of one chip.
+
+  The page's top is details-template-ar.html's (section 139): the softened, darkened picture, the dark grounds, the strong
+  ink, the poster as it is. The pictures are stand-ins; the names, plots and people are examples.
+
+    ?frame=<name>&clean=1   one screen alone: show-tv, show-phone, info-tv, info-phone
+-->
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Series page with info</title>
+<style>
+:root{
+  --ground:#111327; --panel:#20223A; --edgeSoft:rgba(255,255,255,.08);
+  --glassBorder:rgba(255,255,255,.16); --solid:rgba(6,6,16,.72);
+  --azure:#4C9BFF; --gold:#F5C518; --strong:#F4F2FA; --label:#A9A8C2; --muted:#8C8CA8;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#05040E;color:var(--strong);font-family:Inter,"Noto Sans Arabic","DejaVu Sans",sans-serif}
+body.sheet{padding:22px;width:max-content;direction:ltr}
+svg{display:block;flex:none}
+.cap{direction:rtl;text-align:right;width:960px;font:15px/1.6 "Noto Sans Arabic",Inter,sans-serif;color:#a4a4c0;margin:22px 0 10px}
+.cap b{color:#fff}
+
+/* the application's own ground: what the page stands on with no picture, and under a picture still coming */
+.screen{position:relative;overflow:hidden;direction:rtl;
+  background:radial-gradient(120% 90% at 15% 0%,#1B1F3F 0%,rgba(27,31,63,0) 60%),linear-gradient(200deg,#13152D,var(--ground))}
+.phone{width:833px;height:385px}
+.tv{width:960px;height:540px}
+
+/* ---------- 1. the picture: small and stretched (soft on every device), under black, under the gradient ---------- */
+.bd{position:absolute;inset:-14px;filter:blur(4px) saturate(.9);transform:scale(1.04)}
+.bd.dusk{background:
+  radial-gradient(5% 16% at 20% 62%,#1a0f14 0%,#1a0f14 70%,rgba(26,15,20,0) 100%),
+  radial-gradient(5% 15% at 26% 63%,#24131a 0%,#24131a 70%,rgba(36,19,26,0) 100%),
+  repeating-linear-gradient(90deg,rgba(0,0,0,0) 0 40px,rgba(30,18,26,.9) 40px 70px,rgba(0,0,0,0) 70px 95px),
+  linear-gradient(180deg,rgba(0,0,0,0) 58%,#2b1a24 58.5%,#1d1219 100%),
+  radial-gradient(14% 22% at 62% 52%,#ffd59a 0%,#ffb565 35%,rgba(255,181,101,0) 100%),
+  radial-gradient(45% 60% at 35% 35%,#f0a35a 0%,rgba(240,163,90,0) 70%),
+  radial-gradient(35% 45% at 75% 60%,#7b4a8f 0%,rgba(123,74,143,0) 70%),
+  linear-gradient(200deg,#3b2a55 0%,#5a3420 60%,#1d1426 100%)}
+.bd.ice{background:
+  radial-gradient(6% 26% at 28% 52%,#e9eef5 0%,#c9d6e6 55%,rgba(201,214,230,0) 100%),
+  linear-gradient(180deg,rgba(0,0,0,0) 70%,#8fa6c2 70.5%,#3c536f 100%),
+  radial-gradient(40% 55% at 70% 45%,#cfe0ef 0%,rgba(207,224,239,0) 70%),
+  linear-gradient(160deg,#28405f 0%,#16243a 55%,#0b1222 100%)}
+.bd.snow{background:radial-gradient(60% 70% at 40% 40%,#ffffff 0%,#f2f4f8 40%,rgba(242,244,248,0) 80%),linear-gradient(180deg,#e8ecf2,#cfd6e0)}
+.black{position:absolute;inset:0;background:rgba(0,0,0,.28)}
+.scrim{position:absolute;inset:0;background:
+  linear-gradient(to right,rgba(8,8,18,.92) 0%,rgba(8,8,18,.80) 40%,rgba(8,8,18,.40) 72%,rgba(8,8,18,.20) 100%),
+  linear-gradient(to bottom,rgba(17,19,39,0) 55%,var(--ground) 100%)}
+.arriving .bd,.arriving .black,.arriving .scrim{opacity:.3}
+
+/* ---------- the page ---------- */
+.page{position:absolute;inset:0;display:flex;gap:28px;padding:17px 40px}
+.tv .page{padding:30px 48px;gap:36px}
+.tv .facts{height:38px;border-radius:19px;font-size:13.5px;margin-top:12px}
+.tv .facts svg{width:16px;height:16px}
+.tv .btns{margin-top:16px}
+.tv .btn{height:54px;font-size:17px;padding:0 30px}
+.tv .rrow{margin-top:14px}
+.tv .imdb,.tv .chip{height:32px;font-size:13.5px;border-radius:16px}
+.tv .head{margin-top:16px;font-size:15px}
+.tv .more{font-size:14px}
+.poster{flex:none;border-radius:12px;border:1px solid var(--edgeSoft);overflow:hidden;position:relative;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.poster.dusk{background:linear-gradient(170deg,#f2b56b 0%,#c5683a 45%,#4a2a3c 100%)}
+.poster.ice{background:radial-gradient(60% 50% at 50% 55%,#e8f1fa 0%,#9fb6cf 45%,#2a3b55 100%)}
+.poster.snow{background:linear-gradient(170deg,#ffffff 0%,#dfe5ee 60%,#9aa7b8 100%)}
+.poster.flat{background:linear-gradient(170deg,#e6c970 0%,#c99d3c 45%,#8a6422 100%)}
+.poster b{position:absolute;left:0;right:0;top:9%;text-align:center;font:800 12px/1 Inter,sans-serif;letter-spacing:4px;color:rgba(255,255,255,.92);direction:ltr}
+.poster.snow b{color:#3a4250}
+.info{flex:1;min-width:0;display:flex;flex-direction:column}
+.prov{direction:ltr;text-align:right;unicode-bidi:plaintext}
+.trow{display:flex;align-items:center;gap:8px}
+.name{flex:1;font-weight:700;font-size:24px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--strong);text-shadow:0 1px 10px rgba(0,0,0,.6)}
+.tv .name{font-size:34px}
+.back{flex:none;width:40px;height:40px;border-radius:10px;background:var(--solid);border:1px solid var(--glassBorder);display:flex;align-items:center;justify-content:center}
+.back svg{width:20px;height:20px;fill:var(--azure)}
+/* 3. dark, near-opaque grounds */
+.facts{margin-top:8px;height:32px;border-radius:16px;background:var(--solid);border:1px solid var(--glassBorder);
+  display:flex;align-items:center;padding:0 14px;font-size:11.5px;white-space:nowrap;overflow:hidden;align-self:flex-start}
+.facts i{flex:none;width:1px;height:16px;background:var(--glassBorder);margin:0 10px}
+.facts span{display:flex;align-items:center;gap:6px;flex:none;color:var(--strong)}
+.facts svg{width:14px;height:14px;fill:var(--label)}
+.btns{margin-top:12px;display:flex;gap:10px}
+.btn{height:46px;border-radius:12px;display:flex;align-items:center;gap:8px;padding:0 24px;font:600 15px "Noto Sans Arabic",Inter,sans-serif}
+.btn svg{width:20px;height:20px}
+.btn.p{background:linear-gradient(180deg,#4C9BFF,#2F6FE0);color:#fff;box-shadow:0 6px 18px rgba(47,111,224,.35)} .btn.p svg{fill:#fff}
+.btn.s{background:var(--solid);border:1px solid var(--glassBorder);color:var(--strong)} .btn.s svg{fill:var(--strong)}
+.btn.focus{outline:3px solid #6FB2FF;outline-offset:2px}
+.rrow{margin-top:10px;display:flex;gap:10px;align-items:center}
+.imdb{display:flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:14px;border:1.5px solid var(--gold);font:700 12px Inter,sans-serif;background:var(--solid)}
+.imdb small{background:var(--gold);color:#000;font:900 10px Inter,sans-serif;padding:2px 5px;border-radius:4px}
+.imdb svg{width:13px;height:13px;fill:var(--gold)}
+.chip{height:28px;padding:0 12px;border-radius:14px;background:var(--solid);border:1px solid var(--glassBorder);display:flex;align-items:center;gap:6px;font:12px "Noto Sans Arabic",Inter,sans-serif;color:var(--strong)}
+.chip svg{width:13px;height:13px;fill:var(--label)}
+.head{margin-top:10px;display:flex;justify-content:space-between;align-items:center;font:700 13px "Noto Sans Arabic",sans-serif;color:var(--strong)}
+.more{color:var(--azure);font:600 12px "Noto Sans Arabic",sans-serif;display:flex;gap:4px;align-items:center;white-space:nowrap}
+.more svg{width:14px;height:14px;fill:var(--azure)}
+/* 4. strong words */
+.plot{margin-top:3px;font-size:12.5px;line-height:1.55;color:var(--strong);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-shadow:0 1px 6px rgba(0,0,0,.55)}
+.tv .plot{font-size:16px;-webkit-line-clamp:4;margin-top:6px}
+.people{margin-top:6px;font-size:12px;color:var(--strong);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.people b{font:600 12px "Noto Sans Arabic",sans-serif;color:var(--label)}
+.tv .people{font-size:15px;margin-top:10px}
+.tv .people b{font-size:15px}
+
+/* ---------- 5. what is a show's own, below: on the plain ground ---------- */
+.below{position:absolute;left:40px;right:40px;top:322px}
+.season{height:46px;border-radius:14px;background:var(--panel);border:1px solid var(--edgeSoft);display:flex;align-items:center;justify-content:space-between;padding:0 16px;font:600 14px "Noto Sans Arabic",sans-serif}
+.season small{color:var(--muted);font-weight:400}
+
+.tag{position:absolute;bottom:8px;left:10px;font:11px Inter;color:rgba(255,255,255,.45);direction:ltr}
+.legend{position:absolute;top:8px;left:10px;font:11px Inter;color:rgba(255,255,255,.6);direction:ltr;background:rgba(0,0,0,.5);padding:2px 6px;border-radius:4px}
+
+/* ---------- the show's page: name, facts, buttons, IMDb with Info, seasons, episodes ---------- */
+.info-chip{height:28px;padding:0 12px;border-radius:14px;background:var(--solid);border:1px solid var(--glassBorder);display:flex;align-items:center;gap:6px;font:600 12px "Noto Sans Arabic",Inter,sans-serif;color:var(--strong)}
+.info-chip svg{width:14px;height:14px;fill:var(--azure)}
+.tv .info-chip{height:32px;font-size:13.5px;border-radius:16px}
+.info-chip.focus{outline:3px solid #6FB2FF;outline-offset:2px}
+.seasons{position:absolute;left:40px;right:40px;display:flex;gap:10px;direction:rtl}
+.schip{flex:none;padding:6px 14px;border-radius:12px;background:var(--panel);border:1px solid var(--edgeSoft);text-align:center;font:600 13px "Noto Sans Arabic",sans-serif;color:var(--label)}
+.schip small{display:block;font:400 11px "Noto Sans Arabic",sans-serif;color:var(--muted);margin-top:1px}
+.schip.on{background:linear-gradient(180deg,#4C9BFF,#2F6FE0);color:#fff;border-color:transparent}
+.schip.on small{color:rgba(255,255,255,.85)}
+.schip.focus{outline:3px solid #6FB2FF;outline-offset:2px}
+.tv .schip{font-size:15px;padding:8px 18px}.tv .schip small{font-size:12.5px}
+.eps{position:absolute;left:40px;right:40px;display:flex;flex-direction:column;gap:10px}
+.ep{height:66px;border-radius:14px;background:var(--panel);border:1px solid var(--edgeSoft);display:flex;align-items:center;gap:14px;padding:0 14px;font-size:13px;direction:rtl}
+.tv .ep{height:78px;font-size:15px}
+.ep .n{width:18px;text-align:center;color:var(--muted);font:700 15px Inter}
+.ep .still{width:96px;height:52px;border-radius:9px;background:linear-gradient(150deg,#2a4b78,#152742);flex:none}
+.tv .ep .still{width:116px;height:62px}
+.ep .t{flex:1;min-width:0}
+.ep .t b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;direction:ltr;text-align:right}
+.ep .t span{display:block;font-size:11.5px;color:var(--label);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;direction:ltr;text-align:right;margin-top:3px}
+.tv .ep .t span{font-size:13px}
+.ep .d{height:24px;padding:0 9px;border-radius:12px;border:1px solid var(--glassBorder);font:12px Inter;display:flex;align-items:center;direction:ltr;flex:none}
+/* ---------- the information screen ---------- */
+.sheetbox{position:absolute;inset:0;padding:22px 40px;display:flex;flex-direction:column;gap:12px;direction:rtl}
+.tv .sheetbox{padding:34px 64px;gap:16px}
+.sheethead{display:flex;align-items:center;gap:12px}
+.sheethead .name{font-size:22px}
+.tv .sheethead .name{font-size:30px}
+.panelbox{flex:1;min-height:0;border-radius:16px;background:var(--solid);border:1px solid var(--glassBorder);padding:16px 20px;display:flex;flex-direction:column;gap:12px;overflow:hidden}
+.tv .panelbox{padding:24px 30px;gap:16px}
+.sect h4{font:700 13px "Noto Sans Arabic",sans-serif;color:var(--label);margin-bottom:4px}
+.tv .sect h4{font-size:15px}
+.sect p{font-size:13px;line-height:1.6;color:var(--strong);direction:ltr;text-align:right}
+.tv .sect p{font-size:16px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.cell{border-radius:12px;background:rgba(255,255,255,.04);border:1px solid var(--edgeSoft);padding:8px 12px}
+.cell h4{font:600 11.5px "Noto Sans Arabic",sans-serif;color:var(--label)}
+.cell div{margin-top:3px;font:600 13px Inter,"Noto Sans Arabic",sans-serif;color:var(--strong);direction:ltr;text-align:right}
+.tv .cell h4{font-size:13.5px}.tv .cell div{font-size:15.5px}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M4 11h12.2l-5.6-5.6L12 4l8 8-8 8-1.4-1.4 5.6-5.6H4z"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 21l-1.5-1.3C5.4 15.1 2 12.1 2 8.4 2 5.4 4.4 3 7.4 3c1.7 0 3.4.8 4.6 2.1C13.2 3.8 14.9 3 16.6 3 19.6 3 22 5.4 22 8.4c0 3.7-3.4 6.7-8.5 11.3z"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 17.3l6.2 3.7-1.6-7 5.4-4.7-7.2-.6L12 2 9.2 8.7 2 9.3l5.4 4.7-1.6 7z"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2zm0 16H5V9h14z"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16zm.5-13H11v6l5.2 3.2.8-1.3-4.5-2.7z"/></symbol>
+  <symbol id="i-mask" viewBox="0 0 24 24"><path d="M3 3h10v6c0 3-2.2 5.5-5 5.5S3 12 3 9zm2 3v1h2V6zm4 0v1h2V6zM11 10h10v6c0 3-2.2 5.5-5 5.5S11 19 11 16z"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 2l10 6-10 6L2 8zm0 14.5l8.3-5 1.7 1-10 6-10-6 1.7-1z"/></symbol>
+  <symbol id="i-cat" viewBox="0 0 24 24"><path d="M12 2l-5.5 9h11zM17.5 13a4.5 4.5 0 100 9 4.5 4.5 0 000-9zM3 13.5h8v8H3z"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="M15.4 7.4L14 6l-6 6 6 6 1.4-1.4L10.8 12z"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-6h2zm0-8h-2V7h2z"/></symbol>
+</svg>
+<div id="out"></div>
+<script>
+const I=(id)=>`<svg viewBox="0 0 24 24"><use href="#${id}"/></svg>`;
+const fact=(ic,t,prov)=>`<span>${I(ic)}${prov?`<span class="prov">${t}</span>`:t}</span>`;
+const SHOW={name:'NL - EMERGÊNCIA RADIOATIVA (2026)',word:'EMERGÊNCIA',
+  facts:[fact('i-layers','3 مواسم'),fact('i-cal','2026'),fact('i-mask','Drama / Mysterie / Action & Adventure',true)],
+  play:'تشغيل S1 E1',rating:'8.0',
+  plot:'Natuurkundigen en dokters zetten alles op alles om een grote stralingsramp te voorkomen en duizenden levens te redden in dit op ware gebeurtenissen geïnspireerde drama. Een ongekende ramp treft de stad, en een team van wetenschappers moet de bron vinden voordat het te laat is.',
+  director:'Gustavo Lipsztein',cast:'Johnny Massaro · Leandra Leal · Paulo Gorgulho · Ana Costa · Bukassa Kabengele',
+  seasons:[['الموسم 1','5 حلقات'],['الموسم 2','8 حلقات'],['الموسم 3','6 حلقات']],
+  eps:[['S01E01 - Een ongekende ramp','Een vondst op een sloopterrein zet een stad op scherp.','1h 2m'],
+       ['S01E02 - Het blauwe licht','Het team ontdekt hoe ver de straling zich heeft verspreid.','58m'],
+       ['S01E03 - Quarantaine','De autoriteiten sluiten een hele wijk af.','55m'],
+       ['S01E04 - De bron','Een race tegen de klok om de capsule te vinden.','57m']]};
+
+function bg(pic){return `<div class="bd ${pic}"></div><div class="black"></div><div class="scrim"></div>`;}
+function page(tv,focus){
+  const pw=tv?150:110, ph=Math.round(pw*1.5);
+  const top=tv?30:17, seasonsTop=tv?ph+top+26:ph+top+16;
+  const epsTop=seasonsTop+(tv?62:52);
+  return `<div class="page">
+    <div class="poster ice" style="width:${pw}px;height:${ph}px"><b>${SHOW.word}</b></div>
+    <div class="info">
+      <div class="trow"><div class="name prov">${SHOW.name}</div><div class="back">${I('i-back')}</div></div>
+      <div class="facts">${SHOW.facts.join('<i></i>')}</div>
+      <div class="btns"><div class="btn p ${focus==='play'?'focus':''}">${I('i-play')}${SHOW.play}</div><div class="btn s">${I('i-heart')}إضافة إلى المفضلة</div></div>
+      <div class="rrow"><div class="imdb"><small>IMDb</small>${I('i-star')}${SHOW.rating}</div><div class="info-chip ${focus==='info'?'focus':''}">${I('i-info')}معلومات</div></div>
+    </div></div>
+    <div class="seasons" style="top:${seasonsTop}px">${SHOW.seasons.map(([s,n],i)=>`<div class="schip ${i===0?'on':''} ${focus==='season'&&i===0?'focus':''}">${s}<small>${n}</small></div>`).join('')}</div>
+    <div class="eps" style="top:${epsTop}px">${SHOW.eps.map(([t,p,d],i)=>`<div class="ep"><span class="n">${i+1}</span><span class="still"></span><span class="t"><b>${t}</b><span>${p}</span></span><span class="d">${d}</span></div>`).join('')}</div>`;
+}
+function info(tv){
+  return `<div class="sheetbox">
+    <div class="sheethead"><div class="name prov" style="flex:1">${SHOW.name}</div><div class="back">${I('i-back')}</div></div>
+    <div class="panelbox">
+      <div class="sect"><h4>القصة</h4><p>${SHOW.plot}</p></div>
+      <div class="sect"><h4>المخرج</h4><p>${SHOW.director}</p></div>
+      <div class="sect"><h4>الممثلون</h4><p>${SHOW.cast}</p></div>
+      <div class="grid">
+        <div class="cell"><h4>النوع</h4><div>Drama / Mysterie / Action &amp; Adventure</div></div>
+        <div class="cell"><h4>السنة</h4><div>2026</div></div>
+        <div class="cell"><h4>التقييم</h4><div>IMDb 8.0</div></div>
+      </div>
+    </div></div>`;
+}
+const frames={
+  'show-tv':()=>`<div class="screen tv">${bg('ice')}${page(true,'season')}</div>`,
+  'show-phone':()=>`<div class="screen phone">${bg('ice')}${page(false,null)}</div>`,
+  'info-tv':()=>`<div class="screen tv">${bg('ice')}${info(true)}</div>`,
+  'info-phone':()=>`<div class="screen phone">${bg('ice')}${info(false)}</div>`,
+};
+const q=new URLSearchParams(location.search).get('frame')||'show-tv';
+document.getElementById('out').innerHTML=frames[q]();
+</script>
+</body>
+</html>
