@@ -42,6 +42,8 @@ import coil.size.Scale
 import com.castivio.core.common.artwork.ArtworkKick
 import com.castivio.core.common.artwork.ArtworkMetrics
 import com.castivio.core.common.artwork.PosterRetry
+import com.castivio.core.common.artwork.ArtworkShown
+import com.castivio.core.common.artwork.ArtworkSource
 import com.castivio.core.common.artwork.PosterSize
 import com.castivio.core.common.artwork.PrefetchWindow
 import com.castivio.core.common.artwork.PosterTimeline
@@ -84,8 +86,11 @@ internal fun PosterArtwork(
      * wall; false for a film's page, whose one large poster is drawn several times the card's size.
      */
     cardSize: Boolean = false,
+    /** Told how the picture came, once it is on screen: a title's page prints it in a development build. */
+    onShown: ((ArtworkShown) -> Unit)? = null,
 ) {
     val context = LocalContext.current
+    val askedAt = remember(url) { android.os.SystemClock.elapsedRealtime() }
     // All of this is keyed to the url, because a cell of a lazy grid is recycled: a poster that failed must not hand
     // its failure to whichever title scrolls into its place next.
     //
@@ -124,8 +129,9 @@ internal fun PosterArtwork(
         model = pictureRequest(context, url, cardSize),
         contentDescription = null,
         contentScale = contentScale,
-        onSuccess = {
+        onSuccess = { success ->
             PosterTimeline.cardShown(url)
+            onShown?.invoke(artworkShown(askedAt, success.result))
             onLoaded()
         },
         onError = { error ->
@@ -277,7 +283,7 @@ private const val BACKDROP_HEIGHT = 36
  * and the ratio; [seed] picks the placeholder, as the card's position does.
  */
 @Composable
-fun PosterFrame(url: String?, seed: Int, modifier: Modifier = Modifier) {
+fun PosterFrame(url: String?, seed: Int, modifier: Modifier = Modifier, onShown: ((ArtworkShown) -> Unit)? = null) {
     val shape = RoundedCornerShape(Radius.sm)
     Box(
         modifier
@@ -285,9 +291,25 @@ fun PosterFrame(url: String?, seed: Int, modifier: Modifier = Modifier) {
             .background(posterPlaceholderBrush(seed))
             .border(1.dp, CastivioTheme.colors.glassBorderSoft, shape),
     ) {
-        if (!url.isNullOrBlank()) PosterArtwork(url, Modifier.fillMaxSize())
+        if (!url.isNullOrBlank()) PosterArtwork(url, Modifier.fillMaxSize(), onShown = onShown)
     }
 }
+
+/**
+ * What a development build is told of a picture a title's page drew: how long after [askedAt] it came, from where, and at what
+ * size it was decoded (`ArtworkShownLine`). Read from Coil's own answer.
+ */
+internal fun artworkShown(askedAt: Long, result: coil.request.SuccessResult): ArtworkShown = ArtworkShown(
+    millis = android.os.SystemClock.elapsedRealtime() - askedAt,
+    source = when (result.dataSource) {
+        coil.decode.DataSource.MEMORY_CACHE, coil.decode.DataSource.MEMORY -> ArtworkSource.MEMORY
+        coil.decode.DataSource.DISK -> ArtworkSource.DISK
+        coil.decode.DataSource.NETWORK -> ArtworkSource.NETWORK
+    },
+    width = result.drawable.intrinsicWidth,
+    height = result.drawable.intrinsicHeight,
+)
+
 
 /**
  * One short fact on a poster's lower edge: a running time.

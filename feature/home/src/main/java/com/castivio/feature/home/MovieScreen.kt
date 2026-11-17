@@ -72,6 +72,8 @@ import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.castivio.core.common.artwork.ArtworkShown
+import com.castivio.core.common.artwork.ArtworkShownLine
 import com.castivio.core.design.components.ButtonWeight
 import com.castivio.core.design.components.CastivioButton
 import com.castivio.core.design.components.CastivioNoticeDialog
@@ -158,9 +160,18 @@ fun MovieScreen(
     // The line that cost reads as, or null: a user's build has none to draw. It is drawn on the poster -- see `PagePoster`.
     // It ends with the ids the provider gave the film at TMDB and IMDb, once its details are here -- whether they were asked of
     // the provider now or kept from before, which has no cost to print -- for a tester to read whether this provider says them.
-    val costLine = remember(cost, known, instrumented) {
+    // How the page's two pictures came -- the large poster and the wide picture behind the page -- told in the same line.
+    var posterShown by remember(movie.id) { mutableStateOf<ArtworkShown?>(null) }
+    var backdropShown by remember(movie.id) { mutableStateOf<ArtworkShown?>(null) }
+    val costLine = remember(cost, known, instrumented, posterShown, backdropShown) {
         if (instrumented) {
-            listOfNotNull(cost?.line(), known?.let { externalIdsLine(it.tmdbId, it.imdbId, it.idsRead) })
+            listOfNotNull(
+                cost?.line(),
+                known?.let { externalIdsLine(it.tmdbId, it.imdbId, it.idsRead) },
+                ArtworkShownLine.describe(
+                    posterShown, !movie.artworkUrl.isNullOrBlank(), backdropShown, known?.backdropUrl != null,
+                ),
+            )
                 .takeIf { it.isNotEmpty() }
                 ?.joinToString(" · ")
         } else {
@@ -412,7 +423,7 @@ fun MovieScreen(
 
         // The film's wide picture behind the whole page, under its scrim -- the show's page's own (`ShowBackdrop`,
         // design/mockups/details-backdrop-ar.html). Nothing until it comes; the page never waits for it.
-        known?.backdropUrl?.let { url -> ShowBackdrop(url, Modifier.fillMaxSize()) }
+        known?.backdropUrl?.let { url -> ShowBackdrop(url, Modifier.fillMaxSize(), onShown = { backdropShown = it }) }
 
         if (side) {
             Box(Modifier.fillMaxSize().castivioStage(m.frame)) {
@@ -424,6 +435,7 @@ fun MovieScreen(
                     url = movie.artworkUrl,
                     cost = costLine,
                     costStyle = castivioChipStyle(m.frame.fsLabel),
+                    onShown = { posterShown = it },
                     modifier = Modifier.fillMaxHeight()
                         .aspectRatio(CATALOG_POSTER_ASPECT, matchHeightConstraintsFirst = true),
                 )
@@ -443,6 +455,7 @@ fun MovieScreen(
                     url = movie.artworkUrl,
                     cost = costLine,
                     costStyle = castivioChipStyle(m.frame.fsLabel),
+                    onShown = { posterShown = it },
                     modifier = Modifier.fillMaxWidth(STACKED_POSTER).aspectRatio(CATALOG_POSTER_ASPECT),
                 )
                 info(Modifier.fillMaxWidth(), false, null)
@@ -482,10 +495,16 @@ private enum class WholeText { Plot, Director, Crew, Cast }
  * user's has; a user's build has no line ([cost] is null) and draws the poster alone.
  */
 @Composable
-private fun PagePoster(url: String?, cost: String?, costStyle: TextStyle, modifier: Modifier = Modifier) {
+private fun PagePoster(
+    url: String?,
+    cost: String?,
+    costStyle: TextStyle,
+    modifier: Modifier = Modifier,
+    onShown: ((ArtworkShown) -> Unit)? = null,
+) {
     val colors = CastivioTheme.colors
     Box(modifier) {
-        PosterFrame(url = url, seed = 0, modifier = Modifier.fillMaxSize())
+        PosterFrame(url = url, seed = 0, modifier = Modifier.fillMaxSize(), onShown = onShown)
         if (cost != null) {
             Text(
                 text = cost,

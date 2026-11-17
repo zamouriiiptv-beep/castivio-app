@@ -68,6 +68,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.castivio.core.common.artwork.ArtworkShown
+import com.castivio.core.common.artwork.ArtworkShownLine
 import com.castivio.core.design.components.ButtonWeight
 import com.castivio.core.design.components.CardShape
 import com.castivio.core.design.components.CastivioButton
@@ -166,6 +168,9 @@ fun ShowScreen(
     val scope = rememberCoroutineScope()
 
     val details = state.details
+    // How the page's two pictures came -- the show's poster and its wide picture -- printed in a development build.
+    var posterShown by remember(show.seriesId) { mutableStateOf<ArtworkShown?>(null) }
+    var backdropShown by remember(show.seriesId) { mutableStateOf<ArtworkShown?>(null) }
     val sections = showSections(
         hasSeasons = state.seasons.isNotEmpty(),
         episodes = season?.episodes?.size ?: 0,
@@ -192,7 +197,7 @@ fun ShowScreen(
 
         // The show's wide picture behind the whole page, under its scrim: see `ShowBackdrop` and
         // design/mockups/details-backdrop-ar.html. Nothing until it comes; the page never waits for it.
-        details?.backdropUrl?.let { url -> ShowBackdrop(url, Modifier.fillMaxSize()) }
+        details?.backdropUrl?.let { url -> ShowBackdrop(url, Modifier.fillMaxSize(), onShown = { backdropShown = it }) }
 
         Row(
             Modifier.fillMaxSize().castivioStage(m.frame),
@@ -227,7 +232,22 @@ fun ShowScreen(
                         onFavorite = model::toggleFavorite,
                         onMorePlot = { plotOpen = true },
                         onBack = onBack,
+                        onPosterShown = { posterShown = it },
                     )
+                }
+                if (instrumented) {
+                    ArtworkShownLine.describe(
+                        posterShown, !show.artworkUrl.isNullOrBlank(), backdropShown, details?.backdropUrl != null,
+                    )?.let { line ->
+                        item(key = "pictures") {
+                            Text(
+                                text = line,
+                                style = castivioBodyStyle(m.frame.fsLabel),
+                                color = CastivioTheme.colors.onBackgroundMuted,
+                                maxLines = 1,
+                            )
+                        }
+                    }
                 }
                 state.times?.takeIf { instrumented }?.let { cost ->
                     // With the ids the provider gave the show, once its details are here -- see `RequestTimesLine`.
@@ -403,6 +423,7 @@ private fun ShowTop(
     onFavorite: () -> Unit,
     onMorePlot: () -> Unit,
     onBack: () -> Unit,
+    onPosterShown: (ArtworkShown) -> Unit,
 ) {
     val colors = CastivioTheme.colors
     val details = state.details
@@ -424,6 +445,7 @@ private fun ShowTop(
                 url = show.artworkUrl,
                 seed = 0,
                 modifier = Modifier.height(posterHeight).aspectRatio(CATALOG_POSTER_ASPECT),
+                onShown = onPosterShown,
             )
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(m.rowGap)) {
                 // The name, and at the end of the same row the way back: the film page's arrow, in the film page's

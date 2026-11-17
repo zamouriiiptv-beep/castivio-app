@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.castivio.core.common.artwork.ArtworkShown
 import com.castivio.core.common.artwork.PosterSize
 import com.castivio.core.design.theme.CastivioTheme
 import com.castivio.core.design.theme.Motion
@@ -42,8 +43,14 @@ import com.castivio.core.design.theme.Motion
  * Like [PosterArtwork] this file is where the loader is seen: a feature hands over a url and does not import Coil.
  */
 @Composable
-fun ShowBackdrop(url: String, modifier: Modifier = Modifier) {
+fun ShowBackdrop(
+    url: String,
+    modifier: Modifier = Modifier,
+    /** Told how the picture came, once it is on screen: a title's page prints it in a development build. */
+    onShown: ((ArtworkShown) -> Unit)? = null,
+) {
     var failed by remember(url) { mutableStateOf(false) }
+    val askedAt = remember(url) { android.os.SystemClock.elapsedRealtime() }
     var arrived by remember(url) { mutableStateOf(false) }
     if (failed) return
     val ground = CastivioTheme.colors.background
@@ -64,7 +71,10 @@ fun ShowBackdrop(url: String, modifier: Modifier = Modifier) {
                 .build(),
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            onSuccess = { arrived = true },
+            onSuccess = { success ->
+                arrived = true
+                onShown?.invoke(artworkShown(askedAt, success.result))
+            },
             onError = { failed = true },
             modifier = Modifier.fillMaxSize(),
         )
