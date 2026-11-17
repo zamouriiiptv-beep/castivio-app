@@ -10,7 +10,17 @@ enum class ArtworkSource { MEMORY, DISK, NETWORK }
  * it was decoded. What a development build prints of the page's large poster and its wide picture, so that a slow one can be
  * told from a quick one before anything is changed about either.
  */
-data class ArtworkShown(val millis: Long, val source: ArtworkSource, val width: Int, val height: Int)
+data class ArtworkShown(
+    val millis: Long,
+    val source: ArtworkSource,
+    val width: Int,
+    val height: Int,
+    /** The monotonic clock when it came, in milliseconds: what a page counts it from its press with ([since]). */
+    val shownAt: Long = 0L,
+) {
+    /** The same picture, its time counted from [startMillis] -- a press -- instead of from the page asking for it. */
+    fun since(startMillis: Long): ArtworkShown = copy(millis = shownAt - startMillis)
+}
 
 /**
  * The line a title's page prints of its two pictures, in a development build: `poster 0.42 s net 500x750 · backdrop 0.88 s disk

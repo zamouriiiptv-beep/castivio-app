@@ -1,5 +1,6 @@
 package com.castivio.feature.home
 
+import android.os.SystemClock
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -46,6 +47,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -69,7 +71,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.castivio.core.common.artwork.ArtworkShown
-import com.castivio.core.common.artwork.ArtworkShownLine
+import com.castivio.core.common.artwork.PageOpen
+import com.castivio.core.common.artwork.PageOpenLine
+import com.castivio.core.common.artwork.PageOpenTimes
 import com.castivio.core.design.components.ButtonWeight
 import com.castivio.core.design.components.CardShape
 import com.castivio.core.design.components.CastivioButton
@@ -168,7 +172,28 @@ fun ShowScreen(
     val scope = rememberCoroutineScope()
 
     val details = state.details
-    // How the page's two pictures came -- the show's poster and its wide picture -- printed in a development build.
+    // The page's opening, counted from the press that asked for it (`PageOpen`) -- or from its first drawing when it was
+    // reached another way: the page on screen, the details, the two pictures and the episodes. A development build only.
+    val firstDrawn = remember(show.seriesId) { SystemClock.elapsedRealtime() }
+    val pressedAt = remember(show.seriesId) { PageOpen.take(firstDrawn) }
+    val openStart = pressedAt ?: firstDrawn
+    var openMs by remember(show.seriesId) { mutableStateOf<Long?>(null) }
+    LaunchedEffect(show.seriesId) {
+        if (instrumented && pressedAt != null) {
+            withFrameNanos { }
+            openMs = SystemClock.elapsedRealtime() - pressedAt
+        }
+    }
+    var detailsMs by remember(show.seriesId) { mutableStateOf<Long?>(null) }
+    LaunchedEffect(show.seriesId, details != null) {
+        if (instrumented && details != null && detailsMs == null) detailsMs = SystemClock.elapsedRealtime() - openStart
+    }
+    var episodesMs by remember(show.seriesId) { mutableStateOf<Long?>(null) }
+    LaunchedEffect(show.seriesId, state.seasons.isNotEmpty()) {
+        if (instrumented && state.seasons.isNotEmpty() && episodesMs == null) {
+            episodesMs = SystemClock.elapsedRealtime() - openStart
+        }
+    }
     var posterShown by remember(show.seriesId) { mutableStateOf<ArtworkShown?>(null) }
     var backdropShown by remember(show.seriesId) { mutableStateOf<ArtworkShown?>(null) }
     val sections = showSections(
@@ -236,8 +261,18 @@ fun ShowScreen(
                     )
                 }
                 if (instrumented) {
-                    ArtworkShownLine.describe(
-                        posterShown, !show.artworkUrl.isNullOrBlank(), backdropShown, details?.backdropUrl != null,
+                    PageOpenLine.describe(
+                        PageOpenTimes(
+                            open = openMs,
+                            details = detailsMs,
+                            detailsPending = details == null && state.asking,
+                            episodes = episodesMs,
+                            episodesPending = state.seasons.isEmpty() && state.load == ShowLoad.Loading,
+                            poster = posterShown?.since(openStart),
+                            posterAsked = !show.artworkUrl.isNullOrBlank(),
+                            backdrop = backdropShown?.since(openStart),
+                            backdropAsked = details?.backdropUrl != null,
+                        ),
                     )?.let { line ->
                         item(key = "pictures") {
                             Text(

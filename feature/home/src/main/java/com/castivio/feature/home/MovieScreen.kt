@@ -1,5 +1,6 @@
 package com.castivio.feature.home
 
+import android.os.SystemClock
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -35,6 +36,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -73,7 +75,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.castivio.core.common.artwork.ArtworkShown
-import com.castivio.core.common.artwork.ArtworkShownLine
+import com.castivio.core.common.artwork.PageOpen
+import com.castivio.core.common.artwork.PageOpenLine
+import com.castivio.core.common.artwork.PageOpenTimes
 import com.castivio.core.design.components.ButtonWeight
 import com.castivio.core.design.components.CastivioButton
 import com.castivio.core.design.components.CastivioNoticeDialog
@@ -160,16 +164,39 @@ fun MovieScreen(
     // The line that cost reads as, or null: a user's build has none to draw. It is drawn on the poster -- see `PagePoster`.
     // It ends with the ids the provider gave the film at TMDB and IMDb, once its details are here -- whether they were asked of
     // the provider now or kept from before, which has no cost to print -- for a tester to read whether this provider says them.
-    // How the page's two pictures came -- the large poster and the wide picture behind the page -- told in the same line.
+    // The page's opening, counted from the press that asked for it (`PageOpen`) -- or from its first drawing when it was
+    // reached another way: the page on screen, the details, and its two pictures. Told in the same line as the cost.
+    val firstDrawn = remember(movie.id) { SystemClock.elapsedRealtime() }
+    val pressedAt = remember(movie.id) { PageOpen.take(firstDrawn) }
+    val start = pressedAt ?: firstDrawn
+    var openMs by remember(movie.id) { mutableStateOf<Long?>(null) }
+    LaunchedEffect(movie.id) {
+        if (instrumented && pressedAt != null) {
+            withFrameNanos { }
+            openMs = SystemClock.elapsedRealtime() - pressedAt
+        }
+    }
+    var detailsMs by remember(movie.id) { mutableStateOf<Long?>(null) }
+    LaunchedEffect(movie.id, known != null) {
+        if (instrumented && known != null && detailsMs == null) detailsMs = SystemClock.elapsedRealtime() - start
+    }
     var posterShown by remember(movie.id) { mutableStateOf<ArtworkShown?>(null) }
     var backdropShown by remember(movie.id) { mutableStateOf<ArtworkShown?>(null) }
-    val costLine = remember(cost, known, instrumented, posterShown, backdropShown) {
+    val costLine = remember(cost, known, instrumented, openMs, detailsMs, posterShown, backdropShown) {
         if (instrumented) {
             listOfNotNull(
                 cost?.line(),
                 known?.let { externalIdsLine(it.tmdbId, it.imdbId, it.idsRead) },
-                ArtworkShownLine.describe(
-                    posterShown, !movie.artworkUrl.isNullOrBlank(), backdropShown, known?.backdropUrl != null,
+                PageOpenLine.describe(
+                    PageOpenTimes(
+                        open = openMs,
+                        details = detailsMs,
+                        detailsPending = known == null && cost == null,
+                        poster = posterShown?.since(start),
+                        posterAsked = !movie.artworkUrl.isNullOrBlank(),
+                        backdrop = backdropShown?.since(start),
+                        backdropAsked = known?.backdropUrl != null,
+                    ),
                 ),
             )
                 .takeIf { it.isNotEmpty() }

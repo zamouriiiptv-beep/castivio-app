@@ -1,5 +1,6 @@
 package com.castivio.tv.shell
 
+import android.os.SystemClock
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -49,6 +50,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.castivio.core.common.artwork.PageOpen
 import com.castivio.core.design.components.CardShape
 import com.castivio.core.design.components.CastivioShell
 import com.castivio.core.design.components.EmptyState
@@ -462,10 +464,12 @@ fun ShellScreen(
         when (val open = offer.open) {
             is ResumeOpen.Film -> {
                 dest = Dest.Movies
+                PageOpen.press(SystemClock.elapsedRealtime())
                 overlay = Overlay.Movie(open.movie)
             }
             is ResumeOpen.Show -> {
                 dest = Dest.Series
+                PageOpen.press(SystemClock.elapsedRealtime())
                 overlay = Overlay.Show(open.show)
             }
             is ResumeOpen.Station -> {
@@ -697,11 +701,18 @@ fun ShellScreen(
                     // The films have a screen of their own: a sidebar of categories, a wall of posters and a
                     // page per film -- see `MoviesScreen`. Series and radio keep the generic section screen.
                     Dest.Movies -> MoviesScreen(
-                        onOpenMovie = { overlay = Overlay.Movie(it) },
+                        onOpenMovie = {
+                            // The press a film's page counts its opening from, in a development build: see `PageOpen`.
+                            PageOpen.press(SystemClock.elapsedRealtime())
+                            overlay = Overlay.Movie(it)
+                        },
                     )
                     // The shows have the films' board -- see `SeriesScreen` -- and a page per show.
                     Dest.Series -> SeriesScreen(
-                        onOpenShow = { overlay = Overlay.Show(it) },
+                        onOpenShow = {
+                            PageOpen.press(SystemClock.elapsedRealtime())
+                            overlay = Overlay.Show(it)
+                        },
                     )
                     // The radio has its own board too -- see `RadioScreen`: a wall of station cards and a plate
                     // that keeps the sound in view. What is listened to lives in the session and the sound in the
@@ -786,7 +797,10 @@ fun ShellScreen(
                 onPlay = play,
                 onBack = { overlay = null },
                 // A similar show's page replaces this one: Back from it returns to the wall, not to this page.
-                onOpenShow = { overlay = Overlay.Show(it) },
+                onOpenShow = {
+                    PageOpen.press(SystemClock.elapsedRealtime())
+                    overlay = Overlay.Show(it)
+                },
             )
             // A film is played from its page, and the player's Back returns to that page -- the wall
             // underneath is still composed, so the viewer lands where they chose from.

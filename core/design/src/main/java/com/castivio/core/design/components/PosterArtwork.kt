@@ -299,8 +299,14 @@ fun PosterFrame(url: String?, seed: Int, modifier: Modifier = Modifier, onShown:
  * What a development build is told of a picture a title's page drew: how long after [askedAt] it came, from where, and at what
  * size it was decoded (`ArtworkShownLine`). Read from Coil's own answer.
  */
-internal fun artworkShown(askedAt: Long, result: coil.request.SuccessResult): ArtworkShown = ArtworkShown(
-    millis = android.os.SystemClock.elapsedRealtime() - askedAt,
+internal fun artworkShown(askedAt: Long, result: coil.request.SuccessResult): ArtworkShown {
+    val now = android.os.SystemClock.elapsedRealtime()
+    return artworkShownAt(now, askedAt, result)
+}
+
+private fun artworkShownAt(now: Long, askedAt: Long, result: coil.request.SuccessResult): ArtworkShown = ArtworkShown(
+    millis = now - askedAt,
+    shownAt = now,
     source = when (result.dataSource) {
         coil.decode.DataSource.MEMORY_CACHE, coil.decode.DataSource.MEMORY -> ArtworkSource.MEMORY
         coil.decode.DataSource.DISK -> ArtworkSource.DISK
