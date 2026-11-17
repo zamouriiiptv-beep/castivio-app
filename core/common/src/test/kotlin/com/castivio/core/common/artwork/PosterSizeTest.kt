@@ -62,4 +62,14 @@ class PosterSizeTest {
         }
         assertEquals("http://cdn.example/back1.jpg", PosterSize.forScreen("http://cdn.example/back1.jpg"))
     }
+
+    @Test
+    fun `a page's large poster is asked for at w780, and one at it or under is left`() {
+        assertEquals("https://image.tmdb.org/t/p/w780/p.jpg", PosterSize.forPage("https://image.tmdb.org/t/p/original/p.jpg"))
+        for (size in listOf("w780", "w600_and_h900_bestv2", "w500", "w342")) {
+            val url = "https://image.tmdb.org/t/p/$size/p.jpg"
+            assertEquals(url, PosterSize.forPage(url))
+        }
+        assertEquals("http://cdn.example/p.jpg", PosterSize.forPage("http://cdn.example/p.jpg"))
+    }
 }

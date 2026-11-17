@@ -152,7 +152,11 @@ internal fun PosterArtwork(
  */
 private fun pictureRequest(context: Context, url: String, cardSize: Boolean): ImageRequest =
     ImageRequest.Builder(context)
-        .data(if (cardSize) PosterSize.forCard(url) else url)
+        .data(if (cardSize) PosterSize.forCard(url) else PosterSize.forPage(url))
+        // A title's page draws its large poster where the viewer has just pressed its card: the card's picture is in the
+        // loader's memory under its own address, and is drawn in the frame at once until the large one has come. A memory
+        // miss -- a page reached without its card, an episode's still -- draws nothing, as before.
+        .apply { if (!cardSize) placeholderMemoryCacheKey(PosterSize.forCard(url)) }
         .addHeader(ArtworkPolicy.KIND_HEADER, ArtworkPolicy.KIND_PICTURE)
         .crossfade(false)
         .build()
@@ -197,6 +201,9 @@ internal fun PosterBackdrop(
 private fun backdropRequest(context: Context, url: String): ImageRequest =
     ImageRequest.Builder(context)
         .data(PosterSize.forCard(url))
+        // The disk's file is the card's (the same address), but the bitmap in memory is 24 by 36 and must not stand under
+        // the card's own key, where a title's page looks for the card's picture to draw while its large one comes.
+        .memoryCacheKey(PosterSize.forCard(url) + BACKDROP_KEY_SUFFIX)
         // It brings the whole picture into the disk cache on the way, so it is asked for as a picture and given a picture's limit.
         .addHeader(ArtworkPolicy.KIND_HEADER, ArtworkPolicy.KIND_PICTURE)
         .size(BACKDROP_WIDTH, BACKDROP_HEIGHT)
@@ -266,6 +273,9 @@ fun PosterPrefetch(
  * on screen ask for themselves.
  */
 internal fun postersAhead(lastShown: Int, ahead: Int, count: Int): IntRange = PrefetchWindow.window(lastShown, ahead, count)
+
+/** What the small backdrop's bitmap is kept in memory under, apart from the card's own picture: see [backdropRequest]. */
+private const val BACKDROP_KEY_SUFFIX = "#backdrop"
 
 /**
  * The size the backdrop is asked for, in pixels, at the poster's own 2:3. Small enough that enlarging it to a
