@@ -26,8 +26,6 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Favorite
-import androidx.compose.material.icons.rounded.KeyboardArrowDown
-import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -47,10 +45,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
-import com.castivio.core.design.components.CastivioChip
 import com.castivio.core.design.components.CastivioChoiceDialog
 import com.castivio.core.design.components.ChoiceOption
-import com.castivio.core.design.components.castivioChipStyle
 import com.castivio.core.design.components.ltrToken
 import com.castivio.core.design.theme.CastivioTheme
 import com.castivio.core.platform.LoadTrace
@@ -195,17 +191,7 @@ fun RadioScreen(
                 hideLeading = true,
                 alignSearchToPane = true,
                 // Match the shared films header: branding stays visible; the breadcrumb slot remains reserved but empty.
-                trailing = {
-                    CastivioChip(
-                        text = stringResource(R.string.browse_sort, stringResource(state.sort.label)),
-                        onClick = { model.sortBy(state.sort.next()) },
-                        icon = Icons.Rounded.Tune,
-                        labelStyle = castivioChipStyle(m.frame.fsChip),
-                        padH = m.controlPadH,
-                        padV = m.badgePadV,
-                        trailingIcon = Icons.Rounded.KeyboardArrowDown,
-                    )
-                },
+                trailing = { SortChip(state.sort, m) { model.sortBy(state.sort.next()) } },
             )
 
             Spacer(Modifier.height(m.headerGap))

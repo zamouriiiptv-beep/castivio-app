@@ -427,6 +427,7 @@ fun ChannelsScreen(
                 searchText = searchText,
                 onSearch = model::search,
                 onSearchFocus = { searchFocused = it },
+                onSort = model::sortBouquetsBy,
             )
 
             Spacer(Modifier.height(m.headerGap))
@@ -572,6 +573,7 @@ private fun BoardHeader(
     searchText: String,
     onSearch: (String) -> Unit,
     onSearchFocus: (Boolean) -> Unit,
+    onSort: (SortOrder) -> Unit,
 ) {
     BoardBand(
         section = stringResource(R.string.browse_live),
@@ -590,6 +592,9 @@ private fun BoardHeader(
         // Reorder mode is of the lists as they are: nothing to narrow while it is on.
         searchEnabled = state.arranging == null,
         hideLeading = true,
+        // The order of the bouquets, the films' and the shows' control drawn by the same function: the provider's, or by name.
+        // Not the rows' -- a channel's place is its number -- and not in reorder mode, which is of the order they are saved in.
+        trailing = { SortChip(state.bouquetSort, m) { if (state.arranging == null) onSort(state.bouquetSort.otherBouquetOrder()) } },
     )
 }
 
@@ -620,7 +625,7 @@ internal fun BoardBand(
     onSearchFocus: (Boolean) -> Unit,
     searchEnabled: Boolean = true,
     hint: String = stringResource(R.string.channels_search_hint),
-    /** What a section adds to the band between its field and the clock: the films' order. Nothing for channels. */
+    /** What a section adds to the band between its field and the clock: its order -- see [SortChip]. Nothing for Catch-up and the radio. */
     trailing: (@Composable () -> Unit)? = null,
     /** Whether the band has a field at all. Catch-up's has none: a field that searched nothing would be a promise. */
     withSearch: Boolean = true,

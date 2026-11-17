@@ -26,8 +26,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.KeyboardArrowDown
-import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -49,7 +47,6 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.castivio.core.common.artwork.KickWhenLoadEnds
 import com.castivio.core.design.components.CardShape
-import com.castivio.core.design.components.CastivioChip
 import com.castivio.core.design.components.MediaCard
 import com.castivio.core.design.components.PosterPrefetch
 import com.castivio.core.design.components.castivioBodyStyle
@@ -144,17 +141,7 @@ fun SeriesScreen(
                 hideLeading = true,
                 alignSearchToPane = true,
                 // Match the shared films header: branding stays visible; the breadcrumb slot remains reserved but empty.
-                trailing = {
-                    CastivioChip(
-                        text = stringResource(R.string.browse_sort, stringResource(state.sort.label)),
-                        onClick = { model.sortBy(state.sort.next()) },
-                        icon = Icons.Rounded.Tune,
-                        labelStyle = castivioChipStyle(m.frame.fsChip),
-                        padH = m.controlPadH,
-                        padV = m.badgePadV,
-                        trailingIcon = Icons.Rounded.KeyboardArrowDown,
-                    )
-                },
+                trailing = { SortChip(state.sort, m) { model.sortBy(state.sort.next()) } },
             )
 
             Spacer(Modifier.height(m.headerGap))

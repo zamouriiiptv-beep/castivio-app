@@ -72,6 +72,12 @@ data class BrowseState(
      */
     val sort: SortOrder = SortOrder.PROVIDER,
     /**
+     * The order the rail's bouquets are listed in: the provider's, or by name -- see [inOrder]. Not [sort]'s, which is the
+     * rows': the channels' rows stay in the provider's order whichever this is, because a channel's place in it is its
+     * number and the large player's keys step through it. Only the live board offers it.
+     */
+    val bouquetSort: SortOrder = SortOrder.PROVIDER,
+    /**
      * From an indexed `COUNT`, never from measuring a list. What the scope holds -- the open
      * category, or the whole section while a search is on -- and not how many rows match: whether
      * the section has anything is one question, and whether this search found any is the list's.
@@ -236,6 +242,13 @@ class BrowseViewModel @Inject constructor(
      */
     private val order = MutableStateFlow(SortOrder.PROVIDER)
 
+    /**
+     * The order of the rail's bouquets, which is not [order]: that one is the rows', and a list of channels in another order
+     * than the provider's has lost its numbers and the keys that step through it. This one orders only the rail, so the rows'
+     * query is the same whichever it is and the list does not start again when it changes.
+     */
+    private val bouquetOrder = MutableStateFlow(SortOrder.PROVIDER)
+
     /** What the rail's search field holds. See [BrowseState.groupFilter]. */
     private val railFilter = MutableStateFlow("")
 
@@ -350,7 +363,8 @@ class BrowseViewModel @Inject constructor(
             fetch,
             railFilter,
             arrangement,
-        ) { provider, state, filter, arranged -> Surroundings(provider, state, filter, arranged) },
+            bouquetOrder,
+        ) { provider, state, filter, arranged, bouquets -> Surroundings(provider, state, filter, arranged, bouquets) },
     ) { current, available, asked, counts, around ->
         val provider = around.provider
         val run = around.run
@@ -368,13 +382,14 @@ class BrowseViewModel @Inject constructor(
             categoryNames = available.associate { it.id to it.name },
             selectedGroup = asked.groupId,
             sort = asked.sort,
+            bouquetSort = around.bouquets,
             total = counts.first,
             sectionTotal = counts.second,
             groupFilter = filter,
             // Reorder mode lists every bouquet in the order being set; the rail's own filter
             // is set aside, because a list with bouquets filtered out is not one to move in.
             shownGroups = arranged?.let { listed.arrangedAs(it.bouquets) }
-                ?: (if (withPending) available else listed).filtered(filter),
+                ?: (if (withPending) available else listed).inOrder(around.bouquets).filtered(filter),
             // The open category is one of those still on its way: its rows are being brought, and the list says so
             // rather than saying it is empty.
             arriving = withPending && asked.groupId != null &&
@@ -567,6 +582,9 @@ class BrowseViewModel @Inject constructor(
         // chosen before them, or on "all". Nor are the channels watched last.
         favoritesOpen.value = false
         recentOpen.value = false
+        // Reorder mode moves the bouquets as they are saved, so the rail is listed in that order from the press, and the
+        // control says so: a list in alphabetical order has no place to put a bouquet that is not where it was.
+        bouquetOrder.value = SortOrder.PROVIDER
         starting = true
         viewModelScope.launch {
             try {
@@ -741,6 +759,15 @@ class BrowseViewModel @Inject constructor(
         order.value = value
     }
 
+    /**
+     * Lists the rail's bouquets in another order: the provider's, or by name -- see [bouquetOrder]. Not in reorder mode, which
+     * is of the order they are saved in. The rows are not touched.
+     */
+    fun sortBouquetsBy(value: SortOrder) {
+        if (arrangement.value != null) return
+        bouquetOrder.value = value
+    }
+
     /** One show's seasons, small enough to read whole because it is bounded by the show. */
     fun seasons(seriesId: String): Flow<List<Season>> = pager.seasons(seriesId)
 
@@ -793,4 +820,5 @@ private data class Surroundings(
     val run: SectionRun?,
     val filter: String,
     val arranging: Arranging?,
+    val bouquets: SortOrder,
 )
