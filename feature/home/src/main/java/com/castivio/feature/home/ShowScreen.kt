@@ -257,7 +257,12 @@ fun ShowScreen(
                             horizontalArrangement = Arrangement.SpaceBetween,
                         ) {
                             SectionTitle(plural(R.plurals.show_episodes, episodes.size), m)
-                            SeasonSelector(state.seasons, season, m, tv) { picked = it }
+                            // A show of one season has nothing to choose: it is named, and is no control that opens a list of one.
+                            if (state.seasons.size > 1) {
+                                SeasonSelector(state.seasons, season, m, tv) { picked = it }
+                            } else {
+                                SeasonLabel(season, m)
+                            }
                         }
                     }
                     items(season?.episodes.orEmpty(), key = { it.id }) { episode ->
@@ -569,6 +574,38 @@ private fun SeasonChips(seasons: List<Season>, chosen: Season?, m: CatalogMetric
     }
 }
 
+/**
+ * The open season and what it holds -- "Season 1" and "(12 episodes)" -- in the two steps the selector and the plain label
+ * share, so a show of one season and a show of many read the same.
+ */
+@Composable
+private fun SeasonName(chosen: Season?, m: CatalogMetrics) {
+    val colors = CastivioTheme.colors
+    Text(
+        text = chosen?.let { stringResource(R.string.show_season, it.number) }
+            ?: stringResource(R.string.show_nav_seasons),
+        style = castivioChipStyle(m.frame.fsChip).copy(fontWeight = FontWeight.Bold),
+        color = colors.onBackground,
+        maxLines = 1,
+    )
+    chosen?.let {
+        Text(
+            text = "(${plural(R.plurals.show_episodes, it.episodes.size)})",
+            style = castivioBodyStyle(m.frame.fsBody),
+            color = colors.onBackgroundVariant,
+            maxLines = 1,
+        )
+    }
+}
+
+/** The season of a show that has only one, as text: no frame, no arrow and no press, since there is nothing to pick. */
+@Composable
+private fun SeasonLabel(chosen: Season?, m: CatalogMetrics) {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(m.rowGap)) {
+        SeasonName(chosen, m)
+    }
+}
+
 @Composable
 private fun SeasonSelector(
     seasons: List<Season>,
@@ -601,21 +638,7 @@ private fun SeasonSelector(
                 tint = colors.onBackground,
                 modifier = Modifier.size(m.frame.fsBody * 1.25f),
             )
-            Text(
-                text = current?.let { stringResource(R.string.show_season, it.number) }
-                    ?: stringResource(R.string.show_nav_seasons),
-                style = castivioChipStyle(m.frame.fsChip).copy(fontWeight = FontWeight.Bold),
-                color = colors.onBackground,
-                maxLines = 1,
-            )
-            current?.let {
-                Text(
-                    text = "(${plural(R.plurals.show_episodes, it.episodes.size)})",
-                    style = castivioBodyStyle(m.frame.fsBody),
-                    color = colors.onBackgroundVariant,
-                    maxLines = 1,
-                )
-            }
+            SeasonName(current, m)
         }
         DropdownMenu(
             expanded = expanded,

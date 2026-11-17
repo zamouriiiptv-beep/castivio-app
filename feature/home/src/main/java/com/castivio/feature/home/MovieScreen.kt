@@ -47,6 +47,7 @@ import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.platform.LocalContext
@@ -213,13 +214,11 @@ fun MovieScreen(
     BoxWithConstraints(
         modifier
             .fillMaxSize()
-            // This page is drawn over the still-composed movies wall. Consume otherwise-unhandled
-            // touches here so they cannot reach a poster underneath and replace the open film.
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-                onClick = {},
-            )
+            // This page is drawn over the still-composed movies wall. A pointer input here takes the touches no control
+            // of the page handles, so they cannot reach a poster underneath and replace the open film. It is not
+            // `clickable`: that would merge the page's texts into one item for a screen reader, and give the remote a
+            // focus stop with no ring on it.
+            .pointerInput(Unit) {}
             // Drawn over the wall beneath it, so it brings the application's own ground: see `ShowScreen`.
             .castivioBackdrop()
             .statusBarsPadding(),

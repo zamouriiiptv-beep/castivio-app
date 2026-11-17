@@ -48,7 +48,10 @@ internal fun movieDisplayTitle(title: String, cast: List<String>): String {
         suffixWords.size <= personWords.size &&
             suffixWords.indices.all { suffixWords[it].equals(personWords[it], ignoreCase = true) }
     }
-    return if (isCastFragment) title.substring(0, year.range.last + 1).trimEnd() else title
+    // The match runs to the end of the title, so the year's own end is where its suffix begins: the name keeps the year
+    // and loses what follows it.
+    val afterYear = year.groups[1]?.range?.first ?: return title
+    return if (isCastFragment) title.substring(0, afterYear).trimEnd() else title
 }
 
 /**

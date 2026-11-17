@@ -1,15 +1,24 @@
 package com.castivio.feature.home
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.click
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.castivio.core.design.theme.CastivioTheme
@@ -80,12 +89,17 @@ class MovieScreenTest {
     private val played = mutableListOf<CatalogSelection>()
     private var backs = 0
 
-    /** [direction] is the reader's, where a test needs the page turned round; the harness's own (left to right) where it is null. */
+    /**
+     * [direction] is the reader's, where a test needs the page turned round; the harness's own (left to right) where it is null.
+     * [wall] is what the page is drawn over -- a surface under it that fills the screen and counts its presses -- where a test
+     * needs one.
+     */
     private fun show(
         movie: Movie = dune,
         store: Store = Store(),
         details: MovieDetailsRepository = NoDetails,
         direction: LayoutDirection? = null,
+        wall: (() -> Unit)? = null,
     ) {
         val loads = SectionLoads(
             CoroutineScope(SupervisorJob() + Dispatchers.Unconfined),
@@ -97,14 +111,17 @@ class MovieScreenTest {
         compose.setContent {
             CompositionLocalProvider(LocalLayoutDirection provides (direction ?: LocalLayoutDirection.current)) {
                 CastivioTheme {
-                    MovieScreen(
-                        movie = movie,
-                        onPlay = { played += it },
-                        onBack = { backs++ },
-                        model = holder,
-                        favorites = ChannelFavoritesViewModel(store),
-                        detailsModel = MovieDetailsViewModel(details),
-                    )
+                    Box(Modifier.fillMaxSize()) {
+                        if (wall != null) Box(Modifier.fillMaxSize().testTag(WALL).clickable(onClick = wall))
+                        MovieScreen(
+                            movie = movie,
+                            onPlay = { played += it },
+                            onBack = { backs++ },
+                            model = holder,
+                            favorites = ChannelFavoritesViewModel(store),
+                            detailsModel = MovieDetailsViewModel(details),
+                        )
+                    }
                 }
             }
         }
@@ -290,6 +307,40 @@ class MovieScreenTest {
         compose.onNodeWithText("Timothée\u00A0Chalamet", substring = true).assertIsDisplayed()
     }
 
+    // ---------------------------------------------------------------------------------------------- the wall beneath
+
+    /**
+     * The page is drawn over the movies wall, which stays composed beneath it: a touch on the page where no control is must not
+     * reach a poster of the wall and open another film. The touch lands on the poster's side of the page, where there is
+     * nothing to press, so it is the page itself that has to take it.
+     */
+    @Test
+    fun `a touch on the page where nothing is pressed does not reach the wall it is drawn over`() {
+        var wallPressed = 0
+        show(wall = { wallPressed++ })
+
+        compose.onNodeWithTag(WALL).performTouchInput { click(Offset(width * 0.2f, height * 0.5f)) }
+        compose.waitForIdle()
+
+        assertEquals("the wall under the page was pressed through it", 0, wallPressed)
+    }
+
+    /**
+     * What takes those touches is not a press. A press would merge the page's texts into the one item a screen reader sees,
+     * and the name would be found as the whole page's own node; the name is a node of its own, that begins where the name
+     * does and not at the screen's edge.
+     */
+    @Test
+    fun `the name is a node of its own, and not a part of one pressable page`() {
+        show(wall = {})
+
+        val name = compose.onNodeWithText("Dune: Part Two").getUnclippedBoundsInRoot()
+        val page = compose.onNodeWithTag(WALL).getUnclippedBoundsInRoot()
+        val nameWidth = name.right.value - name.left.value
+        val pageWidth = page.right.value - page.left.value
+        assertTrue("the name spans the whole screen, as the page does: $nameWidth of $pageWidth", nameWidth < pageWidth)
+    }
+
     /** A provider that gives a director and a cast and nothing else. */
     private class WithCredits(private val director: String, private val cast: List<String>) : MovieDetailsRepository {
         override suspend fun details(movie: Movie, onTimes: (RequestTimes) -> Unit): MovieDetails? =
@@ -304,5 +355,10 @@ class MovieScreenTest {
     /** A provider that gives no details: the page then draws only what the list row carried. */
     private object NoDetails : MovieDetailsRepository {
         override suspend fun details(movie: Movie, onTimes: (RequestTimes) -> Unit): MovieDetails? = null
+    }
+
+    private companion object {
+        /** The surface the page is drawn over, where a test puts one. */
+        const val WALL = "wall"
     }
 }

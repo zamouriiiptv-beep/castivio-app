@@ -135,12 +135,16 @@ class ShowScreenTest {
     private var backed = 0
     private val marks = Marks()
 
-    /** [direction] is the reader's, where a test needs the page turned round; the harness's own (left to right) where it is null. */
+    /**
+     * [direction] is the reader's, where a test needs the page turned round; the harness's own (left to right) where it is null.
+     * [seasons] are the show's, two by default, and one where a test needs a show that has nothing to choose between.
+     */
     private fun show(
         details: SeriesDetails? = said,
         plots: Map<String, String> = mapOf("s1e1" to "A train crash."),
         similar: List<SeriesSummary> = others,
         direction: LayoutDirection? = null,
+        seasons: List<Season> = this.seasons,
     ) {
         val model = ShowViewModel(Pager(seasons, similar), Answered, NoProgress, Details(details, plots), marks)
         compose.setContent {
@@ -308,13 +312,29 @@ class ShowScreenTest {
     // ---------------------------------------------------------------------------------------- seasons and episodes
 
     @Test
-    fun `a season chip says how many episodes it holds`() {
+    fun `the selector names the open season and how many episodes it holds`() {
         show()
 
         compose.onNodeWithText("Season 1").assertIsDisplayed()
-        compose.onNodeWithText("2 episodes").assertIsDisplayed()
-        compose.onNodeWithText("Season 2").assertIsDisplayed()
-        compose.onNodeWithText("1 episode").assertIsDisplayed()
+        compose.onNodeWithText("(2 episodes)").assertIsDisplayed()
+        // The other season is a line of the menu, which is closed: nothing of it is on the page until the selector is pressed.
+        assertTrue(compose.onAllNodesWithText("Season 2", substring = true).fetchSemanticsNodes().isEmpty())
+    }
+
+    /** A show of one season has nothing to choose between, so its season is named and is not a control. */
+    @Test
+    fun `a show of one season names it, with no menu to open`() {
+        show(seasons = listOf(Season(1, listOf(episode(1, 1), episode(1, 2)))))
+
+        compose.onNodeWithText("Season 1").assertIsDisplayed()
+        compose.onNodeWithText("(2 episodes)").assertIsDisplayed()
+
+        compose.onNodeWithText("Season 1").performClick()
+        compose.waitForIdle()
+
+        // A menu would list the season with its count, as one line: "Season 1 · 2 episodes".
+        assertTrue(compose.onAllNodesWithText("Season 1 \u00B7 2 episodes").fetchSemanticsNodes().isEmpty())
+        compose.onNodeWithText("Episode 1-1").assertIsDisplayed()
     }
 
     @Test
@@ -337,14 +357,18 @@ class ShowScreenTest {
     }
 
     @Test
-    fun `a press on another season lists that season's episodes`() {
+    fun `a pick of another season from the selector's menu lists that season's episodes`() {
         show()
 
-        compose.onNodeWithText("Season 2").performClick()
+        // The selector opens a menu of the seasons, each with its count, and the pick closes it.
+        compose.onNodeWithText("Season 1").performClick()
+        compose.waitForIdle()
+        compose.onNodeWithText("Season 2 \u00B7 1 episode").performClick()
         compose.waitForIdle()
 
         compose.onNodeWithText("Episode 2-1").assertIsDisplayed()
         assertTrue(compose.onAllNodesWithText("Episode 1-1").fetchSemanticsNodes().isEmpty())
+        compose.onNodeWithText("Season 2").assertIsDisplayed()
     }
 
     // ------------------------------------------------------------------------------------ cast and similar shows
