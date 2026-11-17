@@ -345,8 +345,15 @@ private fun MovieWall(
  */
 internal const val POSTER_COLUMNS = 5
 
-/** How many rows below the last one drawn have their posters asked for while the wall is still. */
-internal const val PREFETCH_ROWS = 2
+/**
+ * How many rows below the last one drawn have their posters asked for, while the wall scrolls and while it is still. The
+ * films' and the shows' walls both.
+ *
+ * Three, not two: at 22:09 a scroll through about 260 show cards left 27 of them (about 10%) off the screen before their
+ * pictures came, with only two calls cancelled and no picture slower than 0.85 s -- cards that passed faster than two rows of
+ * head start could cover. A third row is five posters more in flight, about 220 KB at the card's size.
+ */
+internal const val PREFETCH_ROWS = 3
 
 /**
  * The narrowest column a card may be given before its name stops being readable in two lines: a narrower
