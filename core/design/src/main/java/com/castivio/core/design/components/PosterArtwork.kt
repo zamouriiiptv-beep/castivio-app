@@ -42,6 +42,7 @@ import coil.size.Scale
 import com.castivio.core.common.artwork.ArtworkKick
 import com.castivio.core.common.artwork.ArtworkMetrics
 import com.castivio.core.common.artwork.PosterRetry
+import com.castivio.core.common.artwork.PosterSize
 import com.castivio.core.common.artwork.PosterTimeline
 import com.castivio.core.design.theme.CastivioTheme
 import com.castivio.core.design.theme.CastivioType
@@ -79,6 +80,11 @@ internal fun PosterArtwork(
     contentScale: ContentScale = ContentScale.Crop,
     /** Called once the picture is on screen, so the card can take its placeholder away. */
     onLoaded: () -> Unit = {},
+    /**
+     * Asked for at a card's size ([PosterSize.forCard]) rather than at the size the provider chose. True for the cards of a
+     * wall; false for a film's page, whose one large poster is drawn several times the card's size.
+     */
+    cardSize: Boolean = false,
 ) {
     val context = LocalContext.current
     // All of this is keyed to the url, because a cell of a lazy grid is recycled: a poster that failed must not hand
@@ -116,7 +122,7 @@ internal fun PosterArtwork(
 
     if (failedNow) return
     AsyncImage(
-        model = pictureRequest(context, url),
+        model = pictureRequest(context, url, cardSize),
         contentDescription = null,
         contentScale = contentScale,
         onSuccess = {
@@ -135,10 +141,13 @@ internal fun PosterArtwork(
 /**
  * The request for a poster or a backdrop: the address, and a word on the request that gives it a picture's limit -- twenty
  * seconds, not a logo's six -- from the image loader's call factory, which takes the word off before the call is made.
+ *
+ * A card's poster is asked for at the card's size: the provider's 600-pixel or original picture was three times the bytes a
+ * card draws, over the connection and on the processor the film list was arriving on, and a scrolled wall showed it late.
  */
-private fun pictureRequest(context: Context, url: String): ImageRequest =
+private fun pictureRequest(context: Context, url: String, cardSize: Boolean): ImageRequest =
     ImageRequest.Builder(context)
-        .data(url)
+        .data(if (cardSize) PosterSize.forCard(url) else url)
         .addHeader(ArtworkPolicy.KIND_HEADER, ArtworkPolicy.KIND_PICTURE)
         .crossfade(false)
         .build()
@@ -176,10 +185,13 @@ internal fun PosterBackdrop(
     )
 }
 
-/** The one request for a backdrop, so the card and [PosterPrefetch] ask for it in the same words and share an answer. */
+/**
+ * The one request for a backdrop, so the card and [PosterPrefetch] ask for it in the same words and share an answer. At the
+ * card's size, like the card's poster, so the file it brings into the disk cache is the one the card then reads.
+ */
 private fun backdropRequest(context: Context, url: String): ImageRequest =
     ImageRequest.Builder(context)
-        .data(url)
+        .data(PosterSize.forCard(url))
         // It brings the whole picture into the disk cache on the way, so it is asked for as a picture and given a picture's limit.
         .addHeader(ArtworkPolicy.KIND_HEADER, ArtworkPolicy.KIND_PICTURE)
         .size(BACKDROP_WIDTH, BACKDROP_HEIGHT)

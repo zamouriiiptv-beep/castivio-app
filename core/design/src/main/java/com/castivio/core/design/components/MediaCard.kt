@@ -243,7 +243,7 @@ fun MediaCard(
                 }
             }
             if (!artworkUrl.isNullOrBlank()) {
-                PosterArtwork(artworkUrl, Modifier.fillMaxSize(), artworkScale, onLoaded = { artworkShown = true })
+                PosterArtwork(artworkUrl, Modifier.fillMaxSize(), artworkScale, onLoaded = { artworkShown = true }, cardSize = true)
             }
             WatchMarks(watchState)
             if (badge != null) {
