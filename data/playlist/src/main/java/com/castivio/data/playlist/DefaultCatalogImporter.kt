@@ -19,6 +19,7 @@ import com.castivio.core.platform.RoomThreadSampler
 import com.castivio.data.networking.CallMetrics
 import com.castivio.data.networking.HttpStatusException
 import com.castivio.data.networking.HttpStreamSource
+import com.castivio.data.networking.PictureHostWarmUp
 import com.castivio.data.networking.Received
 import com.castivio.data.networking.RemoteRequest
 import com.castivio.data.networking.RemoteResult
@@ -109,6 +110,11 @@ class DefaultCatalogImporter(
      * long as it runs. Nobody asks by default, which is every test of this class.
      */
     private val early: EarlyCategories = EarlyCategories.None,
+    /**
+     * Opens the posters' host's connection as a section of films or shows begins to load: see [PictureHostWarmUp]. Null opens
+     * nothing, which is every test of this class that is not about it.
+     */
+    private val pictureHost: PictureHostWarmUp? = null,
 ) : CatalogImporter {
 
     override fun import(source: PlaylistSource): Flow<ImportProgress> = channelFlow {
@@ -178,7 +184,12 @@ class DefaultCatalogImporter(
             // Every section import is a load of its own on the panel: one started by a
             // press already has its run, and one that started on its own -- a section
             // opened again after Refresh forgot its marks -- gets one, from zero.
-            .onStart { importStarted(kind.perfSection) }
+            .onStart {
+                importStarted(kind.perfSection)
+                // The films' and the shows' posters are asked for on TMDB as soon as their wall draws, and the provider is
+                // seconds from beginning its reply: the connection is opened now, while the line is still quiet.
+                if (kind == MediaKind.MOVIE || kind == MediaKind.SERIES) pictureHost?.warm()
+            }
 
     private fun importKindUnmeasured(source: PlaylistSource, kind: MediaKind, fresh: Boolean): Flow<ImportProgress> =
         when (source) {

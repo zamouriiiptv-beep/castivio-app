@@ -22,6 +22,7 @@ import com.castivio.data.parsing.StalkerItem
 import com.castivio.data.parsing.StalkerImportEngine
 import com.castivio.domain.MediaKind
 import com.castivio.domain.identity.DeviceIdentity
+import com.castivio.data.networking.PictureHostWarmUp
 import com.castivio.data.networking.XtreamHttpApi
 import com.castivio.data.parsing.ReplySpool
 import com.castivio.data.parsing.XtreamImportEngine
@@ -173,6 +174,9 @@ object PlaylistModule {
         portalApiFactory = { source -> source.toApi(client, identity.current().macAddress.value) },
         dispatchers = dispatchers,
         early = early,
+        // The posters' host's connection, opened through this same client as a section of films or shows begins: the image
+        // loader's client is derived from it and shares its connections.
+        pictureHost = PictureHostWarmUp(client),
     )
 
     /**
