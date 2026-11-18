@@ -308,6 +308,9 @@ class ShowScreenTest {
     fun `a press on an episode plays it`() {
         show()
 
+        // The show's poster is the page's large picture, and the second episode may stand under the screen's edge: the
+        // column is scrolled to it, as a viewer would.
+        compose.onNodeWithTag(SHOW_PAGE_TAG).performScrollToNode(hasText("Episode 1-2"))
         compose.onNodeWithText("Episode 1-2").performClick()
         compose.waitForIdle()
 
