@@ -9,7 +9,9 @@
     <string name="prefs_subtitles_none">সাবটাইটেল নেই</string>
     <string name="prefs_audio_detail">সিনেমা বা চ্যানেলে এই ভাষার শব্দ থাকলে সেটিতেই চলবে। না থাকলে নিজের শব্দই থাকবে।</string>
     <string name="prefs_subtitle_detail">সিনেমায় এই ভাষার সাবটাইটেল থাকলে তা চালু হবে। না থাকলে যেমন আছে তেমনই থাকবে।</string>
-    <string name="prefs_hidden">লুকানো আইটেম</string>
+    <string name="prefs_library">লাইব্রেরি</string>
+    <string name="prefs_auto_load">সিনেমা ও সিরিজ নিজে থেকে লোড করুন</string>
+    <string name="prefs_auto_load_detail">ওয়াই-ফাইতে, আর দেখার সময় নয়</string>
     <string name="prefs_restore_bouquets">লুকানো প্যাকেজ ফিরিয়ে আনুন</string>
     <string name="prefs_restore_channels">লুকানো চ্যানেল ফিরিয়ে আনুন</string>
     <string name="prefs_lock">চ্যানেল লক</string>

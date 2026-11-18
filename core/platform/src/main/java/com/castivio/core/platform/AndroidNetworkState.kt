@@ -28,4 +28,9 @@ class AndroidNetworkState(private val context: Context) : NetworkState {
         @Suppress("DEPRECATION")
         return manager.activeNetworkInfo?.isConnected == true
     }
+
+    override fun isUnmetered(): Boolean {
+        val manager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager ?: return true
+        return runCatching { !manager.isActiveNetworkMetered }.getOrDefault(true)
+    }
 }

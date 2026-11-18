@@ -65,4 +65,23 @@ class WriterPriorityTest {
         assertEquals(7, blind.during { 7 })
         assertTrue(changes.isEmpty())
     }
+
+    @Test
+    fun `a load nobody waits for runs its batch below the screens, and gives the thread back`() {
+        priority.yielding = true
+        var during = Int.MIN_VALUE
+        priority.during { during = nice }
+
+        assertEquals(WriterPriority.YIELD_NICE, during)
+        assertEquals(0, nice)
+        assertEquals(listOf(WriterPriority.YIELD_NICE, 0), changes)
+    }
+
+    @Test
+    fun `a yielding batch on a thread already lower is left alone`() {
+        priority.yielding = true
+        nice = 15
+        priority.during { assertEquals(15, nice) }
+        assertTrue(changes.isEmpty())
+    }
 }

@@ -1,6 +1,8 @@
 package com.castivio.feature.settings
 
+import com.castivio.domain.AutoLoadSetting
 import com.castivio.domain.PictureCache
+import kotlinx.coroutines.flow.MutableStateFlow
 import com.castivio.domain.TrackLanguage
 import com.castivio.domain.TrackLanguagePreferences
 import kotlinx.coroutines.CompletableDeferred
@@ -53,10 +55,32 @@ class SettingsViewModelTest {
         }
     }
 
+    private class Auto : AutoLoadSetting {
+        val state = MutableStateFlow(true)
+        override val enabled = state
+        override fun set(on: Boolean) {
+            state.value = on
+        }
+    }
+
+    @Test
+    fun `loading by itself is on until it is turned off, and the switch is kept`() = runTest(dispatcher) {
+        val auto = Auto()
+        val model = SettingsViewModel(Kept(), Pictures(), auto)
+        advanceUntilIdle()
+        assertTrue(model.state.value.autoLoad)
+
+        model.setAutoLoad(false)
+        advanceUntilIdle()
+
+        assertFalse(auto.state.value)
+        assertFalse(model.state.value.autoLoad)
+    }
+
     @Test
     fun `the languages kept are the ones shown, and a choice is kept`() = runTest(dispatcher) {
         val kept = Kept(sound = TrackLanguage.ARABIC)
-        val model = SettingsViewModel(kept, Pictures())
+        val model = SettingsViewModel(kept, Pictures(), Auto())
 
         assertEquals(TrackLanguage.ARABIC, model.state.value.audio)
         assertNull(model.state.value.subtitle)
@@ -73,7 +97,7 @@ class SettingsViewModelTest {
     @Test
     fun `the cache is measured when the screen opens, and emptied on a press`() = runTest(dispatcher) {
         val pictures = Pictures()
-        val model = SettingsViewModel(Kept(), pictures)
+        val model = SettingsViewModel(Kept(), pictures, Auto())
         advanceUntilIdle()
         assertEquals(48L * 1024 * 1024, model.state.value.pictureBytes)
 
@@ -88,7 +112,7 @@ class SettingsViewModelTest {
     @Test
     fun `a second press while it is being emptied empties it once`() = runTest(dispatcher) {
         val pictures = Pictures().apply { gate = CompletableDeferred() }
-        val model = SettingsViewModel(Kept(), pictures)
+        val model = SettingsViewModel(Kept(), pictures, Auto())
         advanceUntilIdle()
 
         model.clearPictures()
@@ -104,7 +128,7 @@ class SettingsViewModelTest {
 
     @Test
     fun `a cache that cannot be measured shows no size, and the screen stands`() = runTest(dispatcher) {
-        val model = SettingsViewModel(Kept(), Pictures().apply { failMeasure = true })
+        val model = SettingsViewModel(Kept(), Pictures().apply { failMeasure = true }, Auto())
         advanceUntilIdle()
 
         assertNull(model.state.value.pictureBytes)

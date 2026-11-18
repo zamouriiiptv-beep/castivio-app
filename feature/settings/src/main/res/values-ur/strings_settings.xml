@@ -9,7 +9,9 @@
     <string name="prefs_subtitles_none">سب ٹائٹل نہیں</string>
     <string name="prefs_audio_detail">اگر فلم یا چینل کی آواز اس زبان میں ہو تو اسی میں چلے گی، ورنہ اپنی آواز رہے گی۔</string>
     <string name="prefs_subtitle_detail">اگر فلم کے سب ٹائٹل اس زبان میں ہوں تو آن ہو جائیں گے، ورنہ جیسے ہیں ویسے رہیں گے۔</string>
-    <string name="prefs_hidden">چھپی ہوئی چیزیں</string>
+    <string name="prefs_library">لائبریری</string>
+    <string name="prefs_auto_load">فلمیں اور سیریز خودکار طور پر لوڈ کریں</string>
+    <string name="prefs_auto_load_detail">وائی فائی پر، اور دیکھتے وقت نہیں</string>
     <string name="prefs_restore_bouquets">چھپے ہوئے پیکج بحال کریں</string>
     <string name="prefs_restore_channels">چھپے ہوئے چینل بحال کریں</string>
     <string name="prefs_lock">چینل لاک</string>

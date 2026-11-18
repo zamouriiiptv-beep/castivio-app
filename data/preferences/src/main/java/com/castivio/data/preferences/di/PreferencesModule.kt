@@ -1,5 +1,6 @@
 package com.castivio.data.preferences.di
 
+import com.castivio.data.preferences.AutoLoadStore
 import com.castivio.data.preferences.CatchUpBackfillStore
 import com.castivio.data.preferences.ChannelLockStore
 import com.castivio.data.preferences.ChannelQualityStore
@@ -7,6 +8,7 @@ import com.castivio.data.preferences.PinStore
 import com.castivio.data.preferences.ProviderStatusStore
 import com.castivio.data.preferences.SectionCatalogueStore
 import com.castivio.data.preferences.TrackLanguageStore
+import com.castivio.domain.AutoLoadSetting
 import com.castivio.domain.CatchUpBackfillMarks
 import com.castivio.domain.ChannelLocks
 import com.castivio.domain.ChannelQualities
@@ -63,4 +65,9 @@ abstract class PreferencesModule {
     @Binds
     @Singleton
     abstract fun trackLanguages(store: TrackLanguageStore): TrackLanguagePreferences
+
+    /** Whether the sections are brought in by themselves: switched in Settings, followed by `AutoLoads`. */
+    @Binds
+    @Singleton
+    abstract fun autoLoad(store: AutoLoadStore): AutoLoadSetting
 }

@@ -85,6 +85,14 @@ interface CatalogWriter {
      */
     fun tellRarely() {}
 
+    /**
+     * Nobody is waiting for this import: it is a section brought in by itself ([BackgroundLoad]). The writer gives the
+     * processor to the screens rather than taking more of it, and tells them of its rows only at its end -- not even its
+     * first rows at once, which nobody is looking for -- so a list scrolled meanwhile is not read again under the viewer's
+     * thumb. Called before [begin]. Does nothing by default.
+     */
+    fun yieldToScreens() {}
+
     /** Makes everything written so far visible to readers. */
     fun commit()
 

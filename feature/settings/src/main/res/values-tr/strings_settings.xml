@@ -9,7 +9,9 @@
     <string name="prefs_subtitles_none">Altyazı yok</string>
     <string name="prefs_audio_detail">Bir film ya da kanalın bu dilde sesi varsa onunla oynatılır. Yoksa kendi sesi kalır.</string>
     <string name="prefs_subtitle_detail">Bir filmin bu dilde altyazısı varsa açılır. Yoksa olduğu gibi kalır.</string>
-    <string name="prefs_hidden">Gizli öğeler</string>
+    <string name="prefs_library">Kitaplık</string>
+    <string name="prefs_auto_load">Filmleri ve dizileri otomatik yükle</string>
+    <string name="prefs_auto_load_detail">Wi-Fi\'da ve izlerken değil</string>
     <string name="prefs_restore_bouquets">Gizli paketleri geri getir</string>
     <string name="prefs_restore_channels">Gizli kanalları geri getir</string>
     <string name="prefs_lock">Kanal kilidi</string>

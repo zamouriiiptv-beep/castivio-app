@@ -147,6 +147,18 @@ class RoomCatalogWriter(
         pacedMs = notifyInterval
     }
 
+    /** See [CatalogWriter.yieldToScreens]: the lowest priority for its batches, and the screens told at its end. */
+    override fun yieldToScreens() {
+        yielding = true
+        writerPriority.yielding = true
+        notifyInterval = BACKGROUND_NOTIFY_INTERVAL_MS
+        pacer = UpdatePacer(notifyInterval)
+        pacedMs = notifyInterval
+    }
+
+    /** A load nobody is waiting for: no first rows are told at once. See [yieldToScreens]. */
+    private var yielding = false
+
     override fun begin(sourceId: String, mode: ImportMode, sections: Set<MediaKind>) {
         require(sections.isNotEmpty()) { "an import of no section" }
         val db = database.openHelper.writableDatabase
@@ -477,7 +489,7 @@ class RoomCatalogWriter(
         // The timer is scheduled whatever else is told, or the pacer would wait for one that
         // does not exist.
         if (step is UpdatePacer.Step.Later) schedule(step.afterMs)
-        val urgent = (firstRows || firstCounts) && pacer.urgent(now) == UpdatePacer.Step.Now
+        val urgent = !yielding && (firstRows || firstCounts) && pacer.urgent(now) == UpdatePacer.Step.Now
         if (step == UpdatePacer.Step.Now || urgent) told()
     }
 
@@ -1062,3 +1074,9 @@ const val NOTIFY_INTERVAL_MS = 1_000L
 
 /** About one in ten seconds during a refresh, which has rows on the screen already: see [RoomCatalogWriter.tellRarely]. */
 const val REFRESH_NOTIFY_INTERVAL_MS = 10_000L
+
+/**
+ * A load nobody is waiting for is told of at its end and, should it run that long, once in ten minutes: see
+ * [RoomCatalogWriter.yieldToScreens].
+ */
+const val BACKGROUND_NOTIFY_INTERVAL_MS = 600_000L

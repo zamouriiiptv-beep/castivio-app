@@ -19,6 +19,7 @@ import com.castivio.domain.RefreshProvider
 import com.castivio.domain.Refreshed
 import com.castivio.domain.SectionCatalogue
 import com.castivio.domain.SectionLoad
+import com.castivio.domain.AutoLoads
 import com.castivio.domain.SectionLoads
 import com.castivio.domain.SectionRun
 import com.castivio.domain.SourceKind
@@ -330,6 +331,8 @@ class HomeViewModel @Inject constructor(
     private val refresher: RefreshProvider,
     private val clock: TrustedTime,
     private val loads: SectionLoads,
+    /** The sections brought in by themselves after the channels: started once, here, where every viewer arrives. */
+    autoLoads: AutoLoads,
     private val network: NetworkState,
     /** Fills the archive hours of a catalogue imported before catch-up existed: once, in the background, when all is quiet. */
     private val catchUpBackfill: CatchUpBackfill,
@@ -571,6 +574,7 @@ class HomeViewModel @Inject constructor(
     private val arrived = MutableStateFlow<Set<MediaKind>>(emptySet())
 
     init {
+        autoLoads.start()
         // The subscription is asked about, quietly, when this holder starts -- each time
         // Castivio is opened -- and again for every subscription the menu switches to: the
         // expiry date belongs on the card before any section is loaded, and whether the

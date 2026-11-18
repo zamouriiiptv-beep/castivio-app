@@ -9,7 +9,9 @@
     <string name="prefs_subtitles_none">ไม่มีคำบรรยาย</string>
     <string name="prefs_audio_detail">หากภาพยนตร์หรือช่องมีเสียงภาษานี้ จะเล่นด้วยภาษานั้น หากไม่มีจะใช้เสียงเดิม</string>
     <string name="prefs_subtitle_detail">หากภาพยนตร์มีคำบรรยายภาษานี้ จะเปิดคำบรรยาย หากไม่มีจะคงไว้ตามเดิม</string>
-    <string name="prefs_hidden">รายการที่ซ่อน</string>
+    <string name="prefs_library">คลัง</string>
+    <string name="prefs_auto_load">โหลดภาพยนตร์และซีรีส์อัตโนมัติ</string>
+    <string name="prefs_auto_load_detail">ผ่าน Wi-Fi และไม่ใช่ระหว่างรับชม</string>
     <string name="prefs_restore_bouquets">คืนค่าแพ็กเกจที่ซ่อน</string>
     <string name="prefs_restore_channels">คืนค่าช่องที่ซ่อน</string>
     <string name="prefs_lock">ล็อกช่อง</string>

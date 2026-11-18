@@ -2,6 +2,7 @@ package com.castivio.feature.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.castivio.domain.AutoLoadSetting
 import com.castivio.domain.PictureCache
 import com.castivio.domain.TrackLanguage
 import com.castivio.domain.TrackLanguagePreferences
@@ -21,6 +22,7 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     private val languages: TrackLanguagePreferences,
     private val pictures: PictureCache,
+    private val autoLoad: AutoLoadSetting,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsState(audio = languages.audio(), subtitle = languages.subtitle()))
@@ -28,6 +30,12 @@ class SettingsViewModel @Inject constructor(
 
     init {
         measure()
+        viewModelScope.launch { autoLoad.enabled.collect { on -> _state.value = _state.value.copy(autoLoad = on) } }
+    }
+
+    /** The films, the series and the radio brought in by themselves, or not (Settings → Library). */
+    fun setAutoLoad(on: Boolean) {
+        autoLoad.set(on)
     }
 
     fun setAudio(language: TrackLanguage?) {
@@ -77,4 +85,6 @@ data class SettingsState(
     val subtitle: TrackLanguage? = null,
     val pictureBytes: Long? = null,
     val clearing: Boolean = false,
+    /** Whether the sections are brought in by themselves: on until the viewer turns it off. */
+    val autoLoad: Boolean = true,
 )

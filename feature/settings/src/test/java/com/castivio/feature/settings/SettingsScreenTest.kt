@@ -2,6 +2,9 @@ package com.castivio.feature.settings
 
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertHasNoClickAction
+import androidx.compose.ui.test.assertIsOff
+import androidx.compose.ui.test.assertIsOn
+import androidx.compose.ui.test.isToggleable
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
@@ -12,7 +15,9 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import com.castivio.core.design.theme.CastivioTheme
 import com.castivio.core.design.theme.MotionLevel
+import com.castivio.domain.AutoLoadSetting
 import com.castivio.domain.PictureCache
+import kotlinx.coroutines.flow.MutableStateFlow
 import com.castivio.domain.TrackLanguage
 import com.castivio.domain.TrackLanguagePreferences
 import org.junit.Assert.assertEquals
@@ -50,6 +55,16 @@ class SettingsScreenTest {
     }
 
     private val kept = Kept()
+
+    private class Auto : AutoLoadSetting {
+        val state = MutableStateFlow(true)
+        override val enabled = state
+        override fun set(on: Boolean) {
+            state.value = on
+        }
+    }
+
+    private val auto = Auto()
     private var motion = MotionLevel.FULL
     private var restoredBouquets = 0
     private var restoredChannels = 0
@@ -57,7 +72,7 @@ class SettingsScreenTest {
     private var backed = 0
 
     private fun settings(hiddenBouquets: Int = 3, hiddenChannels: Int = 0) {
-        val model = SettingsViewModel(kept, NoPictures)
+        val model = SettingsViewModel(kept, NoPictures, auto)
         compose.setContent {
             CastivioTheme {
                 SettingsScreen(
@@ -122,6 +137,19 @@ class SettingsScreenTest {
         assertEquals(TrackLanguage.ARABIC, kept.sound)
         compose.onNodeWithText("العربية").assertExists()
         assertTrue(compose.onAllNodesWithText("Original sound").fetchSemanticsNodes().isEmpty())
+    }
+
+    @Test
+    fun `loading the films and series by themselves is on, and one press turns it off`() {
+        settings()
+
+        compose.onNodeWithText("Load films and series automatically").assertExists()
+        compose.onNodeWithText("On Wi-Fi, and not while you watch").assertExists()
+        compose.onNode(isToggleable()).assertIsOn().performClick()
+        compose.waitForIdle()
+
+        assertEquals(false, auto.state.value)
+        compose.onNode(isToggleable()).assertIsOff()
     }
 
     @Test

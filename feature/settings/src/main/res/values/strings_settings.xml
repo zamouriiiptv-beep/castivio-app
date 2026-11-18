@@ -14,7 +14,9 @@
     <string name="prefs_subtitles_none">No subtitles</string>
     <string name="prefs_audio_detail">If a film or channel has a sound in this language, it plays in it. Otherwise it keeps its own.</string>
     <string name="prefs_subtitle_detail">If a film has subtitles in this language, they are turned on. Otherwise they stay as they are.</string>
-    <string name="prefs_hidden">Hidden items</string>
+    <string name="prefs_library">Library</string>
+    <string name="prefs_auto_load">Load films and series automatically</string>
+    <string name="prefs_auto_load_detail">On Wi-Fi, and not while you watch</string>
     <string name="prefs_restore_bouquets">Restore hidden bouquets</string>
     <string name="prefs_restore_channels">Restore hidden channels</string>
     <string name="prefs_lock">Channel lock</string>

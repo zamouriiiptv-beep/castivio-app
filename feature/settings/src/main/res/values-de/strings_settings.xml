@@ -9,7 +9,9 @@
     <string name="prefs_subtitles_none">Keine Untertitel</string>
     <string name="prefs_audio_detail">Hat ein Film oder Sender Ton in dieser Sprache, wird er darin abgespielt. Sonst bleibt der eigene Ton.</string>
     <string name="prefs_subtitle_detail">Hat ein Film Untertitel in dieser Sprache, werden sie eingeschaltet. Sonst bleiben sie, wie sie sind.</string>
-    <string name="prefs_hidden">Ausgeblendete Elemente</string>
+    <string name="prefs_library">Mediathek</string>
+    <string name="prefs_auto_load">Filme und Serien automatisch laden</string>
+    <string name="prefs_auto_load_detail">Im WLAN und nicht während der Wiedergabe</string>
     <string name="prefs_restore_bouquets">Ausgeblendete Bouquets wiederherstellen</string>
     <string name="prefs_restore_channels">Ausgeblendete Sender wiederherstellen</string>
     <string name="prefs_lock">Sendersperre</string>

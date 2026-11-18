@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -315,13 +316,17 @@ fun ShellScreen(
     // moved on. That is the whole of why the board's playing mark, its preview and its quality
     // badge cannot be fooled by a press.
     var pulse by remember { mutableStateOf<PlayerPulse?>(null) }
+    // A station asked for on the radio's board and not paused: playing too, for whatever must stay out of its way.
+    var radioSounding by remember { mutableStateOf(false) }
 
     // A stream asked for and not yet stopped is told to the background work that waits for quiet -- the catch-up backfill --
     // so that it never competes with a picture for the connection. From the same pulse the board reads, and nothing else:
     // the sound of the radio is in its own destination, where Home is not on screen and nothing waits on it.
     val playbackActivity: PlaybackActivityViewModel = hiltViewModel()
-    LaunchedEffect(pulse) {
-        playbackActivity.activity.set(pulse?.phase.let { it == PulsePhase.OPENING || it == PulsePhase.SHOWING })
+    LaunchedEffect(pulse, radioSounding) {
+        playbackActivity.activity.set(
+            radioSounding || pulse?.phase.let { it == PulsePhase.OPENING || it == PulsePhase.SHOWING },
+        )
     }
 
     // ## Back, and the one place it asks before it acts
@@ -740,14 +745,22 @@ fun ShellScreen(
                         }
                         // One sound for both: the open source's station, in the open source's words. The world's session says which of
                         // the station's two addresses it is asking for, so a station that does not play at the first is asked for at the other.
+                        val stationRequest = when (source) {
+                            RadioSource.Subscription -> radio.station?.asSelection()?.asPlayerRequest()
+                            RadioSource.World -> world.station?.let { station ->
+                                world.url?.let { url -> PlayerRequest(url = url, title = station.name, kind = MediaKind.LIVE) }
+                            }
+                        }
+                        val stationPaused = if (source == RadioSource.World) world.paused else radio.paused
+                        // The station counts as playing from the press until it is paused or let go, as a channel does.
+                        val sounding = stationRequest != null && !stationPaused
+                        DisposableEffect(sounding) {
+                            radioSounding = sounding
+                            onDispose { radioSounding = false }
+                        }
                         RadioAudioRoute(
-                            request = when (source) {
-                                RadioSource.Subscription -> radio.station?.asSelection()?.asPlayerRequest()
-                                RadioSource.World -> world.station?.let { station ->
-                                    world.url?.let { url -> PlayerRequest(url = url, title = station.name, kind = MediaKind.LIVE) }
-                                }
-                            },
-                            paused = if (source == RadioSource.World) world.paused else radio.paused,
+                            request = stationRequest,
+                            paused = stationPaused,
                             retries = if (source == RadioSource.World) world.retries else radio.retries,
                             onStatus = if (source == RadioSource.World) world::heard else radio::heard,
                             onReleased = if (source == RadioSource.World) world::release else radio::release,
@@ -756,9 +769,9 @@ fun ShellScreen(
                         // Recently played entry -- as a channel is once its picture shows. Not on the press. The world's
                         // are recorded by the world's own screen, in the world's own store: the subscription's list is the
                         // subscription's.
-                        val sounding = radio.status.soundingUrl
-                        LaunchedEffect(sounding) {
-                            radio.station?.takeIf { it.streamUrl == sounding }?.let { recentModel.watched(it.id) }
+                        val heard = radio.status.soundingUrl
+                        LaunchedEffect(heard) {
+                            radio.station?.takeIf { it.streamUrl == heard }?.let { recentModel.watched(it.id) }
                         }
                     }
                     // Catch-up plays through the same hand-off a film does: the player opens large over this screen, which

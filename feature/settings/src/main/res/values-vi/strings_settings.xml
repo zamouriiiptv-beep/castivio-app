@@ -9,7 +9,9 @@
     <string name="prefs_subtitles_none">Không có phụ đề</string>
     <string name="prefs_audio_detail">Nếu phim hoặc kênh có âm thanh bằng ngôn ngữ này, nó sẽ phát bằng ngôn ngữ đó. Nếu không, giữ âm thanh gốc.</string>
     <string name="prefs_subtitle_detail">Nếu phim có phụ đề bằng ngôn ngữ này, phụ đề sẽ được bật. Nếu không, giữ nguyên.</string>
-    <string name="prefs_hidden">Mục đã ẩn</string>
+    <string name="prefs_library">Thư viện</string>
+    <string name="prefs_auto_load">Tự động tải phim lẻ và phim bộ</string>
+    <string name="prefs_auto_load_detail">Qua Wi-Fi và không khi đang xem</string>
     <string name="prefs_restore_bouquets">Khôi phục gói đã ẩn</string>
     <string name="prefs_restore_channels">Khôi phục kênh đã ẩn</string>
     <string name="prefs_lock">Khóa kênh</string>

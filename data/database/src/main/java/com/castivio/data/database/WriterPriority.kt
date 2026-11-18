@@ -25,20 +25,34 @@ internal class WriterPriority(
     private val setNice: (Int) -> Unit,
 ) {
 
-    /** Runs [block] at [WRITER_NICE] at least, and puts the thread back as it found it. */
+    /**
+     * A load nobody is waiting for: its batches run at [YIELD_NICE] at most instead -- below every screen's thread -- so a
+     * list scrolled while it arrives keeps the processor. See `CatalogWriter.yieldToScreens`.
+     */
+    @Volatile var yielding: Boolean = false
+
+    /**
+     * Runs [block] at [WRITER_NICE] at least -- or, [yielding], at [YIELD_NICE] at most -- and puts the thread back as it
+     * found it.
+     */
     fun <T> during(block: () -> T): T {
         val before = runCatching(currentNice).getOrNull()
-        val raised = before != null && before > WRITER_NICE && runCatching { setNice(WRITER_NICE) }.isSuccess
+        val target = if (yielding) YIELD_NICE else WRITER_NICE
+        val move = before != null && (if (yielding) before < target else before > target)
+        val changed = move && runCatching { setNice(target) }.isSuccess
         try {
             return block()
         } finally {
-            if (raised && before != null) runCatching { setNice(before) }
+            if (changed && before != null) runCatching { setNice(before) }
         }
     }
 
     companion object {
         /** Two steps more favourable than [Process.THREAD_PRIORITY_DEFAULT], and short of [Process.THREAD_PRIORITY_DISPLAY]. */
         const val WRITER_NICE = -2
+
+        /** [Process.THREAD_PRIORITY_BACKGROUND]: what a load nobody is waiting for runs at. */
+        const val YIELD_NICE = 10
 
         /** For the thread that calls it. */
         fun ofThisThread(): WriterPriority = WriterPriority(

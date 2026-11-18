@@ -9,7 +9,9 @@
     <string name="prefs_subtitles_none">Bez titulkov</string>
     <string name="prefs_audio_detail">Ak má film alebo kanál zvuk v tomto jazyku, prehrá sa v ňom. Inak zostane vlastný.</string>
     <string name="prefs_subtitle_detail">Ak má film titulky v tomto jazyku, zapnú sa. Inak zostanú, ako sú.</string>
-    <string name="prefs_hidden">Skryté položky</string>
+    <string name="prefs_library">Knižnica</string>
+    <string name="prefs_auto_load">Načítavať filmy a seriály automaticky</string>
+    <string name="prefs_auto_load_detail">Cez Wi-Fi a nie počas sledovania</string>
     <string name="prefs_restore_bouquets">Obnoviť skryté balíky</string>
     <string name="prefs_restore_channels">Obnoviť skryté kanály</string>
     <string name="prefs_lock">Zámok kanálov</string>

@@ -5,6 +5,7 @@ import android.os.SystemClock
 import androidx.tracing.Trace
 import com.castivio.core.common.AppDispatchers
 import com.castivio.core.common.Outcome
+import com.castivio.core.platform.NetworkState
 import com.castivio.core.platform.CastivioTrace
 import com.castivio.core.platform.LoadAnswer
 import com.castivio.core.platform.LoadFailure
@@ -20,6 +21,9 @@ import com.castivio.data.playlist.DefaultSeriesEpisodes
 import com.castivio.data.parsing.StalkerChannel
 import com.castivio.data.parsing.StalkerItem
 import com.castivio.data.parsing.StalkerImportEngine
+import com.castivio.domain.PlaybackActivity
+import com.castivio.domain.AutoLoads
+import com.castivio.domain.AutoLoadSetting
 import com.castivio.domain.MediaKind
 import com.castivio.domain.identity.DeviceIdentity
 import com.castivio.data.networking.PictureHostWarmUp
@@ -265,6 +269,31 @@ object PlaylistModule {
             // After the log has settled the run: a report that has just ended is what the session keeps.
             LoadTrace.answered(kind.perfSection, load.asAnswer())
         },
+    )
+
+    /**
+     * The films, the series and the radio brought in by themselves after the channels (Settings → Library): see
+     * [AutoLoads]. On the queue's own thread, and asking it nothing while anything plays or on a network that costs.
+     * Started by Home, which every viewer reaches.
+     */
+    @Provides
+    @Singleton
+    fun autoLoads(
+        loads: SectionLoads,
+        sources: SourceRepository,
+        marks: SectionCatalogue,
+        setting: AutoLoadSetting,
+        playback: PlaybackActivity,
+        network: NetworkState,
+        dispatchers: AppDispatchers,
+    ): AutoLoads = AutoLoads(
+        scope = CoroutineScope(SupervisorJob() + dispatchers.main),
+        loads = loads,
+        activeSource = sources.active().map { it?.id },
+        marks = marks,
+        enabled = setting.enabled,
+        playing = playback.active,
+        unmetered = network::isUnmetered,
     )
 
     /**

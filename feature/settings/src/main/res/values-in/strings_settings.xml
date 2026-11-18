@@ -9,7 +9,9 @@
     <string name="prefs_subtitles_none">Tanpa subtitel</string>
     <string name="prefs_audio_detail">Jika film atau saluran punya suara dalam bahasa ini, diputar dengan bahasa itu. Jika tidak, tetap suaranya sendiri.</string>
     <string name="prefs_subtitle_detail">Jika film punya subtitel dalam bahasa ini, subtitel diaktifkan. Jika tidak, tetap seperti semula.</string>
-    <string name="prefs_hidden">Item tersembunyi</string>
+    <string name="prefs_library">Pustaka</string>
+    <string name="prefs_auto_load">Muat film dan serial secara otomatis</string>
+    <string name="prefs_auto_load_detail">Lewat Wi-Fi, dan tidak saat menonton</string>
     <string name="prefs_restore_bouquets">Pulihkan paket tersembunyi</string>
     <string name="prefs_restore_channels">Pulihkan saluran tersembunyi</string>
     <string name="prefs_lock">Kunci saluran</string>

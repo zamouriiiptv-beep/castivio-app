@@ -9,7 +9,9 @@
     <string name="prefs_subtitles_none">Pa titra</string>
     <string name="prefs_audio_detail">Nëse një film ose kanal ka zë në këtë gjuhë, luhet në të. Përndryshe mban të vetin.</string>
     <string name="prefs_subtitle_detail">Nëse një film ka titra në këtë gjuhë, ato aktivizohen. Përndryshe mbeten siç janë.</string>
-    <string name="prefs_hidden">Elementet e fshehura</string>
+    <string name="prefs_library">Biblioteka</string>
+    <string name="prefs_auto_load">Ngarko automatikisht filmat dhe serialet</string>
+    <string name="prefs_auto_load_detail">Në Wi-Fi dhe jo ndërsa shikoni</string>
     <string name="prefs_restore_bouquets">Rikthe paketat e fshehura</string>
     <string name="prefs_restore_channels">Rikthe kanalet e fshehura</string>
     <string name="prefs_lock">Kyçja e kanaleve</string>

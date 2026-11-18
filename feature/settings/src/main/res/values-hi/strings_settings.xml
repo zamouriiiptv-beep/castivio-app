@@ -9,7 +9,9 @@
     <string name="prefs_subtitles_none">कोई सबटाइटल नहीं</string>
     <string name="prefs_audio_detail">अगर फ़िल्म या चैनल में इस भाषा की आवाज़ है, तो वह उसी में चलेगा। नहीं तो अपनी आवाज़ रहेगी।</string>
     <string name="prefs_subtitle_detail">अगर फ़िल्म में इस भाषा के सबटाइटल हैं, तो वे चालू हो जाएँगे। नहीं तो जैसे हैं वैसे रहेंगे।</string>
-    <string name="prefs_hidden">छिपे हुए आइटम</string>
+    <string name="prefs_library">लाइब्रेरी</string>
+    <string name="prefs_auto_load">फ़िल्में और सीरीज़ अपने-आप लोड करें</string>
+    <string name="prefs_auto_load_detail">वाई-फ़ाई पर, और देखते समय नहीं</string>
     <string name="prefs_restore_bouquets">छिपे हुए पैकेज वापस लाएँ</string>
     <string name="prefs_restore_channels">छिपे हुए चैनल वापस लाएँ</string>
     <string name="prefs_lock">चैनल लॉक</string>

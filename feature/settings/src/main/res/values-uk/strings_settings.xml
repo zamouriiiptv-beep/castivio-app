@@ -9,7 +9,9 @@
     <string name="prefs_subtitles_none">Без субтитрів</string>
     <string name="prefs_audio_detail">Якщо фільм або канал має звук цією мовою, він відтворюється нею. Інакше лишається свій.</string>
     <string name="prefs_subtitle_detail">Якщо фільм має субтитри цією мовою, їх буде ввімкнено. Інакше вони лишаються як є.</string>
-    <string name="prefs_hidden">Приховане</string>
+    <string name="prefs_library">Бібліотека</string>
+    <string name="prefs_auto_load">Завантажувати фільми й серіали автоматично</string>
+    <string name="prefs_auto_load_detail">Через Wi-Fi і не під час перегляду</string>
     <string name="prefs_restore_bouquets">Повернути приховані пакети</string>
     <string name="prefs_restore_channels">Повернути приховані канали</string>
     <string name="prefs_lock">Блокування каналів</string>

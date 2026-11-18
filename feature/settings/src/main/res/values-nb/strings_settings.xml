@@ -9,7 +9,9 @@
     <string name="prefs_subtitles_none">Ingen teksting</string>
     <string name="prefs_audio_detail">Har en film eller kanal lyd på dette språket, spilles den av på det. Ellers beholder den sin egen.</string>
     <string name="prefs_subtitle_detail">Har en film teksting på dette språket, slås den på. Ellers forblir den som den er.</string>
-    <string name="prefs_hidden">Skjulte elementer</string>
+    <string name="prefs_library">Bibliotek</string>
+    <string name="prefs_auto_load">Last inn filmer og serier automatisk</string>
+    <string name="prefs_auto_load_detail">På Wi-Fi og ikke mens du ser</string>
     <string name="prefs_restore_bouquets">Gjenopprett skjulte pakker</string>
     <string name="prefs_restore_channels">Gjenopprett skjulte kanaler</string>
     <string name="prefs_lock">Kanallås</string>

@@ -9,7 +9,9 @@
     <string name="prefs_subtitles_none">بدون زیرنویس</string>
     <string name="prefs_audio_detail">اگر فیلم یا کانال صدایی به این زبان داشته باشد، با آن پخش می‌شود. وگرنه صدای خودش می‌ماند.</string>
     <string name="prefs_subtitle_detail">اگر فیلم زیرنویسی به این زبان داشته باشد، روشن می‌شود. وگرنه همان‌طور که هست می‌ماند.</string>
-    <string name="prefs_hidden">موارد پنهان</string>
+    <string name="prefs_library">کتابخانه</string>
+    <string name="prefs_auto_load">بارگیری خودکار فیلم‌ها و سریال‌ها</string>
+    <string name="prefs_auto_load_detail">با وای‌فای، و نه هنگام تماشا</string>
     <string name="prefs_restore_bouquets">بازگرداندن بسته‌های پنهان</string>
     <string name="prefs_restore_channels">بازگرداندن کانال‌های پنهان</string>
     <string name="prefs_lock">قفل کانال‌ها</string>

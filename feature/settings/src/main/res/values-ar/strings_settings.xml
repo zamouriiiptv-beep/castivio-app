@@ -9,7 +9,9 @@
     <string name="prefs_subtitles_none">بلا ترجمة</string>
     <string name="prefs_audio_detail">إن كان للفيلم أو القناة صوت بهذه اللغة شُغِّل به، وإلا بقي صوته الأصلي.</string>
     <string name="prefs_subtitle_detail">إن كانت للفيلم ترجمة بهذه اللغة شُغِّلت، وإلا بقيت الترجمة كما هي.</string>
-    <string name="prefs_hidden">العناصر المخفية</string>
+    <string name="prefs_library">المكتبة</string>
+    <string name="prefs_auto_load">تحميل الأفلام والمسلسلات تلقائيًا</string>
+    <string name="prefs_auto_load_detail">على الويفي، وليس أثناء المشاهدة</string>
     <string name="prefs_restore_bouquets">استعادة الباقات المخفية</string>
     <string name="prefs_restore_channels">استعادة القنوات المخفية</string>
     <string name="prefs_lock">قفل القنوات</string>

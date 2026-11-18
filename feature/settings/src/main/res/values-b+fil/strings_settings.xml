@@ -9,7 +9,9 @@
     <string name="prefs_subtitles_none">Walang subtitle</string>
     <string name="prefs_audio_detail">Kung may tunog sa wikang ito ang pelikula o channel, ito ang patutugtugin. Kung wala, mananatili ang sarili nitong tunog.</string>
     <string name="prefs_subtitle_detail">Kung may subtitle sa wikang ito ang pelikula, bubuksan ito. Kung wala, mananatili ito gaya ng dati.</string>
-    <string name="prefs_hidden">Mga nakatagong item</string>
+    <string name="prefs_library">Library</string>
+    <string name="prefs_auto_load">Awtomatikong i-load ang mga pelikula at serye</string>
+    <string name="prefs_auto_load_detail">Sa Wi-Fi, at hindi habang nanonood</string>
     <string name="prefs_restore_bouquets">Ibalik ang mga nakatagong bouquet</string>
     <string name="prefs_restore_channels">Ibalik ang mga nakatagong channel</string>
     <string name="prefs_lock">Lock ng channel</string>

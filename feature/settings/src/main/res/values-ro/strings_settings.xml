@@ -9,7 +9,9 @@
     <string name="prefs_subtitles_none">Fără subtitrări</string>
     <string name="prefs_audio_detail">Dacă un film sau un canal are sunet în această limbă, este redat în ea. Altfel își păstrează sunetul.</string>
     <string name="prefs_subtitle_detail">Dacă un film are subtitrări în această limbă, ele sunt activate. Altfel rămân cum sunt.</string>
-    <string name="prefs_hidden">Elemente ascunse</string>
+    <string name="prefs_library">Bibliotecă</string>
+    <string name="prefs_auto_load">Încarcă automat filme și seriale</string>
+    <string name="prefs_auto_load_detail">Pe Wi-Fi și nu în timp ce te uiți</string>
     <string name="prefs_restore_bouquets">Restabilește pachetele ascunse</string>
     <string name="prefs_restore_channels">Restabilește canalele ascunse</string>
     <string name="prefs_lock">Blocarea canalelor</string>

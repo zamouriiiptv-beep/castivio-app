@@ -9,7 +9,9 @@
     <string name="prefs_subtitles_none">Nincs felirat</string>
     <string name="prefs_audio_detail">Ha egy filmnek vagy csatornának van hangja ezen a nyelven, azon szól. Különben marad a sajátja.</string>
     <string name="prefs_subtitle_detail">Ha egy filmnek van felirata ezen a nyelven, bekapcsol. Különben marad, ahogy van.</string>
-    <string name="prefs_hidden">Elrejtett elemek</string>
+    <string name="prefs_library">Könyvtár</string>
+    <string name="prefs_auto_load">Filmek és sorozatok automatikus betöltése</string>
+    <string name="prefs_auto_load_detail">Wi-Fi-n, és nem nézés közben</string>
     <string name="prefs_restore_bouquets">Elrejtett csomagok visszaállítása</string>
     <string name="prefs_restore_channels">Elrejtett csatornák visszaállítása</string>
     <string name="prefs_lock">Csatornazár</string>

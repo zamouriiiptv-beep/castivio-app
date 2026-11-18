@@ -357,6 +357,117 @@ class SectionLoadsTest {
 
     // ------------------------------------------------------------------ helpers
 
+    // ------------------------------------------------------------------ loads nobody asked for
+
+    @Test
+    fun `a load nobody asked for runs as one, and the importer can tell`() = runTest {
+        var marked: Boolean? = null
+        val loader = Loader { _, _ ->
+            flow {
+                marked = kotlin.coroutines.coroutineContext[BackgroundLoad] != null
+                emit(SectionLoad.Done(1))
+            }
+        }
+        val loads = loads(loader)
+
+        loads.request(MediaKind.MOVIE, background = true)
+        runCurrent()
+
+        assertEquals(true, marked)
+    }
+
+    @Test
+    fun `a load the viewer asked for is not one`() = runTest {
+        var marked: Boolean? = null
+        val loader = Loader { _, _ ->
+            flow {
+                marked = kotlin.coroutines.coroutineContext[BackgroundLoad] != null
+                emit(SectionLoad.Done(1))
+            }
+        }
+        val loads = loads(loader)
+
+        loads.request(MediaKind.MOVIE)
+        runCurrent()
+
+        assertEquals(false, marked)
+    }
+
+    @Test
+    fun `stopping ends the running load nobody asked for and forgets it, and the next one starts`() = runTest {
+        val loader = Loader { _, _ -> flow { emit(SectionLoad.Loading(5, 1)); awaitCancellation() } }
+        val loads = loads(loader)
+
+        loads.request(MediaKind.MOVIE, background = true)
+        runCurrent()
+        loads.request(MediaKind.LIVE)
+        runCurrent()
+        assertEquals(SectionLoad.Loading(5, 1), loads.runs.value.getValue(MediaKind.MOVIE).load)
+
+        loads.stopBackground()
+        runCurrent()
+
+        assertNull("the films' card is back to what it said before", loads.runs.value[MediaKind.MOVIE])
+        assertEquals("the viewer's own load starts", listOf(MediaKind.MOVIE, MediaKind.LIVE), loader.kinds)
+        assertEquals(SectionLoad.Loading(5, 1), loads.runs.value.getValue(MediaKind.LIVE).load)
+    }
+
+    @Test
+    fun `stopping leaves alone a load the viewer asked for, and one they asked for while it ran on its own`() = runTest {
+        val loader = Loader { _, _ -> flow { emit(SectionLoad.Loading(5, 1)); awaitCancellation() } }
+        val loads = loads(loader)
+
+        loads.request(MediaKind.MOVIE, background = true)
+        runCurrent()
+        // The viewer presses the films' card while they arrive on their own: from now on it is their load.
+        loads.request(MediaKind.MOVIE)
+        loads.stopBackground()
+        runCurrent()
+
+        assertEquals(SectionLoad.Loading(5, 1), loads.runs.value.getValue(MediaKind.MOVIE).load)
+        assertEquals(listOf(MediaKind.MOVIE), loader.kinds)
+    }
+
+    @Test
+    fun `stopping drops the ones waiting nobody asked for, and keeps the viewer's`() = runTest {
+        val loader = Loader { _, _ -> flow { emit(SectionLoad.Loading(0, 0)); awaitCancellation() } }
+        val loads = loads(loader)
+
+        loads.request(MediaKind.LIVE)
+        loads.request(MediaKind.MOVIE, background = true)
+        loads.request(MediaKind.RADIO)
+        runCurrent()
+        loads.stopBackground()
+        runCurrent()
+
+        assertNull(loads.runs.value[MediaKind.MOVIE])
+        assertEquals(SectionLoad.Queued, loads.runs.value.getValue(MediaKind.RADIO).load)
+    }
+
+    @Test
+    fun `a stopped load's last word does not come back`() = runTest {
+        val gate = CompletableDeferred<Unit>()
+        val loader = Loader { _, _ ->
+            flow {
+                emit(SectionLoad.Loading(1, 1))
+                try {
+                    gate.await()
+                } finally {
+                    // A loader that says something on its way out, as an import that reports its end does.
+                    emit(SectionLoad.Loading(2, 2))
+                }
+            }
+        }
+        val loads = loads(loader)
+
+        loads.request(MediaKind.SERIES, background = true)
+        runCurrent()
+        loads.stopBackground()
+        runCurrent()
+
+        assertNull(loads.runs.value[MediaKind.SERIES])
+    }
+
     private fun TestScope.loads(loader: Loader, active: MutableStateFlow<String?> = MutableStateFlow("xtream")) =
         SectionLoads(backgroundScope, active, loader::invoke, monotonicMs = { 0L })
 

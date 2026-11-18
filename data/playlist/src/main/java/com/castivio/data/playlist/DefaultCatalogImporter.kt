@@ -6,6 +6,7 @@ import android.os.Process
 import android.util.Log
 import com.castivio.core.common.AppError
 import com.castivio.core.common.AppDispatchers
+import com.castivio.core.platform.FrameWatch
 import com.castivio.core.platform.CallTimes
 import com.castivio.core.platform.DevDiagnostics
 import com.castivio.core.platform.PassTimes
@@ -28,6 +29,7 @@ import com.castivio.data.parsing.PortalReport
 import com.castivio.data.parsing.SourceIds
 import com.castivio.data.parsing.StalkerImportEngine
 import com.castivio.data.parsing.XtreamImportEngine
+import com.castivio.domain.BackgroundLoad
 import com.castivio.domain.CatalogImporter
 import com.castivio.domain.CatalogItem
 import com.castivio.domain.CatalogWriter
@@ -46,6 +48,7 @@ import com.castivio.domain.SourceRepository
 import com.castivio.domain.SyncState
 import com.castivio.domain.panelFailureAllowsPlaylist
 import kotlin.coroutines.cancellation.CancellationException
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
@@ -330,6 +333,7 @@ class DefaultCatalogImporter(
         PerformanceLog.requestStarted(PLAYLIST_ACTION)
 
         val writer = WatchedWriter(writerFactory())
+        if (currentCoroutineContext()[BackgroundLoad] != null) writer.yieldToScreens()
         // A section's download is kept for the sections after it. And it asks whether the
         // playlist changed only when there is a copy to read if it did not: "not modified"
         // with nothing kept would leave the section nothing to read from.
@@ -503,6 +507,7 @@ class DefaultCatalogImporter(
         // playlist commits its first batch near the end, and its card would wait until then.
         onProgress(ImportProgress.Importing(itemsImported = 0, groupsReady = 0, kind = sections.first()))
         val writer = WatchedWriter(writerFactory())
+        if (currentCoroutineContext()[BackgroundLoad] != null) writer.yieldToScreens()
         val startedAt = clock()
         var read = 0
         var saved = 0
@@ -739,6 +744,8 @@ class DefaultCatalogImporter(
         // A read that fails is a first load: the import it was before.
         val refresh = kind != MediaKind.RADIO && runCatching { writer.holdsRows(sourceId, kind) }.getOrDefault(false)
         if (refresh) writer.tellRarely()
+        // A section brought in by itself, which nobody is waiting for: it gives way to the screens. See `AutoLoads`.
+        if (currentCoroutineContext()[BackgroundLoad] != null) writer.yieldToScreens()
         // Phase B instrumentation, and the only reason these two lines exist: how many
         // requests one section costs is a property of the *user's* provider, so it cannot
         // be learned from this repository or from a fixture -- only from a real
@@ -765,6 +772,8 @@ class DefaultCatalogImporter(
         val threadsBefore = if (probing) ThreadCpu.read() else null
         // And what the threads of Room's pool were doing, looked at a few times a second, and what the load asked of the storage.
         val sampler = if (probing) RoomThreadSampler().also { it.start() } else null
+        // And the main thread's frames meanwhile: whether a load, one that runs by itself above all, makes the screens stutter.
+        val frames = if (probing) FrameWatch.start() else null
         val ioBefore = if (probing) ProcStats.ioOfThisProcess() else null
         // The reader's own CPU time, from its thread's clock; nothing in the import reads it.
         val readerCpuClock: () -> Long = if (probing) {
@@ -848,6 +857,10 @@ class DefaultCatalogImporter(
             early.close(kind, asks)
             if (probing) {
                 sampler?.stop()?.let { PerformanceLog.note(NOTE_ROOM_THREADS, it) }
+                frames?.stop()?.let { line ->
+                    val who = if (currentCoroutineContext()[BackgroundLoad] != null) "by itself" else "asked for"
+                    PerformanceLog.note(NOTE_FRAMES, "$line · the load $who")
+                }
                 val ioAfter = ProcStats.ioOfThisProcess()
                 if (ioBefore != null && ioAfter != null) {
                     PerformanceLog.note(NOTE_PROCESS_IO, ProcParsers.describe(ioBefore, ioAfter))
@@ -1149,6 +1162,9 @@ private const val NOTE_THREAD_CPU = "thread cpu"
 
 /** What the threads of Room's pool were doing during the import, from their stacks, read by the load strip under the same name. */
 private const val NOTE_ROOM_THREADS = "room threads"
+
+/** The main thread's frames during the import, read by the load strip under the same name. */
+private const val NOTE_FRAMES = "frames"
 
 /** What the import asked of the storage, read by the load strip under the same name. */
 private const val NOTE_PROCESS_IO = "process io"

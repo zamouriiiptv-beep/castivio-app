@@ -9,7 +9,9 @@
     <string name="prefs_subtitles_none">Χωρίς υπότιτλους</string>
     <string name="prefs_audio_detail">Αν μια ταινία ή ένα κανάλι έχει ήχο σε αυτή τη γλώσσα, παίζει σε αυτήν. Αλλιώς κρατά τον δικό του.</string>
     <string name="prefs_subtitle_detail">Αν μια ταινία έχει υπότιτλους σε αυτή τη γλώσσα, ενεργοποιούνται. Αλλιώς μένουν όπως είναι.</string>
-    <string name="prefs_hidden">Κρυφά στοιχεία</string>
+    <string name="prefs_library">Βιβλιοθήκη</string>
+    <string name="prefs_auto_load">Αυτόματη φόρτωση ταινιών και σειρών</string>
+    <string name="prefs_auto_load_detail">Σε Wi-Fi και όχι όσο παρακολουθείτε</string>
     <string name="prefs_restore_bouquets">Επαναφορά κρυφών πακέτων</string>
     <string name="prefs_restore_channels">Επαναφορά κρυφών καναλιών</string>
     <string name="prefs_lock">Κλείδωμα καναλιών</string>

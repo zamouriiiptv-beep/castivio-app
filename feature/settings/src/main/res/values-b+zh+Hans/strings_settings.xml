@@ -9,7 +9,9 @@
     <string name="prefs_subtitles_none">无字幕</string>
     <string name="prefs_audio_detail">如果影片或频道有该语言的音频，就用该语言播放；否则保留原有音频。</string>
     <string name="prefs_subtitle_detail">如果影片有该语言的字幕，就打开字幕；否则保持原样。</string>
-    <string name="prefs_hidden">已隐藏的项目</string>
+    <string name="prefs_library">媒体库</string>
+    <string name="prefs_auto_load">自动加载电影和剧集</string>
+    <string name="prefs_auto_load_detail">仅在 Wi-Fi 下，观看时不加载</string>
     <string name="prefs_restore_bouquets">恢复已隐藏的套餐</string>
     <string name="prefs_restore_channels">恢复已隐藏的频道</string>
     <string name="prefs_lock">频道锁</string>

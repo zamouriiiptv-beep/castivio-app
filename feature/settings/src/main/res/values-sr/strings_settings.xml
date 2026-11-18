@@ -9,7 +9,9 @@
     <string name="prefs_subtitles_none">Без титлова</string>
     <string name="prefs_audio_detail">Ако филм или канал има звук на овом језику, пушта се на њему. Иначе остаје сопствени.</string>
     <string name="prefs_subtitle_detail">Ако филм има титлове на овом језику, укључују се. Иначе остају какви јесу.</string>
-    <string name="prefs_hidden">Скривене ставке</string>
+    <string name="prefs_library">Библиотека</string>
+    <string name="prefs_auto_load">Аутоматски учитај филмове и серије</string>
+    <string name="prefs_auto_load_detail">На Wi-Fi мрежи и не док гледате</string>
     <string name="prefs_restore_bouquets">Врати скривене пакете</string>
     <string name="prefs_restore_channels">Врати скривене канале</string>
     <string name="prefs_lock">Закључавање канала</string>

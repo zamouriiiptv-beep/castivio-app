@@ -554,6 +554,7 @@ object LoadTrace {
         report.notes[NOTE_CURVE]?.let { add("rows curve: $it") }
         report.notes[NOTE_PROCESS_IO]?.let { add("process io: $it") }
         report.notes[NOTE_ROOM_THREADS]?.let { add("room threads: $it") }
+        report.notes[NOTE_FRAMES]?.let { add("main thread: $it") }
 
         val first = passes.firstOrNull { it.oneReply }
         if (first != null) {
@@ -592,6 +593,7 @@ object LoadTrace {
     private const val NOTE_CURVE = "rows curve"
     private const val NOTE_PROCESS_IO = "process io"
     private const val NOTE_ROOM_THREADS = "room threads"
+    private const val NOTE_FRAMES = "frames"
     private const val NOTE_STREAMS = "streams"
     private const val NOTE_TOLD = "told"
     private const val NOTE_TX_BEGIN = "tx begin"

@@ -9,7 +9,9 @@
     <string name="prefs_subtitles_none">Inga undertexter</string>
     <string name="prefs_audio_detail">Har en film eller kanal ljud på det här språket spelas den på det. Annars behåller den sitt eget.</string>
     <string name="prefs_subtitle_detail">Har en film undertexter på det här språket slås de på. Annars förblir de som de är.</string>
-    <string name="prefs_hidden">Dolda objekt</string>
+    <string name="prefs_library">Bibliotek</string>
+    <string name="prefs_auto_load">Läs in filmer och serier automatiskt</string>
+    <string name="prefs_auto_load_detail">På wifi och inte medan du tittar</string>
     <string name="prefs_restore_bouquets">Återställ dolda paket</string>
     <string name="prefs_restore_channels">Återställ dolda kanaler</string>
     <string name="prefs_lock">Kanallås</string>

@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -33,6 +34,7 @@ import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.ClosedCaption
 import androidx.compose.material.icons.rounded.Code
 import androidx.compose.material.icons.rounded.Description
+import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Gavel
 import androidx.compose.material.icons.rounded.HeadsetMic
@@ -45,9 +47,11 @@ import androidx.compose.material.icons.rounded.PlayCircle
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.Shield
 import androidx.compose.material.icons.rounded.Tv
-import androidx.compose.material.icons.rounded.Visibility
+import androidx.compose.material.icons.rounded.VideoLibrary
 import androidx.compose.material.icons.rounded.Waves
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -177,7 +181,15 @@ fun SettingsScreen(
                             onClick = { choosing = LanguageKind.SUBTITLE },
                         )
                     }
-                    Section(Icons.Rounded.Visibility, stringResource(R.string.prefs_hidden), m) {
+                    Section(Icons.Rounded.VideoLibrary, stringResource(R.string.prefs_library), m) {
+                        SwitchRow(
+                            Icons.Rounded.Download,
+                            stringResource(R.string.prefs_auto_load),
+                            stringResource(R.string.prefs_auto_load_detail),
+                            on = state.autoLoad,
+                            m = m,
+                            onChange = model::setAutoLoad,
+                        )
                         SettingRow(
                             Icons.AutoMirrored.Rounded.ListAlt,
                             stringResource(R.string.prefs_restore_bouquets),
@@ -364,6 +376,48 @@ private fun SettingRow(
                 modifier = Modifier.size(ROW_ICON),
             )
         }
+    }
+}
+
+/**
+ * A row that is a switch: its mark, its name with a line under it, and the switch at its end. The whole row is the control,
+ * so the remote and a thumb both turn it over, and a reader hears it as one switch.
+ */
+@Composable
+private fun SwitchRow(icon: ImageVector, label: String, detail: String, on: Boolean, m: CastivioMetrics, onChange: (Boolean) -> Unit) {
+    val colors = CastivioTheme.colors
+    val shape = RoundedCornerShape(Radius.sm)
+    var focused by remember { mutableStateOf(false) }
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .heightIn(min = ROW_HEIGHT)
+            .clip(shape)
+            .background(if (focused) colors.glassFillStrong else colors.glassFill)
+            .border(if (focused) 2.dp else 1.dp, if (focused) colors.focusRing else colors.glassFill.copy(alpha = 0f), shape)
+            .onFocusChanged { focused = it.isFocused }
+            .toggleable(value = on, role = Role.Switch, onValueChange = onChange)
+            .padding(horizontal = Spacing.md, vertical = Spacing.xs),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Spacing.md),
+    ) {
+        Icon(icon, null, tint = colors.onBackgroundVariant, modifier = Modifier.size(ROW_ICON))
+        Column(Modifier.weight(1f)) {
+            Text(label, style = castivioBodyStyle(m.fsBody), color = colors.onBackground, maxLines = 2)
+            Text(detail, style = castivioChipStyle(m.fsChip), color = colors.onBackgroundMuted, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
+        Switch(
+            checked = on,
+            // The row is the control: the switch only shows where it stands.
+            onCheckedChange = null,
+            colors = SwitchDefaults.colors(
+                checkedTrackColor = colors.primary,
+                checkedThumbColor = colors.onPrimary,
+                uncheckedTrackColor = colors.glassFillStrong,
+                uncheckedThumbColor = colors.onBackgroundVariant,
+                uncheckedBorderColor = colors.glassBorder,
+            ),
+        )
     }
 }
 

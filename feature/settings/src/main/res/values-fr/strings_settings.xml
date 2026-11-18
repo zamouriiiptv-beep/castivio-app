@@ -9,7 +9,9 @@
     <string name="prefs_subtitles_none">Sans sous-titres</string>
     <string name="prefs_audio_detail">Si un film ou une chaîne a un son dans cette langue, il est lu dans cette langue. Sinon il garde le sien.</string>
     <string name="prefs_subtitle_detail">Si un film a des sous-titres dans cette langue, ils sont activés. Sinon ils restent tels quels.</string>
-    <string name="prefs_hidden">Éléments masqués</string>
+    <string name="prefs_library">Bibliothèque</string>
+    <string name="prefs_auto_load">Charger films et séries automatiquement</string>
+    <string name="prefs_auto_load_detail">En Wi-Fi, et pas pendant la lecture</string>
     <string name="prefs_restore_bouquets">Rétablir les bouquets masqués</string>
     <string name="prefs_restore_channels">Rétablir les chaînes masquées</string>
     <string name="prefs_lock">Verrou des chaînes</string>

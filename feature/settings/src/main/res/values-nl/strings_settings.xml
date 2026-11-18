@@ -9,7 +9,9 @@
     <string name="prefs_subtitles_none">Geen ondertitels</string>
     <string name="prefs_audio_detail">Heeft een film of zender audio in deze taal, dan wordt die afgespeeld. Anders blijft de eigen audio.</string>
     <string name="prefs_subtitle_detail">Heeft een film ondertitels in deze taal, dan worden ze ingeschakeld. Anders blijven ze zoals ze zijn.</string>
-    <string name="prefs_hidden">Verborgen items</string>
+    <string name="prefs_library">Bibliotheek</string>
+    <string name="prefs_auto_load">Films en series automatisch laden</string>
+    <string name="prefs_auto_load_detail">Via wifi, en niet terwijl je kijkt</string>
     <string name="prefs_restore_bouquets">Verborgen boeketten terugzetten</string>
     <string name="prefs_restore_channels">Verborgen zenders terugzetten</string>
     <string name="prefs_lock">Zendervergrendeling</string>

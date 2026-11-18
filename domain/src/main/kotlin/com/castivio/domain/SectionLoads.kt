@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.coroutines.EmptyCoroutineContext
 
 /**
  * The sections being brought onto the device, for the whole application, one at a time.
@@ -39,6 +40,11 @@ import kotlinx.coroutines.launch
  *  4. **An answer belongs to one subscription.** When the active one changes, the load
  *     running for the previous one is cancelled, the queue is emptied and every answer is
  *     forgotten, so no card can show the old subscription's state as the new one's.
+ *  5. **A load nobody asked for gives way.** [AutoLoads] asks for the sections the viewer has
+ *     not opened yet, with `background`; such a load runs in [BackgroundLoad], so it yields the
+ *     processor and tells the screens rarely, and [stopBackground] ends it -- the moment
+ *     anything plays -- and forgets it, so it is asked again later. A viewer who asks for the
+ *     same section makes it theirs, and it is no longer stopped.
  *
  * Pure, and therefore tested without a device. [scope] decides the thread the loads are
  * collected on; the state is guarded on its own, so [request] may come from any thread.
@@ -70,6 +76,9 @@ class SectionLoads(
     private val waiting = ArrayDeque<Ask>()
     private var running: Job? = null
 
+    /** What [running] is running: which ask, so that a stopped one's late answers are dropped. */
+    private var runningAsk: Ask? = null
+
     /** Bumped when the subscription changes, so a cancelled load's last answer is dropped. */
     private var generation = 0
     private var source: String? = null
@@ -88,11 +97,18 @@ class SectionLoads(
      *   a load over rows that are already here. The asker knows it, from the rows it counts;
      *   the queue only carries it, on [SectionRun.first].
      */
-    fun request(kind: MediaKind, force: Boolean = false, first: Boolean = false) {
+    fun request(kind: MediaKind, force: Boolean = false, first: Boolean = false, background: Boolean = false) {
         synchronized(lock) {
             val current = _runs.value[kind]?.load
-            if (current is SectionLoad.Queued || current is SectionLoad.Loading) return
-            waiting.addLast(Ask(kind, force, first))
+            if (current is SectionLoad.Queued || current is SectionLoad.Loading) {
+                // Asked by the viewer while it waits or arrives on its own: from now on it is theirs.
+                if (!background) {
+                    waiting.filter { it.kind == kind }.forEach { it.background = false }
+                    runningAsk?.takeIf { it.kind == kind }?.background = false
+                }
+                return
+            }
+            waiting.addLast(Ask(kind, force, first, background))
             _runs.update { it + (kind to SectionRun(SectionLoad.Queued, force, elapsedMs = null, first = first)) }
             if (running == null) startNext()
         }
@@ -103,11 +119,14 @@ class SectionLoads(
         val next = waiting.removeFirstOrNull()
         if (next == null) {
             running = null
+            runningAsk = null
             return
         }
         val asked = generation
-        val job = scope.launch(start = CoroutineStart.LAZY) { run(next, asked) }
+        val context = if (next.background) BackgroundLoad() else EmptyCoroutineContext
+        val job = scope.launch(context, start = CoroutineStart.LAZY) { run(next, asked) }
         running = job
+        runningAsk = next
         job.invokeOnCompletion {
             synchronized(lock) { if (running === job) startNext() }
         }
@@ -123,7 +142,7 @@ class SectionLoads(
         // turn" through all of it would name a wait that is not there. Not told to [onAnswer]:
         // this is the queue's own state, not an answer of the load.
         synchronized(lock) {
-            if (asked == generation) {
+            if (asked == generation && runningAsk === ask) {
                 val run = SectionRun(SectionLoad.Loading(0, 0), ask.force, elapsedMs = monotonicMs() - startedAt, first = ask.first)
                 _runs.update { it + (ask.kind to run) }
             }
@@ -143,7 +162,7 @@ class SectionLoads(
             }
             .collect { answer ->
                 val current = synchronized(lock) {
-                    if (asked != generation) {
+                    if (asked != generation || runningAsk !== ask) {
                         false
                     } else {
                         val run = SectionRun(answer, ask.force, elapsedMs = monotonicMs() - startedAt, first = ask.first)
@@ -176,7 +195,29 @@ class SectionLoads(
         }
     }
 
-    private data class Ask(val kind: MediaKind, val force: Boolean, val first: Boolean)
+    /**
+     * Ends every load nobody asked for: the one running, if it is one, and those waiting. Each is forgotten -- its card
+     * goes back to what it said before it was asked -- so [AutoLoads] asks for it again once nothing plays. What it wrote
+     * stays, and the next load of the section writes over it. A load the viewer asked for is not touched.
+     */
+    fun stopBackground() {
+        synchronized(lock) {
+            val dropped = waiting.filter { it.background }
+            waiting.removeAll(dropped.toSet())
+            val stopped = runningAsk?.takeIf { it.background }
+            val job = running.takeIf { stopped != null }
+            val forgotten = dropped.map { it.kind } + listOfNotNull(stopped?.kind)
+            if (forgotten.isNotEmpty()) _runs.update { it - forgotten.toSet() }
+            if (job != null) {
+                // Its late answers are dropped from here: they belong to an ask that is no longer running.
+                runningAsk = null
+                job.cancel()
+            }
+        }
+    }
+
+    /** One question asked of the queue. Compared by identity: two asks for one kind are two runs. */
+    private class Ask(val kind: MediaKind, val force: Boolean, val first: Boolean, @Volatile var background: Boolean)
 }
 
 /**

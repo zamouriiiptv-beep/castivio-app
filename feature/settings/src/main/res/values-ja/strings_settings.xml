@@ -9,7 +9,9 @@
     <string name="prefs_subtitles_none">字幕なし</string>
     <string name="prefs_audio_detail">映画やチャンネルにこの言語の音声があれば、その音声で再生します。なければ元の音声のままです。</string>
     <string name="prefs_subtitle_detail">映画にこの言語の字幕があれば、字幕をオンにします。なければそのままです。</string>
-    <string name="prefs_hidden">非表示の項目</string>
+    <string name="prefs_library">ライブラリ</string>
+    <string name="prefs_auto_load">映画とシリーズを自動で読み込む</string>
+    <string name="prefs_auto_load_detail">Wi-Fi接続時のみ、視聴中は行いません</string>
     <string name="prefs_restore_bouquets">非表示のパッケージを戻す</string>
     <string name="prefs_restore_channels">非表示のチャンネルを戻す</string>
     <string name="prefs_lock">チャンネルのロック</string>

@@ -9,7 +9,9 @@
     <string name="prefs_subtitles_none">Ei tekstitystä</string>
     <string name="prefs_audio_detail">Jos elokuvassa tai kanavalla on ääni tällä kielellä, se toistetaan sillä. Muuten säilyy oma ääni.</string>
     <string name="prefs_subtitle_detail">Jos elokuvassa on tekstitys tällä kielellä, se otetaan käyttöön. Muuten se pysyy ennallaan.</string>
-    <string name="prefs_hidden">Piilotetut kohteet</string>
+    <string name="prefs_library">Kirjasto</string>
+    <string name="prefs_auto_load">Lataa elokuvat ja sarjat automaattisesti</string>
+    <string name="prefs_auto_load_detail">Wi-Fi-yhteydellä eikä katselun aikana</string>
     <string name="prefs_restore_bouquets">Palauta piilotetut paketit</string>
     <string name="prefs_restore_channels">Palauta piilotetut kanavat</string>
     <string name="prefs_lock">Kanavalukko</string>

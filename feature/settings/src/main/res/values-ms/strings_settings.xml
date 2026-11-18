@@ -9,7 +9,9 @@
     <string name="prefs_subtitles_none">Tiada sari kata</string>
     <string name="prefs_audio_detail">Jika filem atau saluran mempunyai bunyi dalam bahasa ini, ia dimainkan dalam bahasa itu. Jika tidak, bunyinya sendiri kekal.</string>
     <string name="prefs_subtitle_detail">Jika filem mempunyai sari kata dalam bahasa ini, ia dihidupkan. Jika tidak, ia kekal seperti asal.</string>
-    <string name="prefs_hidden">Item tersembunyi</string>
+    <string name="prefs_library">Pustaka</string>
+    <string name="prefs_auto_load">Muatkan filem dan siri secara automatik</string>
+    <string name="prefs_auto_load_detail">Melalui Wi-Fi, dan bukan semasa menonton</string>
     <string name="prefs_restore_bouquets">Pulihkan pakej tersembunyi</string>
     <string name="prefs_restore_channels">Pulihkan saluran tersembunyi</string>
     <string name="prefs_lock">Kunci saluran</string>

@@ -9,7 +9,9 @@
     <string name="prefs_subtitles_none">Sin subtítulos</string>
     <string name="prefs_audio_detail">Si una película o un canal tiene sonido en este idioma, se reproduce en él. Si no, conserva el suyo.</string>
     <string name="prefs_subtitle_detail">Si una película tiene subtítulos en este idioma, se activan. Si no, se quedan como están.</string>
-    <string name="prefs_hidden">Elementos ocultos</string>
+    <string name="prefs_library">Biblioteca</string>
+    <string name="prefs_auto_load">Cargar películas y series automáticamente</string>
+    <string name="prefs_auto_load_detail">Con Wi-Fi y no mientras ves algo</string>
     <string name="prefs_restore_bouquets">Restaurar paquetes ocultos</string>
     <string name="prefs_restore_channels">Restaurar canales ocultos</string>
     <string name="prefs_lock">Bloqueo de canales</string>
