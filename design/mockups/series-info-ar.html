@@ -205,7 +205,7 @@ function page(tv,focus){
       <div class="trow"><div class="name prov">${SHOW.name}</div><div class="back">${I('i-back')}</div></div>
       <div class="facts">${SHOW.facts.join('<i></i>')}</div>
       <div class="btns"><div class="btn p ${focus==='play'?'focus':''}">${I('i-play')}${SHOW.play}</div><div class="btn s">${I('i-heart')}إضافة إلى المفضلة</div></div>
-      <div class="rrow"><div class="imdb"><small>IMDb</small>${I('i-star')}${SHOW.rating}</div><div class="info-chip ${focus==='info'?'focus':''}">${I('i-info')}معلومات</div></div>
+      <div class="rrow"><div class="imdb"><small>IMDb</small>${I('i-star')}${SHOW.rating}</div><div class="chip">${I('i-cal')}أُضيف في 14/03/2026</div><div class="info-chip ${focus==='info'?'focus':''}">${I('i-info')}معلومات</div></div>
     </div></div>
     <div class="seasons" style="top:${seasonsTop}px">${SHOW.seasons.map(([s,n],i)=>`<div class="schip ${i===0?'on':''} ${focus==='season'&&i===0?'focus':''}">${s}<small>${n}</small></div>`).join('')}</div>
     <div class="eps" style="top:${epsTop}px">${SHOW.eps.map(([t,p,d],i)=>`<div class="ep"><span class="n">${i+1}</span><span class="still"></span><span class="t"><b>${t}</b><span>${p}</span></span><span class="d">${d}</span></div>`).join('')}</div>`;
