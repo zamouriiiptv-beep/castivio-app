@@ -1,6 +1,5 @@
 package com.castivio.feature.home
 
-import com.castivio.core.design.components.CastivioChip
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.verticalScroll
@@ -20,7 +19,6 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -41,12 +39,10 @@ import androidx.compose.material.icons.rounded.CalendarToday
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Layers
-import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.TheaterComedy
-import androidx.compose.material.icons.rounded.ThumbUp
-import androidx.compose.material.icons.rounded.VideoLibrary
 import androidx.compose.material3.Icon
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -69,6 +65,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.style.TextOverflow
@@ -112,27 +110,25 @@ import com.castivio.domain.externalIdsLine
 import kotlinx.coroutines.launch
 
 /**
- * One show's page: a rail of its sections beside one column that scrolls.
+ * One show's page: one column that scrolls, across the whole width.
  *
- * The column opens on the show -- its poster, name, a row of facts (year, genre, rating, seasons), the plot, and the
- * two buttons, Play and the favourite -- over the provider's wide picture of it when it sent one. Under that, the
- * season chips with how many episodes each holds, and the chosen season's episodes: number, the provider's still, name,
- * a line of its plot, and its running time. Then the cast, and other shows of the same category. The rail names these
- * parts on a television and keeps their icons on a handset, takes the viewer to one with a press, and lights the one
- * the page has reached.
+ * The column opens on the show -- its poster, name, a row of facts (year, genre, seasons), the two buttons, Play and the
+ * favourite, and a row of the rating, the day it was added and the way to its information -- over the provider's wide
+ * picture of it when it sent one. Under that, the season chips with how many episodes each holds, and the chosen season's
+ * episodes: number, the provider's still, name, a line of its plot, and its running time. Then the cast, and other shows of
+ * the same category. No rail stands beside it: the column has the whole width (design/mockups/series-info-show-phone.png).
  *
- * The way back is the film page's, and no part of the rail: the same arrow, drawn by [PageBack], at the end of the
- * show's name row, in the top corner opposite the poster.
+ * The way back is the film page's: the same arrow, drawn by [PageBack], at the end of the show's name row, in the top
+ * corner opposite the poster.
  *
  * Play continues the show from the episode last started, or starts its first. A press on an episode plays it.
  *
  * Nothing is drawn that the provider did not send, and nothing is made up. The first of what it says arrives after the
  * page is up, with the episodes, so until the provider has answered a quiet placeholder stands where the facts, the
  * plot and the episodes' plots will be; once it has, only what came is drawn, and a section with nothing in it is not
- * in the rail.
+ * drawn.
  *
- * It follows the language's direction, as the film's page does: in Arabic the rail stands at the right, the poster and the
- * words begin at the right, and every row begins where the language does. The provider's own words -- the show's and the
+ * It follows the language's direction, as the film's page does: in Arabic the poster and the words begin at the right, and every row begins where the language does. The provider's own words -- the show's and the
  * episodes' names, the plot, the people -- are not the page's language and are not turned round: each keeps its order and is
  * set against the start edge ([startEdgeAlign]), and the figures are left-to-right tokens.
  */
@@ -207,13 +203,6 @@ fun ShowScreen(
     // The open season's episode pictures as they come, by episode: what the line says of them.
     val stillsShown = remember(show.seriesId) { mutableStateMapOf<String, ArtworkShown>() }
     var backdropShown by remember(show.seriesId) { mutableStateOf<ArtworkShown?>(null) }
-    val sections = showSections(
-        hasSeasons = state.seasons.isNotEmpty(),
-        episodes = season?.episodes?.size ?: 0,
-        hasCast = details?.cast?.isNotEmpty() == true,
-        hasSimilar = state.similar.isNotEmpty(),
-    )
-    val lit = litSection(sections, listState.firstVisibleItemIndex, atEnd = !listState.canScrollForward)
 
     BoxWithConstraints(
         modifier
@@ -226,8 +215,7 @@ fun ShowScreen(
         // Read here: the constraints' own scope is a layout scope, and the lists below are others.
         val surfaceHeight = maxHeight
         val tv = CastivioTheme.device.isTv
-        val railWidth = if (tv) (maxWidth * RAIL_OF_WIDTH).coerceIn(MIN_RAIL, MAX_RAIL) else HANDSET_RAIL
-        val posterHeight = (surfaceHeight * POSTER_OF_HEIGHT).coerceIn(MIN_POSTER, MAX_POSTER)
+        val posterHeight = (surfaceHeight * POSTER_OF_HEIGHT).coerceIn(MIN_POSTER, MAX_SHOW_POSTER)
         // The wall's metrics, for the poster cards of the similar shows: the same card, the same sizes.
         val board = channelsMetricsFor(tv = tv, width = maxWidth, height = maxHeight)
 
@@ -235,23 +223,10 @@ fun ShowScreen(
         // design/mockups/details-backdrop-ar.html. Nothing until it comes; the page never waits for it.
         details?.backdropUrl?.let { url -> ShowBackdrop(url, Modifier.fillMaxSize(), onShown = { backdropShown = it }) }
 
-        Row(
-            Modifier.fillMaxSize().castivioStage(m.frame),
-            horizontalArrangement = Arrangement.spacedBy(m.paneGap),
-        ) {
-            ShowRail(
-                sections = sections.map { it.section },
-                lit = lit,
-                tv = tv,
-                m = m,
-                onSection = { section ->
-                    val at = sections.firstOrNull { it.section == section } ?: return@ShowRail
-                    scope.launch { listState.animateScrollToItem(at.index) }
-                },
-                modifier = Modifier.width(railWidth).fillMaxHeight(),
-            )
+        // One column across the whole width, with no rail beside it (design/mockups/series-info-show-phone.png).
+        Box(Modifier.fillMaxSize().castivioStage(m.frame)) {
             LazyColumn(
-                Modifier.weight(1f).fillMaxHeight(),
+                Modifier.fillMaxSize().testTag(SHOW_PAGE_TAG),
                 state = listState,
                 verticalArrangement = Arrangement.spacedBy(m.rowGap),
                 contentPadding = PaddingValues(bottom = m.listBottom),
@@ -501,93 +476,6 @@ private fun InfoHeading(text: String, m: CatalogMetrics) {
     )
 }
 
-/** The rail: the page's sections, the one the page is at lit. The way back is not in it: see [PageBack]. */
-@Composable
-private fun ShowRail(
-    sections: List<ShowSection>,
-    lit: ShowSection,
-    tv: Boolean,
-    m: CatalogMetrics,
-    onSection: (ShowSection) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Column(modifier, verticalArrangement = Arrangement.spacedBy(RAIL_GAP)) {
-        for (section in sections) {
-            val label = stringResource(section.label)
-            RailEntry(
-                icon = section.icon,
-                label = label,
-                m = m,
-                showLabel = tv,
-                selected = section == lit,
-                onClick = { onSection(section) },
-            )
-        }
-    }
-}
-
-private val ShowSection.label: Int
-    get() = when (this) {
-        ShowSection.Overview -> R.string.show_nav_overview
-        ShowSection.Seasons -> R.string.show_nav_seasons
-        ShowSection.Cast -> R.string.show_nav_cast
-        ShowSection.Similar -> R.string.show_nav_similar
-    }
-
-private val ShowSection.icon: ImageVector
-    get() = when (this) {
-        ShowSection.Overview -> Icons.Rounded.Info
-        ShowSection.Seasons -> Icons.Rounded.VideoLibrary
-        ShowSection.Cast -> Icons.Rounded.Person
-        ShowSection.Similar -> Icons.Rounded.ThumbUp
-    }
-
-/** One section in the rail: its icon, and on a television its name; violet when the page is at it. */
-@Composable
-private fun RailEntry(icon: ImageVector, label: String, m: CatalogMetrics, showLabel: Boolean, selected: Boolean, onClick: () -> Unit) {
-    val colors = CastivioTheme.colors
-    val shape = RoundedCornerShape(Radius.md)
-    var focused by remember { mutableStateOf(false) }
-    val tv = CastivioTheme.device.isTv
-    Row(
-        Modifier
-            .then(if (showLabel) Modifier.fillMaxWidth() else Modifier.size(HANDSET_ENTRY))
-            .height(if (tv) Sizing.minTarget(true) else HANDSET_ENTRY)
-            .clip(shape)
-            .background(if (selected) colors.selectedFill else colors.glassFill.copy(alpha = 0f))
-            .border(
-                if (focused) 2.dp else 1.dp,
-                when {
-                    focused -> colors.focusRing
-                    selected -> colors.selectedBorder
-                    else -> colors.glassFill.copy(alpha = 0f)
-                },
-                shape,
-            )
-            .onFocusChanged { focused = it.isFocused || it.hasFocus }
-            .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = onClick)
-            .padding(horizontal = if (showLabel) RAIL_PAD else 0.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = if (showLabel) Arrangement.spacedBy(RAIL_PAD) else Arrangement.Center,
-    ) {
-        Icon(
-            icon,
-            contentDescription = if (showLabel) null else label,
-            tint = if (selected) colors.onBackground else colors.onBackgroundVariant,
-            modifier = Modifier.size(RAIL_ICON),
-        )
-        if (showLabel) {
-            Text(
-                text = label,
-                style = castivioChipStyle(m.frame.fsLabel),
-                color = if (selected) colors.onBackground else colors.onBackgroundVariant,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
-    }
-}
-
 /** The show: its poster and name, the facts, the plot, and the buttons, over the provider's wide picture. */
 @Composable
 private fun ShowTop(
@@ -616,7 +504,7 @@ private fun ShowTop(
             Modifier
                 .fillMaxWidth()
                 .clip(heroShape)
-                .padding(horizontal = m.cardPad, vertical = m.rowGap),
+                .padding(vertical = m.rowGap),
             horizontalArrangement = Arrangement.spacedBy(m.paneGap),
         ) {
             PosterFrame(
@@ -687,23 +575,38 @@ private fun ShowTop(
                     details?.addedEpochSeconds?.let {
                         DetailsDateChip(stringResource(R.string.movie_added, ltrToken(addedDateText(it))), m)
                     }
-                    if (details != null) {
-                        CastivioChip(
-                            text = stringResource(R.string.show_info),
-                            onClick = onInfo,
-                            icon = Icons.Rounded.Info,
-                            labelStyle = castivioChipStyle(m.frame.fsChip),
-                            padH = m.entryPadH,
-                            padV = m.entryPadV,
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(Radius.pill))
-                                .background(detailsGround())
-                                .focusRequester(infoFocus),
-                        )
-                    }
+                    if (details != null) InfoChip(m, onInfo, Modifier.focusRequester(infoFocus))
                 }
             }
         }
+    }
+}
+
+/**
+ * The way to the show's information, at the height of the rating and the date beside it (series-info-show-phone.png): the
+ * same pill on the same dark ground, and the focus ring when the remote is on it. Its touch area keeps the 48dp floor around
+ * the smaller pill.
+ */
+@Composable
+private fun InfoChip(m: CatalogMetrics, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    val colors = CastivioTheme.colors
+    val shape = RoundedCornerShape(Radius.pill)
+    var focused by remember { mutableStateOf(false) }
+    val label = stringResource(R.string.show_info)
+    Row(
+        modifier
+            .minimumInteractiveComponentSize()
+            .clip(shape)
+            .background(detailsGround())
+            .border(if (focused) 2.dp else 1.dp, if (focused) colors.focusRing else colors.glassBorderSoft, shape)
+            .onFocusChanged { focused = it.isFocused }
+            .clickable(onClickLabel = label, role = Role.Button, onClick = onClick)
+            .padding(horizontal = m.entryPadH, vertical = m.entryPadV),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(m.rowGap / 2),
+    ) {
+        Icon(Icons.Rounded.Info, null, tint = colors.primary, modifier = Modifier.size(m.frame.fsBody * FACT_ICON_OF_BODY))
+        Text(text = label, style = castivioChipStyle(m.frame.fsChip), color = colors.onBackground, maxLines = 1)
     }
 }
 
@@ -1123,18 +1026,6 @@ internal fun episodeText(episode: Episode): String = when {
     else -> episode.title
 }
 
-/** A handset's rail entries' side: under the 48dp floor, which a television keeps. */
-private val HANDSET_ENTRY = 40.dp
-
-/** The rail's width on a handset, icons only; a television's is a share of its width, between a floor and a ceiling. */
-private val HANDSET_RAIL = 56.dp
-private const val RAIL_OF_WIDTH = 0.17f
-private val MIN_RAIL = 150.dp
-private val MAX_RAIL = 240.dp
-private val RAIL_GAP = 8.dp
-private val RAIL_PAD = 10.dp
-private val RAIL_ICON = 20.dp
-
 /** An episode's picture is 16:9. */
 private const val THUMB_ASPECT = 16f / 9f
 
@@ -1148,10 +1039,13 @@ private const val SHOW_TITLE_LINES = 3
 private const val HERO_PANEL_ALPHA = 0.72f
 
 /** How tall the show's poster is, as a share of the screen: beside the page's other things, not all of it. */
-private const val POSTER_OF_HEIGHT = 0.42f
+private const val POSTER_OF_HEIGHT = 0.48f
 private const val SIMILAR_POSTER_OF_HEIGHT = 0.3f
 private val MIN_POSTER = 96.dp
 private val MAX_POSTER = 300.dp
+
+/** The show's own poster's ceiling: a little over the similar shows' cards', as the page's one large picture. */
+private val MAX_SHOW_POSTER = 340.dp
 
 private const val FACT_ICON_OF_BODY = 1.25f
 private val FACT_GAP = 6.dp
@@ -1171,3 +1065,6 @@ private const val PLACEHOLDER_ROWS = 5
 private val MARK_PAD = 4.dp
 private val MARK_SIZE = 18.dp
 private val BAR_HEIGHT = 3.dp
+
+/** The page's one column, for a test to scroll it to a section. */
+internal const val SHOW_PAGE_TAG = "castivio.show.page"

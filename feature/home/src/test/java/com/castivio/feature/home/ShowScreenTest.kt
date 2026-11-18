@@ -5,13 +5,17 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
+import androidx.compose.ui.test.hasContentDescription
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.paging.PagingData
 import com.castivio.core.design.theme.CastivioTheme
@@ -45,7 +49,7 @@ import org.robolectric.annotation.Config
 
 /**
  * A show's page composed over the real state holder, with the provider, the catalogue and the viewer's marks as fakes:
- * the rail names the parts that have something in them, the facts the provider sent are drawn and no others, Play and
+ * no rail stands beside the column, the facts the provider sent are drawn and no others, Play and
  * an episode start what they say, the heart flips, a similar show opens, and the way back stands where the film's does.
  *
  * What the holder does with the provider's reply is `ShowViewModelTest`'s; here the details are given and the page is
@@ -165,34 +169,6 @@ class ShowScreenTest {
 
     // ---------------------------------------------------------------------------------------------- the direction
 
-    /** The left of the rail's first entry and the middle of the screen, both measured from the left of the screen. */
-    private fun railAndMiddle(): Pair<Float, Float> {
-        val rail = compose.onNodeWithContentDescription("Overview").getUnclippedBoundsInRoot().left.value
-        val root = compose.onRoot().getUnclippedBoundsInRoot()
-        val middle = (root.left.value + root.right.value) / 2f
-        return rail to middle
-    }
-
-    @Test
-    fun `left to right the rail stands at the left of the page`() {
-        show(direction = LayoutDirection.Ltr)
-
-        val (rail, middle) = railAndMiddle()
-        assertTrue("the rail begins at $rail, the middle is at $middle", rail < middle)
-    }
-
-    /**
-     * The page used to be drawn left to right in every language, as the film's was. It follows the reader's direction
-     * now: in Arabic, Persian and Urdu the rail -- the parts of the page -- stands at the right.
-     */
-    @Test
-    fun `right to left the rail stands at the right of the page`() {
-        show(direction = LayoutDirection.Rtl)
-
-        val (rail, middle) = railAndMiddle()
-        assertTrue("the rail begins at $rail, the middle is at $middle", rail > middle)
-    }
-
     // ------------------------------------------------------------------------------------------------ the way back
 
     /** The left of the way back and the middle of the screen, both measured from the left of the screen. */
@@ -205,7 +181,7 @@ class ShowScreenTest {
 
     /**
      * The way back is the film page's, in the film page's corner: at the end of the show's name row, opposite the poster --
-     * and so opposite the rail, which stands at the start. Left to right that is the right of the page.
+     * which stands at the start. Left to right that is the right of the page.
      */
     @Test
     fun `left to right the way back ends the name's row, at the right of the page`() {
@@ -224,15 +200,6 @@ class ShowScreenTest {
     }
 
     @Test
-    fun `the rail holds the page's sections and not the way back`() {
-        show()
-
-        val rail = compose.onNodeWithContentDescription("Overview").getUnclippedBoundsInRoot().left.value
-        val back = compose.onNodeWithContentDescription("Back").getUnclippedBoundsInRoot().left.value
-        assertTrue("the rail begins at $rail and the way back at $back", back > rail)
-    }
-
-    @Test
     fun `a press on the way back leaves the page`() {
         show()
 
@@ -242,27 +209,16 @@ class ShowScreenTest {
         assertEquals(1, backed)
     }
 
-    // ----------------------------------------------------------------------------------------------- the rail
+    // ----------------------------------------------------------------------------------------------- no rail
 
+    /** The page is one column across the width (series-info-show-phone.png): nothing names its parts beside it. */
     @Test
-    fun `the rail names the sections that have something in them`() {
+    fun `no rail stands beside the page`() {
         show()
 
-        // A handset keeps the icons, which speak their names.
-        compose.onNodeWithContentDescription("Overview").assertIsDisplayed()
-        compose.onNodeWithContentDescription("Seasons").assertIsDisplayed()
-        compose.onNodeWithContentDescription("Cast").assertIsDisplayed()
-        compose.onNodeWithContentDescription("Similar").assertIsDisplayed()
-    }
-
-    @Test
-    fun `a show the provider said nothing of has an overview and its seasons, and no cast or similar`() {
-        show(details = null, plots = emptyMap(), similar = emptyList())
-
-        compose.onNodeWithContentDescription("Overview").assertIsDisplayed()
-        compose.onNodeWithContentDescription("Seasons").assertIsDisplayed()
-        assertTrue(compose.onAllNodesWithContentDescription("Cast").fetchSemanticsNodes().isEmpty())
-        assertTrue(compose.onAllNodesWithContentDescription("Similar").fetchSemanticsNodes().isEmpty())
+        for (part in listOf("Overview", "Cast", "Similar")) {
+            assertTrue(part, compose.onAllNodesWithContentDescription(part).fetchSemanticsNodes().isEmpty())
+        }
     }
 
     // ------------------------------------------------------------------------------------------------- the top
@@ -401,10 +357,10 @@ class ShowScreenTest {
     // ------------------------------------------------------------------------------------ cast and similar shows
 
     @Test
-    fun `the rail takes the page to the cast, which is names and nothing else`() {
+    fun `the page scrolls down to the cast, which is names and nothing else`() {
         show()
 
-        compose.onNodeWithContentDescription("Cast").performClick()
+        compose.onNodeWithTag(SHOW_PAGE_TAG).performScrollToNode(hasText("Nick Gehlfuss"))
         compose.waitForIdle()
 
         compose.onNodeWithText("Nick Gehlfuss").assertIsDisplayed()
@@ -415,7 +371,7 @@ class ShowScreenTest {
     fun `a press on a similar show opens its page`() {
         show()
 
-        compose.onNodeWithContentDescription("Similar").performClick()
+        compose.onNodeWithTag(SHOW_PAGE_TAG).performScrollToNode(hasContentDescription("Chicago PD", substring = true))
         compose.waitForIdle()
         compose.onNodeWithContentDescription("Chicago PD", substring = true).performClick()
         compose.waitForIdle()
