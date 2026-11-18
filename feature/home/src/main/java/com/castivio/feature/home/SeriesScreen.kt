@@ -33,6 +33,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -92,6 +93,11 @@ fun SeriesScreen(
     modifier: Modifier = Modifier,
     /** Keyed as `BrowseScreen` keys its holders, so each section keeps its own selection. */
     model: BrowseViewModel = hiltViewModel(key = CatalogSection.Series.name),
+    /**
+     * On a television, asks a show's provider ahead of the press while the remote rests on its card: see
+     * [ShowPrefetchViewModel]. None on a handset.
+     */
+    prefetch: ShowPrefetchViewModel? = if (CastivioTheme.device.isTv) hiltViewModel() else null,
 ) {
     // Told once, and idempotently: composition runs again for reasons that are not a change of section.
     LaunchedEffect(Unit) { model.show(CatalogSection.Series) }
@@ -150,6 +156,7 @@ fun SeriesScreen(
                 gridState = gridState,
                 onOpenShow = onOpenShow,
                 modifier = Modifier.weight(1f),
+                prefetch = prefetch,
             )
         }
     }
@@ -169,6 +176,7 @@ private fun SeriesBoard(
     gridState: LazyGridState,
     onOpenShow: (SeriesSummary) -> Unit,
     modifier: Modifier = Modifier,
+    prefetch: ShowPrefetchViewModel? = null,
 ) {
     val colors = CastivioTheme.colors
     val shape = RoundedCornerShape(m.panelRadius)
@@ -209,6 +217,7 @@ private fun SeriesBoard(
                     gridState = gridState,
                     onOpenShow = onOpenShow,
                     modifier = Modifier.weight(1f).fillMaxHeight(),
+                    prefetch = prefetch,
                 )
             }
         }
@@ -229,6 +238,7 @@ private fun SeriesPane(
     gridState: LazyGridState,
     onOpenShow: (SeriesSummary) -> Unit,
     modifier: Modifier = Modifier,
+    prefetch: ShowPrefetchViewModel? = null,
 ) {
     val fetch = state.fetch
     if (fetch is SectionLoad.Failed && state.sectionTotal == 0) {
@@ -258,7 +268,7 @@ private fun SeriesPane(
                 onShowAll = { model.choose(null) },
                 onClearSearch = { model.search("") },
             ) {
-                ShowWall(shows, m, columns, cardWidth, poster, gridState, onOpenShow)
+                ShowWall(shows, m, columns, cardWidth, poster, gridState, onOpenShow, prefetch)
             }
         }
     }
@@ -274,6 +284,7 @@ private fun ShowWall(
     poster: Dp,
     gridState: LazyGridState,
     onOpenShow: (SeriesSummary) -> Unit,
+    prefetch: ShowPrefetchViewModel? = null,
 ) {
     val titleStep = filmTitleStep(m)
     // The covers of the next rows are asked for as the wall moves, so they are on the device when their cards arrive.
@@ -293,8 +304,20 @@ private fun ShowWall(
     ) {
         items(shows.itemCount, key = shows.itemKey { it.seriesId }) { index ->
             val show = shows[index] ?: return@items
-            // Centred in its column, so what a card narrower than its column leaves is shared out evenly.
-            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
+            // Centred in its column, so what a card narrower than its column leaves is shared out evenly. On a television
+            // the remote resting on it asks the show's provider ahead of the press (`ShowPrefetchViewModel`).
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .then(
+                        if (prefetch != null) {
+                            Modifier.onFocusChanged { if (it.hasFocus) prefetch.focused(show.seriesId) else prefetch.left(show.seriesId) }
+                        } else {
+                            Modifier
+                        },
+                    ),
+                contentAlignment = Alignment.TopCenter,
+            ) {
                 MediaCard(
                     title = show.title,
                     shape = CardShape.Poster,
