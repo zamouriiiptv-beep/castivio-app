@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prefs_title">設定</string>
+    <string name="prefs_back">返回</string>
+    <string name="prefs_player">播放器</string>
+    <string name="prefs_audio_language">偏好的音訊語言</string>
+    <string name="prefs_subtitle_language">偏好的字幕語言</string>
+    <string name="prefs_audio_original">原始音訊</string>
+    <string name="prefs_subtitles_none">無字幕</string>
+    <string name="prefs_audio_detail">如果影片或頻道有這個語言的音訊，就以該語言播放；否則保留原本的音訊。</string>
+    <string name="prefs_subtitle_detail">如果影片有這個語言的字幕，就開啟字幕；否則維持原樣。</string>
+    <string name="prefs_hidden">已隱藏的項目</string>
+    <string name="prefs_restore_bouquets">還原已隱藏的套餐</string>
+    <string name="prefs_restore_channels">還原已隱藏的頻道</string>
+    <string name="prefs_lock">頻道鎖</string>
+    <string name="prefs_change_pin">變更鎖定密碼</string>
+    <string name="prefs_application">應用程式</string>
+    <string name="prefs_motion">動態效果</string>
+    <string name="prefs_motion_full">完整</string>
+    <string name="prefs_motion_reduced">減少</string>
+    <string name="prefs_motion_none">無</string>
+    <string name="prefs_clear_pictures">清除圖片快取</string>
+    <string name="prefs_about">關於</string>
+    <string name="prefs_help">說明</string>
+    <string name="prefs_support">說明與支援</string>
+    <string name="prefs_privacy">隱私權政策</string>
+    <string name="prefs_terms">使用條款</string>
+    <string name="prefs_scan">用手機相機掃描條碼即可開啟此頁面。</string>
+    <string name="prefs_support_detail">電話號碼、服務時間和常見問題都在支援頁面上。</string>
+    <string name="prefs_on_site">完整內容在網站上。</string>
+    <string name="prefs_open_browser">在瀏覽器中開啟</string>
+</resources>

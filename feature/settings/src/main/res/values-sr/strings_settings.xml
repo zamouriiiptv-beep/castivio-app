@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prefs_title">Подешавања</string>
+    <string name="prefs_back">Назад</string>
+    <string name="prefs_player">Плејер</string>
+    <string name="prefs_audio_language">Жељени језик звука</string>
+    <string name="prefs_subtitle_language">Жељени језик титлова</string>
+    <string name="prefs_audio_original">Оригинални звук</string>
+    <string name="prefs_subtitles_none">Без титлова</string>
+    <string name="prefs_audio_detail">Ако филм или канал има звук на овом језику, пушта се на њему. Иначе остаје сопствени.</string>
+    <string name="prefs_subtitle_detail">Ако филм има титлове на овом језику, укључују се. Иначе остају какви јесу.</string>
+    <string name="prefs_hidden">Скривене ставке</string>
+    <string name="prefs_restore_bouquets">Врати скривене пакете</string>
+    <string name="prefs_restore_channels">Врати скривене канале</string>
+    <string name="prefs_lock">Закључавање канала</string>
+    <string name="prefs_change_pin">Промени лозинку закључавања</string>
+    <string name="prefs_application">Апликација</string>
+    <string name="prefs_motion">Покрет</string>
+    <string name="prefs_motion_full">Пун</string>
+    <string name="prefs_motion_reduced">Смањен</string>
+    <string name="prefs_motion_none">Без</string>
+    <string name="prefs_clear_pictures">Обриши кеш слика</string>
+    <string name="prefs_about">О апликацији</string>
+    <string name="prefs_help">Помоћ</string>
+    <string name="prefs_support">Помоћ и подршка</string>
+    <string name="prefs_privacy">Политика приватности</string>
+    <string name="prefs_terms">Услови коришћења</string>
+    <string name="prefs_scan">Скенирајте кôд камером телефона да бисте отворили ову страницу.</string>
+    <string name="prefs_support_detail">Број телефона, радно време и честа питања налазе се на страници подршке.</string>
+    <string name="prefs_on_site">Цео текст је на сајту.</string>
+    <string name="prefs_open_browser">Отвори у прегледачу</string>
+</resources>

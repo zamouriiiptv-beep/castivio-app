@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prefs_title">Ajustes</string>
+    <string name="prefs_back">Atrás</string>
+    <string name="prefs_player">Reproductor</string>
+    <string name="prefs_audio_language">Idioma de audio preferido</string>
+    <string name="prefs_subtitle_language">Idioma de subtítulos preferido</string>
+    <string name="prefs_audio_original">Sonido original</string>
+    <string name="prefs_subtitles_none">Sin subtítulos</string>
+    <string name="prefs_audio_detail">Si una película o un canal tiene sonido en este idioma, se reproduce en él. Si no, conserva el suyo.</string>
+    <string name="prefs_subtitle_detail">Si una película tiene subtítulos en este idioma, se activan. Si no, se quedan como están.</string>
+    <string name="prefs_hidden">Elementos ocultos</string>
+    <string name="prefs_restore_bouquets">Restaurar paquetes ocultos</string>
+    <string name="prefs_restore_channels">Restaurar canales ocultos</string>
+    <string name="prefs_lock">Bloqueo de canales</string>
+    <string name="prefs_change_pin">Cambiar la contraseña del bloqueo</string>
+    <string name="prefs_application">Aplicación</string>
+    <string name="prefs_motion">Movimiento</string>
+    <string name="prefs_motion_full">Completo</string>
+    <string name="prefs_motion_reduced">Reducido</string>
+    <string name="prefs_motion_none">Ninguno</string>
+    <string name="prefs_clear_pictures">Vaciar la caché de imágenes</string>
+    <string name="prefs_about">Acerca de</string>
+    <string name="prefs_help">Ayuda</string>
+    <string name="prefs_support">Ayuda y soporte</string>
+    <string name="prefs_privacy">Política de privacidad</string>
+    <string name="prefs_terms">Condiciones de uso</string>
+    <string name="prefs_scan">Escanea el código con la cámara de tu teléfono para abrir esta página.</string>
+    <string name="prefs_support_detail">El teléfono, el horario y las preguntas frecuentes están en la página de soporte.</string>
+    <string name="prefs_on_site">El texto completo está en el sitio web.</string>
+    <string name="prefs_open_browser">Abrir en el navegador</string>
+</resources>

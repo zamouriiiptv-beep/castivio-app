@@ -1,0 +1,650 @@
+package com.castivio.feature.settings
+
+import android.text.format.Formatter
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.rounded.Help
+import androidx.compose.material.icons.automirrored.rounded.ListAlt
+import androidx.compose.material.icons.automirrored.rounded.VolumeUp
+import androidx.compose.material.icons.rounded.Apps
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.ClosedCaption
+import androidx.compose.material.icons.rounded.Code
+import androidx.compose.material.icons.rounded.Description
+import androidx.compose.material.icons.rounded.Email
+import androidx.compose.material.icons.rounded.Gavel
+import androidx.compose.material.icons.rounded.HeadsetMic
+import androidx.compose.material.icons.rounded.Image
+import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.Key
+import androidx.compose.material.icons.rounded.Language
+import androidx.compose.material.icons.rounded.Lock
+import androidx.compose.material.icons.rounded.PlayCircle
+import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material.icons.rounded.Shield
+import androidx.compose.material.icons.rounded.Tv
+import androidx.compose.material.icons.rounded.Visibility
+import androidx.compose.material.icons.rounded.Waves
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.PointerInputScope
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDirection
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.castivio.core.design.components.ButtonWeight
+import com.castivio.core.design.components.CastivioButton
+import com.castivio.core.design.components.CastivioIconButton
+import com.castivio.core.design.components.QrPlate
+import com.castivio.core.design.components.castivioBodyStyle
+import com.castivio.core.design.components.castivioChipStyle
+import com.castivio.core.design.components.castivioTitleStyle
+import com.castivio.core.design.theme.CastivioMetrics
+import com.castivio.core.design.theme.CastivioTheme
+import com.castivio.core.design.theme.MotionLevel
+import com.castivio.core.design.theme.Radius
+import com.castivio.core.design.theme.Spacing
+import com.castivio.core.design.theme.castivioBackdrop
+import com.castivio.core.design.theme.castivioStage
+import com.castivio.core.design.theme.rememberMetrics
+import com.castivio.domain.TrackLanguage
+
+/**
+ * A row only a development build draws -- the design board, the device's class -- handed in by the application, which
+ * alone knows which build it is. A null [onClick] is a line of information.
+ */
+data class DeveloperRow(val label: String, val value: String? = null, val onClick: (() -> Unit)? = null)
+
+/**
+ * Settings, as `design/mockups/settings-ar.html` draws it: two columns of section cards.
+ *
+ * Only what has no other place, and does something. Theme and language are at the top of Home; the subscriptions and the
+ * device are on Home; the player's speed, picture shape, quality, sound and subtitles' look are in its own gear panel; a
+ * channel is locked from the channels board. What is here:
+ *  - **Player**: the language preferred for the sound and for subtitles, picked from a list over the page. The player takes
+ *    the track in that language when a film or channel has one (see `PlayerViewModel.preferLanguages`).
+ *  - **Hidden items**: bringing back the bouquets and the channels hidden on the channels board, with how many; none
+ *    hidden is a line of information with nothing to press.
+ *  - **Channel lock**: the lock's password.
+ *  - **Application**: the motion level, emptying the pictures' cache (with its size), and About -- the licence screen.
+ *  - **Help**: support, the privacy policy and the terms, which are pages of Castivio's site ([SettingsLinks]). A
+ *    television opens no link, so each is a QR code a phone scans, with the address written out; a phone opens them.
+ *
+ * Everything the application owns -- the motion level, the hidden items, the password, the licence -- comes in as values
+ * and callbacks; what is Settings' own is [SettingsViewModel]'s.
+ */
+@Composable
+fun SettingsScreen(
+    motion: MotionLevel,
+    onMotion: (MotionLevel) -> Unit,
+    hiddenBouquets: Int,
+    hiddenChannels: Int,
+    onRestoreBouquets: () -> Unit,
+    onRestoreChannels: () -> Unit,
+    onChangePin: () -> Unit,
+    onAbout: () -> Unit,
+    version: String,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
+    developerTitle: String? = null,
+    developer: List<DeveloperRow> = emptyList(),
+    model: SettingsViewModel = hiltViewModel(),
+) {
+    val state by model.state.collectAsStateWithLifecycle()
+    // What is open over the page, if anything: a list of languages, or a page of the site. Back closes it first.
+    var choosing by rememberSaveable { mutableStateOf<LanguageKind?>(null) }
+    var reading by rememberSaveable { mutableStateOf<SitePage?>(null) }
+    val firstRow = remember { FocusRequester() }
+    val tv = CastivioTheme.device.isTv
+
+    BoxWithConstraints(modifier.fillMaxSize().castivioBackdrop()) {
+        val m = rememberMetrics(maxWidth, maxHeight)
+        // Left out while a page of the site covers it, so the remote cannot wander into rows nobody can see.
+        if (reading == null) Column(
+            Modifier
+                .fillMaxSize()
+                .castivioStage(m)
+                .verticalScroll(rememberScrollState())
+                .testTag(SETTINGS_PAGE_TAG),
+            verticalArrangement = Arrangement.spacedBy(Spacing.lg),
+        ) {
+            TitleRow(stringResource(R.string.prefs_title), Icons.Rounded.Settings, m, onBack)
+            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.lg)) {
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(Spacing.md)) {
+                    Section(Icons.Rounded.PlayCircle, stringResource(R.string.prefs_player), m) {
+                        SettingRow(
+                            Icons.AutoMirrored.Rounded.VolumeUp,
+                            stringResource(R.string.prefs_audio_language),
+                            state.audio?.endonym ?: stringResource(R.string.prefs_audio_original),
+                            m,
+                            onClick = { choosing = LanguageKind.AUDIO },
+                            modifier = Modifier.focusRequester(firstRow),
+                        )
+                        SettingRow(
+                            Icons.Rounded.ClosedCaption,
+                            stringResource(R.string.prefs_subtitle_language),
+                            state.subtitle?.endonym ?: stringResource(R.string.prefs_subtitles_none),
+                            m,
+                            onClick = { choosing = LanguageKind.SUBTITLE },
+                        )
+                    }
+                    Section(Icons.Rounded.Visibility, stringResource(R.string.prefs_hidden), m) {
+                        SettingRow(
+                            Icons.AutoMirrored.Rounded.ListAlt,
+                            stringResource(R.string.prefs_restore_bouquets),
+                            hiddenBouquets.toString(),
+                            m,
+                            onClick = onRestoreBouquets.takeIf { hiddenBouquets > 0 },
+                        )
+                        SettingRow(
+                            Icons.Rounded.Tv,
+                            stringResource(R.string.prefs_restore_channels),
+                            hiddenChannels.toString(),
+                            m,
+                            onClick = onRestoreChannels.takeIf { hiddenChannels > 0 },
+                        )
+                    }
+                    Section(Icons.Rounded.Lock, stringResource(R.string.prefs_lock), m) {
+                        SettingRow(Icons.Rounded.Key, stringResource(R.string.prefs_change_pin), null, m, onClick = onChangePin)
+                    }
+                }
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(Spacing.md)) {
+                    Section(Icons.Rounded.Apps, stringResource(R.string.prefs_application), m) {
+                        MotionRow(motion, onMotion, m)
+                        val context = LocalContext.current
+                        SettingRow(
+                            Icons.Rounded.Image,
+                            stringResource(R.string.prefs_clear_pictures),
+                            state.pictureBytes?.let { Formatter.formatShortFileSize(context, it) },
+                            m,
+                            onClick = if (state.clearing) null else model::clearPictures,
+                            ltrValue = true,
+                        )
+                        SettingRow(Icons.Rounded.Info, stringResource(R.string.prefs_about), version, m, onClick = onAbout, ltrValue = true)
+                    }
+                    Section(Icons.AutoMirrored.Rounded.Help, stringResource(R.string.prefs_help), m) {
+                        SettingRow(Icons.Rounded.HeadsetMic, stringResource(R.string.prefs_support), null, m, onClick = { reading = SitePage.SUPPORT })
+                        SettingRow(Icons.Rounded.Shield, stringResource(R.string.prefs_privacy), null, m, onClick = { reading = SitePage.PRIVACY })
+                        SettingRow(Icons.Rounded.Description, stringResource(R.string.prefs_terms), null, m, onClick = { reading = SitePage.TERMS })
+                    }
+                    if (developerTitle != null && developer.isNotEmpty()) {
+                        Section(Icons.Rounded.Code, developerTitle, m) {
+                            developer.forEach { SettingRow(Icons.Rounded.Code, it.label, it.value, m, onClick = it.onClick) }
+                        }
+                    }
+                }
+            }
+            Box(Modifier.heightIn(min = Spacing.lg))
+        }
+        // The remote starts on the first row, as every screen of the application starts on its first control.
+        LaunchedEffect(tv, reading) { if (tv && reading == null) runCatching { firstRow.requestFocus() } }
+
+        choosing?.let { kind ->
+            LanguageSheet(
+                kind = kind,
+                chosen = if (kind == LanguageKind.AUDIO) state.audio else state.subtitle,
+                m = m,
+                onChoose = { language ->
+                    if (kind == LanguageKind.AUDIO) model.setAudio(language) else model.setSubtitle(language)
+                    choosing = null
+                },
+                onClose = { choosing = null },
+            )
+        }
+        reading?.let { page -> SitePageView(page, tv, m, onClose = { reading = null }) }
+    }
+}
+
+/** The two lists of languages a viewer can prefer: the sound's, whose "none" is the original sound, and the subtitles'. */
+internal enum class LanguageKind { AUDIO, SUBTITLE }
+
+/** The way back, the screen's mark and its name. */
+@Composable
+private fun TitleRow(title: String, icon: ImageVector, m: CastivioMetrics, onBack: () -> Unit) {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spacing.md)) {
+        CastivioIconButton(
+            icon = Icons.AutoMirrored.Rounded.ArrowBack,
+            contentDescription = stringResource(R.string.prefs_back),
+            onClick = onBack,
+        )
+        Icon(icon, null, tint = CastivioTheme.colors.onBackground, modifier = Modifier.size(m.fsTitle))
+        Text(title, style = castivioTitleStyle(m.fsTitle), color = CastivioTheme.colors.onBackground, maxLines = 1)
+    }
+}
+
+/** A section: its mark and name in the secondary hue, then its rows, on one card. */
+@Composable
+private fun Section(icon: ImageVector, title: String, m: CastivioMetrics, rows: @Composable () -> Unit) {
+    val colors = CastivioTheme.colors
+    val shape = RoundedCornerShape(Radius.md)
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .background(colors.glassFill)
+            .border(1.dp, colors.glassBorderSoft, shape)
+            .padding(Spacing.md),
+        verticalArrangement = Arrangement.spacedBy(Spacing.sm),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+            Icon(icon, null, tint = colors.secondary, modifier = Modifier.size(SECTION_ICON))
+            Text(
+                title,
+                style = castivioChipStyle(m.fsLabel).copy(fontWeight = FontWeight.Bold),
+                color = colors.secondary,
+                maxLines = 1,
+            )
+        }
+        rows()
+    }
+}
+
+/**
+ * One row: its mark, its name, what it is now, and the arrow into it. With nothing to press ([onClick] null) it is a line of
+ * information -- quieter, without the arrow, and the remote passes over it.
+ */
+@Composable
+private fun SettingRow(
+    icon: ImageVector,
+    label: String,
+    value: String?,
+    m: CastivioMetrics,
+    onClick: (() -> Unit)?,
+    modifier: Modifier = Modifier,
+    ltrValue: Boolean = false,
+) {
+    val colors = CastivioTheme.colors
+    val shape = RoundedCornerShape(Radius.sm)
+    var focused by remember { mutableStateOf(false) }
+    val live = onClick != null
+    Row(
+        modifier
+            .fillMaxWidth()
+            .heightIn(min = ROW_HEIGHT)
+            .clip(shape)
+            .background(if (focused) colors.glassFillStrong else if (live) colors.glassFill else colors.glassFill.copy(alpha = 0f))
+            .border(
+                if (focused) 2.dp else 1.dp,
+                when {
+                    focused -> colors.focusRing
+                    live -> colors.glassFill.copy(alpha = 0f)
+                    else -> colors.glassBorderSoft
+                },
+                shape,
+            )
+            .then(
+                if (onClick != null) {
+                    Modifier
+                        .onFocusChanged { focused = it.isFocused }
+                        .clickable(role = Role.Button, onClick = onClick)
+                } else {
+                    Modifier
+                },
+            )
+            .padding(horizontal = Spacing.md),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Spacing.md),
+    ) {
+        Icon(
+            icon,
+            null,
+            tint = if (live) colors.onBackgroundVariant else colors.onBackgroundMuted,
+            modifier = Modifier.size(ROW_ICON),
+        )
+        Text(
+            label,
+            style = castivioBodyStyle(m.fsBody),
+            color = if (live) colors.onBackground else colors.onBackgroundMuted,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f),
+        )
+        value?.let {
+            Text(
+                it,
+                style = castivioBodyStyle(m.fsBody).let { style -> if (ltrValue) style.copy(textDirection = TextDirection.Ltr) else style },
+                color = if (live) colors.onBackgroundVariant else colors.onBackgroundMuted,
+                maxLines = 1,
+            )
+        }
+        if (live) {
+            Icon(
+                Icons.AutoMirrored.Rounded.KeyboardArrowRight,
+                null,
+                tint = if (focused) colors.onBackground else colors.onBackgroundVariant,
+                modifier = Modifier.size(ROW_ICON),
+            )
+        }
+    }
+}
+
+/** The motion level: its name, and its three levels in the row itself; left and right on the remote move between them. */
+@Composable
+private fun MotionRow(motion: MotionLevel, onMotion: (MotionLevel) -> Unit, m: CastivioMetrics) {
+    val colors = CastivioTheme.colors
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .heightIn(min = ROW_HEIGHT)
+            .clip(RoundedCornerShape(Radius.sm))
+            .background(colors.glassFill)
+            .padding(horizontal = Spacing.md),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+    ) {
+        Icon(Icons.Rounded.Waves, null, tint = colors.onBackgroundVariant, modifier = Modifier.size(ROW_ICON))
+        Text(
+            stringResource(R.string.prefs_motion),
+            style = castivioBodyStyle(m.fsBody),
+            color = colors.onBackground,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f),
+        )
+        MotionLevel.entries.forEach { level ->
+            LevelChip(
+                label = stringResource(level.labelRes()),
+                selected = level == motion,
+                m = m,
+                onClick = { onMotion(level) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun LevelChip(label: String, selected: Boolean, m: CastivioMetrics, onClick: () -> Unit) {
+    val colors = CastivioTheme.colors
+    val shape = RoundedCornerShape(Radius.xs)
+    var focused by remember { mutableStateOf(false) }
+    Box(
+        Modifier
+            .heightIn(min = CHIP_HEIGHT)
+            .clip(shape)
+            .background(if (selected) colors.primary else colors.glassFillStrong)
+            .border(if (focused) 2.dp else 1.dp, if (focused) colors.focusRing else colors.glassBorderSoft, shape)
+            .onFocusChanged { focused = it.isFocused }
+            .semantics { this.selected = selected }
+            .clickable(role = Role.RadioButton, onClick = onClick)
+            .padding(horizontal = Spacing.md),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            label,
+            style = castivioChipStyle(m.fsChip).copy(fontWeight = FontWeight.SemiBold),
+            color = if (selected) colors.onPrimary else colors.onBackgroundVariant,
+            maxLines = 1,
+        )
+    }
+}
+
+private fun MotionLevel.labelRes(): Int = when (this) {
+    MotionLevel.FULL -> R.string.prefs_motion_full
+    MotionLevel.REDUCED -> R.string.prefs_motion_reduced
+    MotionLevel.DISABLED -> R.string.prefs_motion_none
+}
+
+/**
+ * The languages to prefer, as a list over the page at its end edge: "none" first -- the original sound, or no subtitles
+ * -- then each language named in itself, the one in use ticked and under the remote when the list opens.
+ */
+@Composable
+private fun LanguageSheet(
+    kind: LanguageKind,
+    chosen: TrackLanguage?,
+    m: CastivioMetrics,
+    onChoose: (TrackLanguage?) -> Unit,
+    onClose: () -> Unit,
+) {
+    BackHandler(onBack = onClose)
+    val colors = CastivioTheme.colors
+    val current = remember { FocusRequester() }
+    Box(
+        Modifier
+            .fillMaxSize()
+            .background(colors.scrim)
+            // Over the page: a touch outside the list closes it, and nothing underneath is reached.
+            .pointerInput(Unit) { detectTapAnywhere(onClose) },
+        // At the end edge, as the mockup draws it: the page's titles and first rows stay readable at the start.
+        contentAlignment = Alignment.TopEnd,
+    ) {
+        Column(
+            Modifier
+                .fillMaxHeight()
+                .width(SHEET_WIDTH)
+                .background(colors.surfaceWell)
+                .border(1.dp, colors.glassBorder)
+                .pointerInput(Unit) { detectTapAnywhere {} }
+                .verticalScroll(rememberScrollState())
+                .padding(Spacing.xl),
+            verticalArrangement = Arrangement.spacedBy(Spacing.sm),
+        ) {
+            Text(
+                stringResource(if (kind == LanguageKind.AUDIO) R.string.prefs_audio_language else R.string.prefs_subtitle_language),
+                style = castivioTitleStyle(m.fsLabel),
+                color = colors.onBackground,
+            )
+            Text(
+                stringResource(if (kind == LanguageKind.AUDIO) R.string.prefs_audio_detail else R.string.prefs_subtitle_detail),
+                style = castivioBodyStyle(m.fsBody),
+                color = colors.onBackgroundMuted,
+            )
+            val none = stringResource(if (kind == LanguageKind.AUDIO) R.string.prefs_audio_original else R.string.prefs_subtitles_none)
+            (listOf<TrackLanguage?>(null) + TrackLanguage.entries).forEach { language ->
+                val on = language == chosen
+                LanguageOption(
+                    label = language?.endonym ?: none,
+                    on = on,
+                    m = m,
+                    onClick = { onChoose(language) },
+                    modifier = if (on) Modifier.focusRequester(current) else Modifier,
+                )
+            }
+        }
+    }
+    LaunchedEffect(Unit) { runCatching { current.requestFocus() } }
+}
+
+@Composable
+private fun LanguageOption(label: String, on: Boolean, m: CastivioMetrics, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    val colors = CastivioTheme.colors
+    val shape = RoundedCornerShape(Radius.sm)
+    var focused by remember { mutableStateOf(false) }
+    Row(
+        modifier
+            .fillMaxWidth()
+            .heightIn(min = ROW_HEIGHT)
+            .clip(shape)
+            .background(if (on) colors.selectedFill else colors.glassFill)
+            .border(if (focused) 2.dp else 1.dp, if (focused) colors.focusRing else colors.glassFill.copy(alpha = 0f), shape)
+            .onFocusChanged { focused = it.isFocused }
+            .semantics { selected = on }
+            .clickable(role = Role.RadioButton, onClick = onClick)
+            .padding(horizontal = Spacing.lg),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            label,
+            style = castivioBodyStyle(m.fsBody).copy(textDirection = TextDirection.Content),
+            color = colors.onBackground,
+            maxLines = 1,
+            modifier = Modifier.weight(1f),
+        )
+        if (on) Icon(Icons.Rounded.Check, null, tint = colors.primary, modifier = Modifier.size(ROW_ICON))
+    }
+}
+
+/**
+ * A page of Castivio's site. On a television, its QR code to scan with a phone, and the address -- and for support, the
+ * e-mail -- written out beside it. On a phone, a button that opens the browser, and for support one that opens the mail
+ * application.
+ */
+@Composable
+private fun SitePageView(page: SitePage, tv: Boolean, m: CastivioMetrics, onClose: () -> Unit) {
+    BackHandler(onBack = onClose)
+    val colors = CastivioTheme.colors
+    val uri = LocalUriHandler.current
+    val title = stringResource(
+        when (page) {
+            SitePage.SUPPORT -> R.string.prefs_support
+            SitePage.PRIVACY -> R.string.prefs_privacy
+            SitePage.TERMS -> R.string.prefs_terms
+        },
+    )
+    val icon = when (page) {
+        SitePage.SUPPORT -> Icons.Rounded.HeadsetMic
+        SitePage.PRIVACY -> Icons.Rounded.Shield
+        SitePage.TERMS -> Icons.Rounded.Gavel
+    }
+    val detail = stringResource(if (page == SitePage.SUPPORT) R.string.prefs_support_detail else R.string.prefs_on_site)
+    Column(
+        Modifier
+            .fillMaxSize()
+            .castivioBackdrop()
+            .pointerInput(Unit) { detectTapAnywhere {} }
+            .castivioStage(m)
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(Spacing.lg),
+    ) {
+        TitleRow(title, icon, m, onClose)
+        val shape = RoundedCornerShape(Radius.lg)
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .clip(shape)
+                .background(colors.glassFill)
+                .border(1.dp, colors.glassBorderSoft, shape)
+                .padding(Spacing.xl),
+            horizontalArrangement = Arrangement.spacedBy(Spacing.xxl),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            if (tv) QrSymbol(page.url, QR_SIDE)
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(Spacing.md)) {
+                if (tv) {
+                    Text(stringResource(R.string.prefs_scan), style = castivioTitleStyle(m.fsLabel), color = colors.onBackground)
+                    Text(detail, style = castivioBodyStyle(m.fsBody), color = colors.onBackgroundVariant)
+                    Address(Icons.Rounded.Language, SettingsLinks.shown(page.url), m)
+                    if (page == SitePage.SUPPORT) Address(Icons.Rounded.Email, SettingsLinks.EMAIL, m)
+                } else {
+                    Text(detail, style = castivioBodyStyle(m.fsBody), color = colors.onBackgroundVariant)
+                    Row(horizontalArrangement = Arrangement.spacedBy(Spacing.md)) {
+                        CastivioButton(
+                            text = stringResource(R.string.prefs_open_browser),
+                            onClick = { runCatching { uri.openUri(page.url) } },
+                            weight = ButtonWeight.Primary,
+                            icon = Icons.Rounded.Language,
+                        )
+                        if (page == SitePage.SUPPORT) {
+                            CastivioButton(
+                                text = SettingsLinks.EMAIL,
+                                onClick = { runCatching { uri.openUri(SettingsLinks.MAIL) } },
+                                icon = Icons.Rounded.Email,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/** An address written out to be typed or read: what a viewer who will not scan has. */
+@Composable
+private fun Address(icon: ImageVector, text: String, m: CastivioMetrics) {
+    val colors = CastivioTheme.colors
+    val shape = RoundedCornerShape(Radius.sm)
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .heightIn(min = ROW_HEIGHT)
+            .clip(shape)
+            .background(colors.glassFill)
+            .border(1.dp, colors.glassBorderSoft, shape)
+            // Read, not pressed: the remote may still rest on it, so the address can be read under the focus.
+            .focusable()
+            .padding(horizontal = Spacing.lg),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Spacing.md),
+    ) {
+        Icon(icon, null, tint = colors.secondary, modifier = Modifier.size(ROW_ICON))
+        Text(
+            text,
+            style = castivioTitleStyle(m.fsLabel).copy(textDirection = TextDirection.Ltr),
+            color = colors.onBackground,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+}
+
+/** A page's QR code on the shared white plate (`QrPlate`), at the size the screen gives it. */
+@Composable
+private fun QrSymbol(url: String, side: Dp) {
+    val pixels = with(LocalDensity.current) { side.roundToPx() }
+    val code = remember(url, pixels) { siteQrBitmap(url, pixels).asImageBitmap() }
+    QrPlate(code = code, plate = side, padding = Spacing.md)
+}
+
+/** Takes every tap in this area: to close what is open over the page, or ([onTap] doing nothing) to keep it from the page. */
+private suspend fun PointerInputScope.detectTapAnywhere(onTap: () -> Unit) {
+    detectTapGestures(onTap = { onTap() })
+}
+
+/** The page's scrolling column, for a test to find and scroll. */
+const val SETTINGS_PAGE_TAG = "castivio.settings.page"
+
+private val ROW_HEIGHT: Dp = 48.dp
+private val CHIP_HEIGHT: Dp = 36.dp
+private val ROW_ICON: Dp = 20.dp
+private val SECTION_ICON: Dp = 18.dp
+private val SHEET_WIDTH: Dp = 360.dp
+private val QR_SIDE: Dp = 220.dp

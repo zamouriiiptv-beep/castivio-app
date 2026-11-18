@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prefs_title">ترتیبات</string>
+    <string name="prefs_back">واپس</string>
+    <string name="prefs_player">پلیئر</string>
+    <string name="prefs_audio_language">پسندیدہ آڈیو زبان</string>
+    <string name="prefs_subtitle_language">پسندیدہ سب ٹائٹل زبان</string>
+    <string name="prefs_audio_original">اصل آواز</string>
+    <string name="prefs_subtitles_none">سب ٹائٹل نہیں</string>
+    <string name="prefs_audio_detail">اگر فلم یا چینل کی آواز اس زبان میں ہو تو اسی میں چلے گی، ورنہ اپنی آواز رہے گی۔</string>
+    <string name="prefs_subtitle_detail">اگر فلم کے سب ٹائٹل اس زبان میں ہوں تو آن ہو جائیں گے، ورنہ جیسے ہیں ویسے رہیں گے۔</string>
+    <string name="prefs_hidden">چھپی ہوئی چیزیں</string>
+    <string name="prefs_restore_bouquets">چھپے ہوئے پیکج بحال کریں</string>
+    <string name="prefs_restore_channels">چھپے ہوئے چینل بحال کریں</string>
+    <string name="prefs_lock">چینل لاک</string>
+    <string name="prefs_change_pin">لاک کا پاس ورڈ بدلیں</string>
+    <string name="prefs_application">ایپ</string>
+    <string name="prefs_motion">حرکت</string>
+    <string name="prefs_motion_full">مکمل</string>
+    <string name="prefs_motion_reduced">کم</string>
+    <string name="prefs_motion_none">کوئی نہیں</string>
+    <string name="prefs_clear_pictures">تصاویر کا کیش صاف کریں</string>
+    <string name="prefs_about">ایپ کے بارے میں</string>
+    <string name="prefs_help">مدد</string>
+    <string name="prefs_support">مدد اور سپورٹ</string>
+    <string name="prefs_privacy">رازداری کی پالیسی</string>
+    <string name="prefs_terms">استعمال کی شرائط</string>
+    <string name="prefs_scan">یہ صفحہ کھولنے کے لیے فون کے کیمرے سے کوڈ اسکین کریں۔</string>
+    <string name="prefs_support_detail">فون نمبر، اوقات کار اور عام سوالات سپورٹ صفحے پر ہیں۔</string>
+    <string name="prefs_on_site">مکمل متن ویب سائٹ پر ہے۔</string>
+    <string name="prefs_open_browser">براؤزر میں کھولیں</string>
+</resources>

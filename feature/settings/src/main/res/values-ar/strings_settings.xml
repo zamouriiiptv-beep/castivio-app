@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prefs_title">الإعدادات</string>
+    <string name="prefs_back">رجوع</string>
+    <string name="prefs_player">المشغّل</string>
+    <string name="prefs_audio_language">لغة الصوت المفضلة</string>
+    <string name="prefs_subtitle_language">لغة الترجمة المفضلة</string>
+    <string name="prefs_audio_original">الصوت الأصلي</string>
+    <string name="prefs_subtitles_none">بلا ترجمة</string>
+    <string name="prefs_audio_detail">إن كان للفيلم أو القناة صوت بهذه اللغة شُغِّل به، وإلا بقي صوته الأصلي.</string>
+    <string name="prefs_subtitle_detail">إن كانت للفيلم ترجمة بهذه اللغة شُغِّلت، وإلا بقيت الترجمة كما هي.</string>
+    <string name="prefs_hidden">العناصر المخفية</string>
+    <string name="prefs_restore_bouquets">استعادة الباقات المخفية</string>
+    <string name="prefs_restore_channels">استعادة القنوات المخفية</string>
+    <string name="prefs_lock">قفل القنوات</string>
+    <string name="prefs_change_pin">تغيير رمز القفل</string>
+    <string name="prefs_application">التطبيق</string>
+    <string name="prefs_motion">الحركة</string>
+    <string name="prefs_motion_full">كاملة</string>
+    <string name="prefs_motion_reduced">مخففة</string>
+    <string name="prefs_motion_none">بلا</string>
+    <string name="prefs_clear_pictures">مسح ذاكرة الصور</string>
+    <string name="prefs_about">حول التطبيق</string>
+    <string name="prefs_help">المساعدة</string>
+    <string name="prefs_support">المساعدة والدعم</string>
+    <string name="prefs_privacy">سياسة الخصوصية</string>
+    <string name="prefs_terms">شروط الاستخدام</string>
+    <string name="prefs_scan">امسح الرمز بكاميرا هاتفك لتفتح هذه الصفحة.</string>
+    <string name="prefs_support_detail">رقم الهاتف وساعات العمل والأسئلة الشائعة في صفحة الدعم.</string>
+    <string name="prefs_on_site">النص الكامل على الموقع.</string>
+    <string name="prefs_open_browser">فتح في المتصفح</string>
+</resources>

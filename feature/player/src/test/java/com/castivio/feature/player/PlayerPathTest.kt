@@ -13,6 +13,8 @@ import com.castivio.domain.PulsePhase
 import com.castivio.domain.TimeShiftAddress
 import com.castivio.domain.TimeShiftChoice
 import com.castivio.domain.TimeShiftSource
+import com.castivio.domain.TrackLanguage
+import com.castivio.domain.TrackLanguagePreferences
 import com.castivio.playback.api.AspectMode
 import com.castivio.playback.api.EngineFactory
 import com.castivio.playback.api.EngineId
@@ -30,6 +32,7 @@ import com.castivio.playback.api.PlaybackState
 import com.castivio.playback.api.QualityReading
 import com.castivio.playback.api.Track
 import com.castivio.playback.api.TrackSet
+import com.castivio.playback.api.TrackType
 import com.castivio.playback.api.VideoOutput
 import com.castivio.data.subtitles.SubtitleCue
 import com.castivio.data.subtitles.SubtitleFailure
@@ -142,11 +145,11 @@ class PlayerPathTest {
      * exercise is what actually runs. Each call gets its own key, because a test that
      * opens two players is testing two players.
      */
-    private fun model(): PlayerViewModel {
+    private fun model(languages: TrackLanguagePreferences = TrackLanguagePreferences.None): PlayerViewModel {
         val factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T =
-                PlayerViewModel(engines, memory, subtitles, hunt, allowance) as T
+                PlayerViewModel(engines, memory, subtitles, hunt, allowance, languages) as T
         }
         return ViewModelProvider(store, factory)["player-${created++}", PlayerViewModel::class.java]
     }
@@ -5420,7 +5423,17 @@ class PlayerPathTest {
         override fun seekTo(positionMs: Long) {
             seeks += positionMs
         }
-        override fun selectTrack(track: Track) = Unit
+        /** Every track selected, by the viewer or for them, in order. */
+        val selectedTracks = mutableListOf<Track>()
+
+        override fun selectTrack(track: Track) {
+            selectedTracks += track
+        }
+
+        /** The tracks the source turned out to carry, as an engine reports them once it has read the container. */
+        fun list(tracks: TrackSet) {
+            _tracks.value = tracks
+        }
         override fun setSpeed(speed: Float) = Unit
         override fun setAspect(mode: com.castivio.playback.api.AspectMode) = Unit
 
@@ -5630,5 +5643,103 @@ class PlayerPathTest {
         override fun remember(sourceKey: String, engine: EngineId) {
             if (engine == EngineId.BACKUP) entries[sourceKey] = engine else entries.remove(sourceKey)
         }
+    }
+
+    // ------------------------------------------------------------------ preferred languages (Settings → Player)
+
+    private class Preferring(private val sound: TrackLanguage?, private val text: TrackLanguage?) : TrackLanguagePreferences {
+        override fun audio() = sound
+        override fun subtitle() = text
+        override fun setAudio(language: TrackLanguage?) = Unit
+        override fun setSubtitle(language: TrackLanguage?) = Unit
+    }
+
+    private fun audio(id: String, language: String?, selected: Boolean = false) =
+        Track(id = id, type = TrackType.AUDIO, label = id, language = language, selected = selected)
+
+    private fun subtitle(id: String, language: String?, label: String = id) =
+        Track(id = id, type = TrackType.SUBTITLE, label = label, language = language)
+
+    @Test
+    fun `a film with a sound in the preferred language is played in it`() = playerTest {
+        val model = model(Preferring(TrackLanguage.ARABIC, null))
+        model.open(vodRequest())
+        runCurrent()
+
+        engines.last.list(TrackSet(audio = listOf(audio("en", "eng", selected = true), audio("ar", "ara"))))
+        runCurrent()
+
+        assertEquals(listOf("ar"), engines.last.selectedTracks.map { it.id })
+    }
+
+    @Test
+    fun `the preferred subtitles are turned on when the film carries them, found by their label alone`() = playerTest {
+        val model = model(Preferring(null, TrackLanguage.ARABIC))
+        model.open(vodRequest())
+        runCurrent()
+
+        engines.last.list(TrackSet(subtitle = listOf(subtitle("s1", null, "English"), subtitle("s2", "und", "Arabic"))))
+        runCurrent()
+
+        assertEquals(listOf("s2"), engines.last.selectedTracks.map { it.id })
+    }
+
+    @Test
+    fun `a film with no track in the language keeps what it started with`() = playerTest {
+        val model = model(Preferring(TrackLanguage.ARABIC, TrackLanguage.ARABIC))
+        model.open(vodRequest())
+        runCurrent()
+
+        engines.last.list(TrackSet(audio = listOf(audio("en", "en", selected = true)), subtitle = listOf(subtitle("fr", "fr"))))
+        runCurrent()
+
+        assertTrue(engines.last.selectedTracks.isEmpty())
+    }
+
+    @Test
+    fun `a sound already in the language is left as it is, and nothing is chosen with no preference`() = playerTest {
+        val preferring = model(Preferring(TrackLanguage.ARABIC, null))
+        preferring.open(vodRequest())
+        runCurrent()
+        engines.last.list(TrackSet(audio = listOf(audio("ar", "ar", selected = true), audio("en", "en"))))
+        runCurrent()
+        assertTrue(engines.last.selectedTracks.isEmpty())
+
+        val plain = model()
+        plain.open(vodRequest())
+        runCurrent()
+        engines.last.list(TrackSet(audio = listOf(audio("en", "en", selected = true), audio("ar", "ar"))))
+        runCurrent()
+        assertTrue(engines.last.selectedTracks.isEmpty())
+    }
+
+    @Test
+    fun `a sound the viewer picked by hand is not undone by the preference`() = playerTest {
+        val model = model(Preferring(TrackLanguage.ARABIC, null))
+        model.open(vodRequest())
+        runCurrent()
+        val english = audio("en", "en")
+        model.selectTrack(english)
+
+        // The engine lists its tracks only now, the Arabic among them.
+        engines.last.list(TrackSet(audio = listOf(english.copy(selected = true), audio("ar", "ar"))))
+        runCurrent()
+
+        assertEquals(listOf("en"), engines.last.selectedTracks.map { it.id })
+    }
+
+    @Test
+    fun `the preference is applied again to the next film, once`() = playerTest {
+        val model = model(Preferring(TrackLanguage.FRENCH, null))
+        model.open(vodRequest())
+        runCurrent()
+        val first = engines.last
+        first.list(TrackSet(audio = listOf(audio("en", "en", selected = true), audio("fr", "fre"))))
+        runCurrent()
+        // The engine says again what it carries, the French now playing: nothing more is chosen.
+        first.list(TrackSet(audio = listOf(audio("en", "en"), audio("fr", "fre", selected = true))))
+        runCurrent()
+
+        assertEquals(listOf("fr"), first.selectedTracks.map { it.id })
     }
 }

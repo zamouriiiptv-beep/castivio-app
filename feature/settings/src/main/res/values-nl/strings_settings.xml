@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prefs_title">Instellingen</string>
+    <string name="prefs_back">Terug</string>
+    <string name="prefs_player">Speler</string>
+    <string name="prefs_audio_language">Voorkeurstaal audio</string>
+    <string name="prefs_subtitle_language">Voorkeurstaal ondertitels</string>
+    <string name="prefs_audio_original">Originele audio</string>
+    <string name="prefs_subtitles_none">Geen ondertitels</string>
+    <string name="prefs_audio_detail">Heeft een film of zender audio in deze taal, dan wordt die afgespeeld. Anders blijft de eigen audio.</string>
+    <string name="prefs_subtitle_detail">Heeft een film ondertitels in deze taal, dan worden ze ingeschakeld. Anders blijven ze zoals ze zijn.</string>
+    <string name="prefs_hidden">Verborgen items</string>
+    <string name="prefs_restore_bouquets">Verborgen boeketten terugzetten</string>
+    <string name="prefs_restore_channels">Verborgen zenders terugzetten</string>
+    <string name="prefs_lock">Zendervergrendeling</string>
+    <string name="prefs_change_pin">Vergrendelwachtwoord wijzigen</string>
+    <string name="prefs_application">App</string>
+    <string name="prefs_motion">Beweging</string>
+    <string name="prefs_motion_full">Volledig</string>
+    <string name="prefs_motion_reduced">Beperkt</string>
+    <string name="prefs_motion_none">Geen</string>
+    <string name="prefs_clear_pictures">Afbeeldingscache wissen</string>
+    <string name="prefs_about">Over</string>
+    <string name="prefs_help">Hulp</string>
+    <string name="prefs_support">Hulp en ondersteuning</string>
+    <string name="prefs_privacy">Privacybeleid</string>
+    <string name="prefs_terms">Gebruiksvoorwaarden</string>
+    <string name="prefs_scan">Scan de code met de camera van je telefoon om deze pagina te openen.</string>
+    <string name="prefs_support_detail">Telefoonnummer, openingstijden en veelgestelde vragen staan op de supportpagina.</string>
+    <string name="prefs_on_site">De volledige tekst staat op de website.</string>
+    <string name="prefs_open_browser">Openen in de browser</string>
+</resources>

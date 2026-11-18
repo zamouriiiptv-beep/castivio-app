@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prefs_title">Setări</string>
+    <string name="prefs_back">Înapoi</string>
+    <string name="prefs_player">Player</string>
+    <string name="prefs_audio_language">Limba audio preferată</string>
+    <string name="prefs_subtitle_language">Limba subtitrărilor preferată</string>
+    <string name="prefs_audio_original">Sunet original</string>
+    <string name="prefs_subtitles_none">Fără subtitrări</string>
+    <string name="prefs_audio_detail">Dacă un film sau un canal are sunet în această limbă, este redat în ea. Altfel își păstrează sunetul.</string>
+    <string name="prefs_subtitle_detail">Dacă un film are subtitrări în această limbă, ele sunt activate. Altfel rămân cum sunt.</string>
+    <string name="prefs_hidden">Elemente ascunse</string>
+    <string name="prefs_restore_bouquets">Restabilește pachetele ascunse</string>
+    <string name="prefs_restore_channels">Restabilește canalele ascunse</string>
+    <string name="prefs_lock">Blocarea canalelor</string>
+    <string name="prefs_change_pin">Schimbă parola de blocare</string>
+    <string name="prefs_application">Aplicație</string>
+    <string name="prefs_motion">Animații</string>
+    <string name="prefs_motion_full">Complete</string>
+    <string name="prefs_motion_reduced">Reduse</string>
+    <string name="prefs_motion_none">Fără</string>
+    <string name="prefs_clear_pictures">Golește memoria cache a imaginilor</string>
+    <string name="prefs_about">Despre</string>
+    <string name="prefs_help">Ajutor</string>
+    <string name="prefs_support">Ajutor și asistență</string>
+    <string name="prefs_privacy">Politica de confidențialitate</string>
+    <string name="prefs_terms">Termeni de utilizare</string>
+    <string name="prefs_scan">Scanează codul cu camera telefonului pentru a deschide această pagină.</string>
+    <string name="prefs_support_detail">Telefonul, programul și întrebările frecvente sunt pe pagina de asistență.</string>
+    <string name="prefs_on_site">Textul complet este pe site.</string>
+    <string name="prefs_open_browser">Deschide în browser</string>
+</resources>

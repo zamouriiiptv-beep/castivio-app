@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prefs_title">設定</string>
+    <string name="prefs_back">戻る</string>
+    <string name="prefs_player">プレーヤー</string>
+    <string name="prefs_audio_language">優先する音声の言語</string>
+    <string name="prefs_subtitle_language">優先する字幕の言語</string>
+    <string name="prefs_audio_original">元の音声</string>
+    <string name="prefs_subtitles_none">字幕なし</string>
+    <string name="prefs_audio_detail">映画やチャンネルにこの言語の音声があれば、その音声で再生します。なければ元の音声のままです。</string>
+    <string name="prefs_subtitle_detail">映画にこの言語の字幕があれば、字幕をオンにします。なければそのままです。</string>
+    <string name="prefs_hidden">非表示の項目</string>
+    <string name="prefs_restore_bouquets">非表示のパッケージを戻す</string>
+    <string name="prefs_restore_channels">非表示のチャンネルを戻す</string>
+    <string name="prefs_lock">チャンネルのロック</string>
+    <string name="prefs_change_pin">ロックのパスワードを変更</string>
+    <string name="prefs_application">アプリ</string>
+    <string name="prefs_motion">モーション</string>
+    <string name="prefs_motion_full">フル</string>
+    <string name="prefs_motion_reduced">控えめ</string>
+    <string name="prefs_motion_none">なし</string>
+    <string name="prefs_clear_pictures">画像のキャッシュを消去</string>
+    <string name="prefs_about">アプリについて</string>
+    <string name="prefs_help">ヘルプ</string>
+    <string name="prefs_support">ヘルプとサポート</string>
+    <string name="prefs_privacy">プライバシーポリシー</string>
+    <string name="prefs_terms">利用規約</string>
+    <string name="prefs_scan">スマートフォンのカメラでコードを読み取ると、このページが開きます。</string>
+    <string name="prefs_support_detail">電話番号、受付時間、よくある質問はサポートページにあります。</string>
+    <string name="prefs_on_site">全文はウェブサイトにあります。</string>
+    <string name="prefs_open_browser">ブラウザで開く</string>
+</resources>

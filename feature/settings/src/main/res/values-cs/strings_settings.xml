@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prefs_title">Nastavení</string>
+    <string name="prefs_back">Zpět</string>
+    <string name="prefs_player">Přehrávač</string>
+    <string name="prefs_audio_language">Preferovaný jazyk zvuku</string>
+    <string name="prefs_subtitle_language">Preferovaný jazyk titulků</string>
+    <string name="prefs_audio_original">Původní zvuk</string>
+    <string name="prefs_subtitles_none">Bez titulků</string>
+    <string name="prefs_audio_detail">Má-li film nebo kanál zvuk v tomto jazyce, přehraje se v něm. Jinak zůstane vlastní.</string>
+    <string name="prefs_subtitle_detail">Má-li film titulky v tomto jazyce, zapnou se. Jinak zůstanou, jak jsou.</string>
+    <string name="prefs_hidden">Skryté položky</string>
+    <string name="prefs_restore_bouquets">Obnovit skryté balíčky</string>
+    <string name="prefs_restore_channels">Obnovit skryté kanály</string>
+    <string name="prefs_lock">Zámek kanálů</string>
+    <string name="prefs_change_pin">Změnit heslo zámku</string>
+    <string name="prefs_application">Aplikace</string>
+    <string name="prefs_motion">Pohyb</string>
+    <string name="prefs_motion_full">Plný</string>
+    <string name="prefs_motion_reduced">Omezený</string>
+    <string name="prefs_motion_none">Žádný</string>
+    <string name="prefs_clear_pictures">Vymazat mezipaměť obrázků</string>
+    <string name="prefs_about">O aplikaci</string>
+    <string name="prefs_help">Nápověda</string>
+    <string name="prefs_support">Nápověda a podpora</string>
+    <string name="prefs_privacy">Zásady ochrany soukromí</string>
+    <string name="prefs_terms">Podmínky použití</string>
+    <string name="prefs_scan">Naskenujte kód fotoaparátem telefonu a otevřete tuto stránku.</string>
+    <string name="prefs_support_detail">Telefon, provozní doba a časté dotazy jsou na stránce podpory.</string>
+    <string name="prefs_on_site">Celý text je na webu.</string>
+    <string name="prefs_open_browser">Otevřít v prohlížeči</string>
+</resources>

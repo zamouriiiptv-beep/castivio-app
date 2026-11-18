@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prefs_title">Ayarlar</string>
+    <string name="prefs_back">Geri</string>
+    <string name="prefs_player">Oynatıcı</string>
+    <string name="prefs_audio_language">Tercih edilen ses dili</string>
+    <string name="prefs_subtitle_language">Tercih edilen altyazı dili</string>
+    <string name="prefs_audio_original">Orijinal ses</string>
+    <string name="prefs_subtitles_none">Altyazı yok</string>
+    <string name="prefs_audio_detail">Bir film ya da kanalın bu dilde sesi varsa onunla oynatılır. Yoksa kendi sesi kalır.</string>
+    <string name="prefs_subtitle_detail">Bir filmin bu dilde altyazısı varsa açılır. Yoksa olduğu gibi kalır.</string>
+    <string name="prefs_hidden">Gizli öğeler</string>
+    <string name="prefs_restore_bouquets">Gizli paketleri geri getir</string>
+    <string name="prefs_restore_channels">Gizli kanalları geri getir</string>
+    <string name="prefs_lock">Kanal kilidi</string>
+    <string name="prefs_change_pin">Kilit şifresini değiştir</string>
+    <string name="prefs_application">Uygulama</string>
+    <string name="prefs_motion">Hareket</string>
+    <string name="prefs_motion_full">Tam</string>
+    <string name="prefs_motion_reduced">Azaltılmış</string>
+    <string name="prefs_motion_none">Yok</string>
+    <string name="prefs_clear_pictures">Resim önbelleğini temizle</string>
+    <string name="prefs_about">Hakkında</string>
+    <string name="prefs_help">Yardım</string>
+    <string name="prefs_support">Yardım ve destek</string>
+    <string name="prefs_privacy">Gizlilik politikası</string>
+    <string name="prefs_terms">Kullanım koşulları</string>
+    <string name="prefs_scan">Bu sayfayı açmak için kodu telefonunuzun kamerasıyla tarayın.</string>
+    <string name="prefs_support_detail">Telefon numarası, çalışma saatleri ve sık sorulan sorular destek sayfasında.</string>
+    <string name="prefs_on_site">Metnin tamamı web sitesinde.</string>
+    <string name="prefs_open_browser">Tarayıcıda aç</string>
+</resources>

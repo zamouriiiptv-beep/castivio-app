@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prefs_title">Beállítások</string>
+    <string name="prefs_back">Vissza</string>
+    <string name="prefs_player">Lejátszó</string>
+    <string name="prefs_audio_language">Előnyben részesített hangnyelv</string>
+    <string name="prefs_subtitle_language">Előnyben részesített feliratnyelv</string>
+    <string name="prefs_audio_original">Eredeti hang</string>
+    <string name="prefs_subtitles_none">Nincs felirat</string>
+    <string name="prefs_audio_detail">Ha egy filmnek vagy csatornának van hangja ezen a nyelven, azon szól. Különben marad a sajátja.</string>
+    <string name="prefs_subtitle_detail">Ha egy filmnek van felirata ezen a nyelven, bekapcsol. Különben marad, ahogy van.</string>
+    <string name="prefs_hidden">Elrejtett elemek</string>
+    <string name="prefs_restore_bouquets">Elrejtett csomagok visszaállítása</string>
+    <string name="prefs_restore_channels">Elrejtett csatornák visszaállítása</string>
+    <string name="prefs_lock">Csatornazár</string>
+    <string name="prefs_change_pin">Zárjelszó módosítása</string>
+    <string name="prefs_application">Alkalmazás</string>
+    <string name="prefs_motion">Mozgás</string>
+    <string name="prefs_motion_full">Teljes</string>
+    <string name="prefs_motion_reduced">Csökkentett</string>
+    <string name="prefs_motion_none">Nincs</string>
+    <string name="prefs_clear_pictures">Képgyorsítótár törlése</string>
+    <string name="prefs_about">Névjegy</string>
+    <string name="prefs_help">Súgó</string>
+    <string name="prefs_support">Súgó és támogatás</string>
+    <string name="prefs_privacy">Adatvédelmi irányelvek</string>
+    <string name="prefs_terms">Felhasználási feltételek</string>
+    <string name="prefs_scan">Olvasd be a kódot a telefonod kamerájával az oldal megnyitásához.</string>
+    <string name="prefs_support_detail">A telefonszám, a nyitvatartás és a gyakori kérdések a támogatási oldalon vannak.</string>
+    <string name="prefs_on_site">A teljes szöveg a weboldalon van.</string>
+    <string name="prefs_open_browser">Megnyitás böngészőben</string>
+</resources>

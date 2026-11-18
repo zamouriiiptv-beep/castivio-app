@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prefs_title">Asetukset</string>
+    <string name="prefs_back">Takaisin</string>
+    <string name="prefs_player">Soitin</string>
+    <string name="prefs_audio_language">Ensisijainen äänen kieli</string>
+    <string name="prefs_subtitle_language">Ensisijainen tekstityskieli</string>
+    <string name="prefs_audio_original">Alkuperäinen ääni</string>
+    <string name="prefs_subtitles_none">Ei tekstitystä</string>
+    <string name="prefs_audio_detail">Jos elokuvassa tai kanavalla on ääni tällä kielellä, se toistetaan sillä. Muuten säilyy oma ääni.</string>
+    <string name="prefs_subtitle_detail">Jos elokuvassa on tekstitys tällä kielellä, se otetaan käyttöön. Muuten se pysyy ennallaan.</string>
+    <string name="prefs_hidden">Piilotetut kohteet</string>
+    <string name="prefs_restore_bouquets">Palauta piilotetut paketit</string>
+    <string name="prefs_restore_channels">Palauta piilotetut kanavat</string>
+    <string name="prefs_lock">Kanavalukko</string>
+    <string name="prefs_change_pin">Vaihda lukon salasana</string>
+    <string name="prefs_application">Sovellus</string>
+    <string name="prefs_motion">Liike</string>
+    <string name="prefs_motion_full">Täysi</string>
+    <string name="prefs_motion_reduced">Vähennetty</string>
+    <string name="prefs_motion_none">Ei mitään</string>
+    <string name="prefs_clear_pictures">Tyhjennä kuvavälimuisti</string>
+    <string name="prefs_about">Tietoja</string>
+    <string name="prefs_help">Ohje</string>
+    <string name="prefs_support">Ohje ja tuki</string>
+    <string name="prefs_privacy">Tietosuojakäytäntö</string>
+    <string name="prefs_terms">Käyttöehdot</string>
+    <string name="prefs_scan">Avaa sivu skannaamalla koodi puhelimen kameralla.</string>
+    <string name="prefs_support_detail">Puhelinnumero, aukioloajat ja usein kysytyt kysymykset ovat tukisivulla.</string>
+    <string name="prefs_on_site">Koko teksti on verkkosivustolla.</string>
+    <string name="prefs_open_browser">Avaa selaimessa</string>
+</resources>

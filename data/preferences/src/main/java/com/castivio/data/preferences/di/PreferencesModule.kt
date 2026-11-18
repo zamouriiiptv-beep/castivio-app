@@ -6,12 +6,14 @@ import com.castivio.data.preferences.ChannelQualityStore
 import com.castivio.data.preferences.PinStore
 import com.castivio.data.preferences.ProviderStatusStore
 import com.castivio.data.preferences.SectionCatalogueStore
+import com.castivio.data.preferences.TrackLanguageStore
 import com.castivio.domain.CatchUpBackfillMarks
 import com.castivio.domain.ChannelLocks
 import com.castivio.domain.ChannelQualities
 import com.castivio.domain.PinVault
 import com.castivio.domain.ProviderStatusCatalogue
 import com.castivio.domain.SectionCatalogue
+import com.castivio.domain.TrackLanguagePreferences
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -56,4 +58,9 @@ abstract class PreferencesModule {
     @Binds
     @Singleton
     abstract fun catchUpBackfillMarks(store: CatchUpBackfillStore): CatchUpBackfillMarks
+
+    /** The languages the viewer prefers for sound and subtitles: written by Settings, read by the player. */
+    @Binds
+    @Singleton
+    abstract fun trackLanguages(store: TrackLanguageStore): TrackLanguagePreferences
 }

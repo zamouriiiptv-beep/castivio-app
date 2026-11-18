@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prefs_title">Nastavenia</string>
+    <string name="prefs_back">Späť</string>
+    <string name="prefs_player">Prehrávač</string>
+    <string name="prefs_audio_language">Preferovaný jazyk zvuku</string>
+    <string name="prefs_subtitle_language">Preferovaný jazyk titulkov</string>
+    <string name="prefs_audio_original">Pôvodný zvuk</string>
+    <string name="prefs_subtitles_none">Bez titulkov</string>
+    <string name="prefs_audio_detail">Ak má film alebo kanál zvuk v tomto jazyku, prehrá sa v ňom. Inak zostane vlastný.</string>
+    <string name="prefs_subtitle_detail">Ak má film titulky v tomto jazyku, zapnú sa. Inak zostanú, ako sú.</string>
+    <string name="prefs_hidden">Skryté položky</string>
+    <string name="prefs_restore_bouquets">Obnoviť skryté balíky</string>
+    <string name="prefs_restore_channels">Obnoviť skryté kanály</string>
+    <string name="prefs_lock">Zámok kanálov</string>
+    <string name="prefs_change_pin">Zmeniť heslo zámku</string>
+    <string name="prefs_application">Aplikácia</string>
+    <string name="prefs_motion">Pohyb</string>
+    <string name="prefs_motion_full">Plný</string>
+    <string name="prefs_motion_reduced">Obmedzený</string>
+    <string name="prefs_motion_none">Žiadny</string>
+    <string name="prefs_clear_pictures">Vymazať vyrovnávaciu pamäť obrázkov</string>
+    <string name="prefs_about">O aplikácii</string>
+    <string name="prefs_help">Pomoc</string>
+    <string name="prefs_support">Pomoc a podpora</string>
+    <string name="prefs_privacy">Zásady ochrany súkromia</string>
+    <string name="prefs_terms">Podmienky používania</string>
+    <string name="prefs_scan">Naskenujte kód fotoaparátom telefónu a otvorte túto stránku.</string>
+    <string name="prefs_support_detail">Telefón, otváracie hodiny a časté otázky sú na stránke podpory.</string>
+    <string name="prefs_on_site">Celý text je na webe.</string>
+    <string name="prefs_open_browser">Otvoriť v prehliadači</string>
+</resources>

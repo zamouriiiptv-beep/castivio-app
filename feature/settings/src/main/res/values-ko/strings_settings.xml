@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prefs_title">설정</string>
+    <string name="prefs_back">뒤로</string>
+    <string name="prefs_player">플레이어</string>
+    <string name="prefs_audio_language">선호 오디오 언어</string>
+    <string name="prefs_subtitle_language">선호 자막 언어</string>
+    <string name="prefs_audio_original">원래 소리</string>
+    <string name="prefs_subtitles_none">자막 없음</string>
+    <string name="prefs_audio_detail">영화나 채널에 이 언어의 소리가 있으면 그 언어로 재생합니다. 없으면 원래 소리를 유지합니다.</string>
+    <string name="prefs_subtitle_detail">영화에 이 언어의 자막이 있으면 자막을 켭니다. 없으면 그대로 둡니다.</string>
+    <string name="prefs_hidden">숨긴 항목</string>
+    <string name="prefs_restore_bouquets">숨긴 패키지 복원</string>
+    <string name="prefs_restore_channels">숨긴 채널 복원</string>
+    <string name="prefs_lock">채널 잠금</string>
+    <string name="prefs_change_pin">잠금 비밀번호 변경</string>
+    <string name="prefs_application">앱</string>
+    <string name="prefs_motion">모션</string>
+    <string name="prefs_motion_full">전체</string>
+    <string name="prefs_motion_reduced">줄임</string>
+    <string name="prefs_motion_none">없음</string>
+    <string name="prefs_clear_pictures">이미지 캐시 지우기</string>
+    <string name="prefs_about">정보</string>
+    <string name="prefs_help">도움말</string>
+    <string name="prefs_support">도움말 및 지원</string>
+    <string name="prefs_privacy">개인정보처리방침</string>
+    <string name="prefs_terms">이용약관</string>
+    <string name="prefs_scan">휴대전화 카메라로 코드를 스캔하면 이 페이지가 열립니다.</string>
+    <string name="prefs_support_detail">전화번호, 운영 시간, 자주 묻는 질문은 지원 페이지에 있습니다.</string>
+    <string name="prefs_on_site">전체 내용은 웹사이트에 있습니다.</string>
+    <string name="prefs_open_browser">브라우저에서 열기</string>
+</resources>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prefs_title">Configurações</string>
+    <string name="prefs_back">Voltar</string>
+    <string name="prefs_player">Player</string>
+    <string name="prefs_audio_language">Idioma de áudio preferido</string>
+    <string name="prefs_subtitle_language">Idioma de legendas preferido</string>
+    <string name="prefs_audio_original">Som original</string>
+    <string name="prefs_subtitles_none">Sem legendas</string>
+    <string name="prefs_audio_detail">Se um filme ou canal tiver som neste idioma, ele é reproduzido nele. Caso contrário, mantém o seu.</string>
+    <string name="prefs_subtitle_detail">Se um filme tiver legendas neste idioma, elas são ativadas. Caso contrário, ficam como estão.</string>
+    <string name="prefs_hidden">Itens ocultos</string>
+    <string name="prefs_restore_bouquets">Restaurar pacotes ocultos</string>
+    <string name="prefs_restore_channels">Restaurar canais ocultos</string>
+    <string name="prefs_lock">Bloqueio de canais</string>
+    <string name="prefs_change_pin">Alterar a senha do bloqueio</string>
+    <string name="prefs_application">Aplicativo</string>
+    <string name="prefs_motion">Movimento</string>
+    <string name="prefs_motion_full">Completo</string>
+    <string name="prefs_motion_reduced">Reduzido</string>
+    <string name="prefs_motion_none">Nenhum</string>
+    <string name="prefs_clear_pictures">Limpar o cache de imagens</string>
+    <string name="prefs_about">Sobre</string>
+    <string name="prefs_help">Ajuda</string>
+    <string name="prefs_support">Ajuda e suporte</string>
+    <string name="prefs_privacy">Política de privacidade</string>
+    <string name="prefs_terms">Termos de uso</string>
+    <string name="prefs_scan">Escaneie o código com a câmera do seu celular para abrir esta página.</string>
+    <string name="prefs_support_detail">Telefone, horário de atendimento e perguntas frequentes estão na página de suporte.</string>
+    <string name="prefs_on_site">O texto completo está no site.</string>
+    <string name="prefs_open_browser">Abrir no navegador</string>
+</resources>

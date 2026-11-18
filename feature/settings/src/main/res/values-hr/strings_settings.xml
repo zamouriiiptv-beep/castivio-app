@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prefs_title">Postavke</string>
+    <string name="prefs_back">Natrag</string>
+    <string name="prefs_player">Reproduktor</string>
+    <string name="prefs_audio_language">Željeni jezik zvuka</string>
+    <string name="prefs_subtitle_language">Željeni jezik titlova</string>
+    <string name="prefs_audio_original">Izvorni zvuk</string>
+    <string name="prefs_subtitles_none">Bez titlova</string>
+    <string name="prefs_audio_detail">Ako film ili kanal ima zvuk na ovom jeziku, reproducira se na njemu. Inače ostaje vlastiti.</string>
+    <string name="prefs_subtitle_detail">Ako film ima titlove na ovom jeziku, uključuju se. Inače ostaju kakvi jesu.</string>
+    <string name="prefs_hidden">Skrivene stavke</string>
+    <string name="prefs_restore_bouquets">Vrati skrivene pakete</string>
+    <string name="prefs_restore_channels">Vrati skrivene kanale</string>
+    <string name="prefs_lock">Zaključavanje kanala</string>
+    <string name="prefs_change_pin">Promijeni lozinku zaključavanja</string>
+    <string name="prefs_application">Aplikacija</string>
+    <string name="prefs_motion">Pokret</string>
+    <string name="prefs_motion_full">Puni</string>
+    <string name="prefs_motion_reduced">Smanjeni</string>
+    <string name="prefs_motion_none">Bez</string>
+    <string name="prefs_clear_pictures">Očisti predmemoriju slika</string>
+    <string name="prefs_about">O aplikaciji</string>
+    <string name="prefs_help">Pomoć</string>
+    <string name="prefs_support">Pomoć i podrška</string>
+    <string name="prefs_privacy">Pravila o privatnosti</string>
+    <string name="prefs_terms">Uvjeti korištenja</string>
+    <string name="prefs_scan">Skenirajte kôd kamerom telefona da biste otvorili ovu stranicu.</string>
+    <string name="prefs_support_detail">Broj telefona, radno vrijeme i česta pitanja nalaze se na stranici podrške.</string>
+    <string name="prefs_on_site">Cijeli tekst nalazi se na web-mjestu.</string>
+    <string name="prefs_open_browser">Otvori u pregledniku</string>
+</resources>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prefs_title">Cài đặt</string>
+    <string name="prefs_back">Quay lại</string>
+    <string name="prefs_player">Trình phát</string>
+    <string name="prefs_audio_language">Ngôn ngữ âm thanh ưu tiên</string>
+    <string name="prefs_subtitle_language">Ngôn ngữ phụ đề ưu tiên</string>
+    <string name="prefs_audio_original">Âm thanh gốc</string>
+    <string name="prefs_subtitles_none">Không có phụ đề</string>
+    <string name="prefs_audio_detail">Nếu phim hoặc kênh có âm thanh bằng ngôn ngữ này, nó sẽ phát bằng ngôn ngữ đó. Nếu không, giữ âm thanh gốc.</string>
+    <string name="prefs_subtitle_detail">Nếu phim có phụ đề bằng ngôn ngữ này, phụ đề sẽ được bật. Nếu không, giữ nguyên.</string>
+    <string name="prefs_hidden">Mục đã ẩn</string>
+    <string name="prefs_restore_bouquets">Khôi phục gói đã ẩn</string>
+    <string name="prefs_restore_channels">Khôi phục kênh đã ẩn</string>
+    <string name="prefs_lock">Khóa kênh</string>
+    <string name="prefs_change_pin">Đổi mật khẩu khóa</string>
+    <string name="prefs_application">Ứng dụng</string>
+    <string name="prefs_motion">Chuyển động</string>
+    <string name="prefs_motion_full">Đầy đủ</string>
+    <string name="prefs_motion_reduced">Giảm bớt</string>
+    <string name="prefs_motion_none">Không</string>
+    <string name="prefs_clear_pictures">Xóa bộ nhớ đệm hình ảnh</string>
+    <string name="prefs_about">Giới thiệu</string>
+    <string name="prefs_help">Trợ giúp</string>
+    <string name="prefs_support">Trợ giúp và hỗ trợ</string>
+    <string name="prefs_privacy">Chính sách quyền riêng tư</string>
+    <string name="prefs_terms">Điều khoản sử dụng</string>
+    <string name="prefs_scan">Quét mã bằng camera điện thoại để mở trang này.</string>
+    <string name="prefs_support_detail">Số điện thoại, giờ làm việc và câu hỏi thường gặp có trên trang hỗ trợ.</string>
+    <string name="prefs_on_site">Toàn văn có trên trang web.</string>
+    <string name="prefs_open_browser">Mở trong trình duyệt</string>
+</resources>

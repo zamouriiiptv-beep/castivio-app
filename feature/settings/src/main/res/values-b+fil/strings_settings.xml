@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prefs_title">Mga Setting</string>
+    <string name="prefs_back">Bumalik</string>
+    <string name="prefs_player">Player</string>
+    <string name="prefs_audio_language">Gustong wika ng audio</string>
+    <string name="prefs_subtitle_language">Gustong wika ng subtitle</string>
+    <string name="prefs_audio_original">Orihinal na tunog</string>
+    <string name="prefs_subtitles_none">Walang subtitle</string>
+    <string name="prefs_audio_detail">Kung may tunog sa wikang ito ang pelikula o channel, ito ang patutugtugin. Kung wala, mananatili ang sarili nitong tunog.</string>
+    <string name="prefs_subtitle_detail">Kung may subtitle sa wikang ito ang pelikula, bubuksan ito. Kung wala, mananatili ito gaya ng dati.</string>
+    <string name="prefs_hidden">Mga nakatagong item</string>
+    <string name="prefs_restore_bouquets">Ibalik ang mga nakatagong bouquet</string>
+    <string name="prefs_restore_channels">Ibalik ang mga nakatagong channel</string>
+    <string name="prefs_lock">Lock ng channel</string>
+    <string name="prefs_change_pin">Palitan ang password ng lock</string>
+    <string name="prefs_application">App</string>
+    <string name="prefs_motion">Galaw</string>
+    <string name="prefs_motion_full">Buo</string>
+    <string name="prefs_motion_reduced">Binawasan</string>
+    <string name="prefs_motion_none">Wala</string>
+    <string name="prefs_clear_pictures">I-clear ang cache ng larawan</string>
+    <string name="prefs_about">Tungkol dito</string>
+    <string name="prefs_help">Tulong</string>
+    <string name="prefs_support">Tulong at suporta</string>
+    <string name="prefs_privacy">Patakaran sa privacy</string>
+    <string name="prefs_terms">Mga tuntunin ng paggamit</string>
+    <string name="prefs_scan">I-scan ang code gamit ang camera ng iyong telepono para buksan ang pahinang ito.</string>
+    <string name="prefs_support_detail">Nasa pahina ng suporta ang numero ng telepono, oras, at mga karaniwang tanong.</string>
+    <string name="prefs_on_site">Nasa website ang buong teksto.</string>
+    <string name="prefs_open_browser">Buksan sa browser</string>
+</resources>

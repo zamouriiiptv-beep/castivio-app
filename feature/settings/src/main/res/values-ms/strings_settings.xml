@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prefs_title">Tetapan</string>
+    <string name="prefs_back">Kembali</string>
+    <string name="prefs_player">Pemain</string>
+    <string name="prefs_audio_language">Bahasa audio pilihan</string>
+    <string name="prefs_subtitle_language">Bahasa sari kata pilihan</string>
+    <string name="prefs_audio_original">Bunyi asal</string>
+    <string name="prefs_subtitles_none">Tiada sari kata</string>
+    <string name="prefs_audio_detail">Jika filem atau saluran mempunyai bunyi dalam bahasa ini, ia dimainkan dalam bahasa itu. Jika tidak, bunyinya sendiri kekal.</string>
+    <string name="prefs_subtitle_detail">Jika filem mempunyai sari kata dalam bahasa ini, ia dihidupkan. Jika tidak, ia kekal seperti asal.</string>
+    <string name="prefs_hidden">Item tersembunyi</string>
+    <string name="prefs_restore_bouquets">Pulihkan pakej tersembunyi</string>
+    <string name="prefs_restore_channels">Pulihkan saluran tersembunyi</string>
+    <string name="prefs_lock">Kunci saluran</string>
+    <string name="prefs_change_pin">Tukar kata laluan kunci</string>
+    <string name="prefs_application">Aplikasi</string>
+    <string name="prefs_motion">Gerakan</string>
+    <string name="prefs_motion_full">Penuh</string>
+    <string name="prefs_motion_reduced">Dikurangkan</string>
+    <string name="prefs_motion_none">Tiada</string>
+    <string name="prefs_clear_pictures">Kosongkan cache gambar</string>
+    <string name="prefs_about">Perihal</string>
+    <string name="prefs_help">Bantuan</string>
+    <string name="prefs_support">Bantuan dan sokongan</string>
+    <string name="prefs_privacy">Dasar privasi</string>
+    <string name="prefs_terms">Terma penggunaan</string>
+    <string name="prefs_scan">Imbas kod dengan kamera telefon anda untuk membuka halaman ini.</string>
+    <string name="prefs_support_detail">Nombor telefon, waktu operasi dan soalan lazim ada di halaman sokongan.</string>
+    <string name="prefs_on_site">Teks penuh ada di laman web.</string>
+    <string name="prefs_open_browser">Buka dalam pelayar</string>
+</resources>

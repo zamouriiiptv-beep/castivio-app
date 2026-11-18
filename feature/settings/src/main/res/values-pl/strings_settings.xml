@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prefs_title">Ustawienia</string>
+    <string name="prefs_back">Wstecz</string>
+    <string name="prefs_player">Odtwarzacz</string>
+    <string name="prefs_audio_language">Preferowany język dźwięku</string>
+    <string name="prefs_subtitle_language">Preferowany język napisów</string>
+    <string name="prefs_audio_original">Oryginalny dźwięk</string>
+    <string name="prefs_subtitles_none">Bez napisów</string>
+    <string name="prefs_audio_detail">Jeśli film lub kanał ma dźwięk w tym języku, jest w nim odtwarzany. W przeciwnym razie zostaje własny.</string>
+    <string name="prefs_subtitle_detail">Jeśli film ma napisy w tym języku, zostaną włączone. W przeciwnym razie pozostaną bez zmian.</string>
+    <string name="prefs_hidden">Ukryte elementy</string>
+    <string name="prefs_restore_bouquets">Przywróć ukryte pakiety</string>
+    <string name="prefs_restore_channels">Przywróć ukryte kanały</string>
+    <string name="prefs_lock">Blokada kanałów</string>
+    <string name="prefs_change_pin">Zmień hasło blokady</string>
+    <string name="prefs_application">Aplikacja</string>
+    <string name="prefs_motion">Ruch</string>
+    <string name="prefs_motion_full">Pełny</string>
+    <string name="prefs_motion_reduced">Ograniczony</string>
+    <string name="prefs_motion_none">Brak</string>
+    <string name="prefs_clear_pictures">Wyczyść pamięć podręczną obrazów</string>
+    <string name="prefs_about">Informacje</string>
+    <string name="prefs_help">Pomoc</string>
+    <string name="prefs_support">Pomoc i wsparcie</string>
+    <string name="prefs_privacy">Polityka prywatności</string>
+    <string name="prefs_terms">Warunki korzystania</string>
+    <string name="prefs_scan">Zeskanuj kod aparatem telefonu, aby otworzyć tę stronę.</string>
+    <string name="prefs_support_detail">Numer telefonu, godziny pracy i częste pytania są na stronie wsparcia.</string>
+    <string name="prefs_on_site">Pełny tekst jest na stronie internetowej.</string>
+    <string name="prefs_open_browser">Otwórz w przeglądarce</string>
+</resources>

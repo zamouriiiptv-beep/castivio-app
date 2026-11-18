@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prefs_title">Indstillinger</string>
+    <string name="prefs_back">Tilbage</string>
+    <string name="prefs_player">Afspiller</string>
+    <string name="prefs_audio_language">Foretrukket lydsprog</string>
+    <string name="prefs_subtitle_language">Foretrukket undertekstsprog</string>
+    <string name="prefs_audio_original">Originallyd</string>
+    <string name="prefs_subtitles_none">Ingen undertekster</string>
+    <string name="prefs_audio_detail">Har en film eller kanal lyd på dette sprog, afspilles den på det. Ellers beholder den sin egen.</string>
+    <string name="prefs_subtitle_detail">Har en film undertekster på dette sprog, slås de til. Ellers forbliver de, som de er.</string>
+    <string name="prefs_hidden">Skjulte elementer</string>
+    <string name="prefs_restore_bouquets">Gendan skjulte pakker</string>
+    <string name="prefs_restore_channels">Gendan skjulte kanaler</string>
+    <string name="prefs_lock">Kanallås</string>
+    <string name="prefs_change_pin">Skift låsens adgangskode</string>
+    <string name="prefs_application">App</string>
+    <string name="prefs_motion">Bevægelse</string>
+    <string name="prefs_motion_full">Fuld</string>
+    <string name="prefs_motion_reduced">Reduceret</string>
+    <string name="prefs_motion_none">Ingen</string>
+    <string name="prefs_clear_pictures">Ryd billedcache</string>
+    <string name="prefs_about">Om</string>
+    <string name="prefs_help">Hjælp</string>
+    <string name="prefs_support">Hjælp og support</string>
+    <string name="prefs_privacy">Privatlivspolitik</string>
+    <string name="prefs_terms">Brugsvilkår</string>
+    <string name="prefs_scan">Scan koden med telefonens kamera for at åbne denne side.</string>
+    <string name="prefs_support_detail">Telefonnummer, åbningstider og ofte stillede spørgsmål står på supportsiden.</string>
+    <string name="prefs_on_site">Hele teksten står på hjemmesiden.</string>
+    <string name="prefs_open_browser">Åbn i browseren</string>
+</resources>

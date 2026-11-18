@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prefs_title">সেটিংস</string>
+    <string name="prefs_back">ফিরে যান</string>
+    <string name="prefs_player">প্লেয়ার</string>
+    <string name="prefs_audio_language">পছন্দের অডিও ভাষা</string>
+    <string name="prefs_subtitle_language">পছন্দের সাবটাইটেল ভাষা</string>
+    <string name="prefs_audio_original">মূল শব্দ</string>
+    <string name="prefs_subtitles_none">সাবটাইটেল নেই</string>
+    <string name="prefs_audio_detail">সিনেমা বা চ্যানেলে এই ভাষার শব্দ থাকলে সেটিতেই চলবে। না থাকলে নিজের শব্দই থাকবে।</string>
+    <string name="prefs_subtitle_detail">সিনেমায় এই ভাষার সাবটাইটেল থাকলে তা চালু হবে। না থাকলে যেমন আছে তেমনই থাকবে।</string>
+    <string name="prefs_hidden">লুকানো আইটেম</string>
+    <string name="prefs_restore_bouquets">লুকানো প্যাকেজ ফিরিয়ে আনুন</string>
+    <string name="prefs_restore_channels">লুকানো চ্যানেল ফিরিয়ে আনুন</string>
+    <string name="prefs_lock">চ্যানেল লক</string>
+    <string name="prefs_change_pin">লকের পাসওয়ার্ড বদলান</string>
+    <string name="prefs_application">অ্যাপ</string>
+    <string name="prefs_motion">গতি</string>
+    <string name="prefs_motion_full">পূর্ণ</string>
+    <string name="prefs_motion_reduced">কম</string>
+    <string name="prefs_motion_none">নেই</string>
+    <string name="prefs_clear_pictures">ছবির ক্যাশ মুছুন</string>
+    <string name="prefs_about">অ্যাপ সম্পর্কে</string>
+    <string name="prefs_help">সাহায্য</string>
+    <string name="prefs_support">সাহায্য ও সহায়তা</string>
+    <string name="prefs_privacy">গোপনীয়তা নীতি</string>
+    <string name="prefs_terms">ব্যবহারের শর্তাবলি</string>
+    <string name="prefs_scan">এই পাতা খুলতে ফোনের ক্যামেরা দিয়ে কোডটি স্ক্যান করুন।</string>
+    <string name="prefs_support_detail">ফোন নম্বর, কাজের সময় ও সাধারণ প্রশ্ন সহায়তা পাতায় আছে।</string>
+    <string name="prefs_on_site">পূর্ণ লেখাটি ওয়েবসাইটে আছে।</string>
+    <string name="prefs_open_browser">ব্রাউজারে খুলুন</string>
+</resources>

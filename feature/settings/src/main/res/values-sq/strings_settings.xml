@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prefs_title">Cilësimet</string>
+    <string name="prefs_back">Kthehu</string>
+    <string name="prefs_player">Luajtësi</string>
+    <string name="prefs_audio_language">Gjuha e preferuar e zërit</string>
+    <string name="prefs_subtitle_language">Gjuha e preferuar e titrave</string>
+    <string name="prefs_audio_original">Zëri origjinal</string>
+    <string name="prefs_subtitles_none">Pa titra</string>
+    <string name="prefs_audio_detail">Nëse një film ose kanal ka zë në këtë gjuhë, luhet në të. Përndryshe mban të vetin.</string>
+    <string name="prefs_subtitle_detail">Nëse një film ka titra në këtë gjuhë, ato aktivizohen. Përndryshe mbeten siç janë.</string>
+    <string name="prefs_hidden">Elementet e fshehura</string>
+    <string name="prefs_restore_bouquets">Rikthe paketat e fshehura</string>
+    <string name="prefs_restore_channels">Rikthe kanalet e fshehura</string>
+    <string name="prefs_lock">Kyçja e kanaleve</string>
+    <string name="prefs_change_pin">Ndrysho fjalëkalimin e kyçjes</string>
+    <string name="prefs_application">Aplikacioni</string>
+    <string name="prefs_motion">Lëvizja</string>
+    <string name="prefs_motion_full">E plotë</string>
+    <string name="prefs_motion_reduced">E pakësuar</string>
+    <string name="prefs_motion_none">Asnjë</string>
+    <string name="prefs_clear_pictures">Pastro memorien e figurave</string>
+    <string name="prefs_about">Rreth</string>
+    <string name="prefs_help">Ndihmë</string>
+    <string name="prefs_support">Ndihmë dhe mbështetje</string>
+    <string name="prefs_privacy">Politika e privatësisë</string>
+    <string name="prefs_terms">Kushtet e përdorimit</string>
+    <string name="prefs_scan">Skano kodin me kamerën e telefonit për të hapur këtë faqe.</string>
+    <string name="prefs_support_detail">Numri i telefonit, orari dhe pyetjet e shpeshta janë në faqen e mbështetjes.</string>
+    <string name="prefs_on_site">Teksti i plotë është në faqen e internetit.</string>
+    <string name="prefs_open_browser">Hape në shfletues</string>
+</resources>

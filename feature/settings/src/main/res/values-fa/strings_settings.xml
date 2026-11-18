@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prefs_title">تنظیمات</string>
+    <string name="prefs_back">بازگشت</string>
+    <string name="prefs_player">پخش‌کننده</string>
+    <string name="prefs_audio_language">زبان صدای ترجیحی</string>
+    <string name="prefs_subtitle_language">زبان زیرنویس ترجیحی</string>
+    <string name="prefs_audio_original">صدای اصلی</string>
+    <string name="prefs_subtitles_none">بدون زیرنویس</string>
+    <string name="prefs_audio_detail">اگر فیلم یا کانال صدایی به این زبان داشته باشد، با آن پخش می‌شود. وگرنه صدای خودش می‌ماند.</string>
+    <string name="prefs_subtitle_detail">اگر فیلم زیرنویسی به این زبان داشته باشد، روشن می‌شود. وگرنه همان‌طور که هست می‌ماند.</string>
+    <string name="prefs_hidden">موارد پنهان</string>
+    <string name="prefs_restore_bouquets">بازگرداندن بسته‌های پنهان</string>
+    <string name="prefs_restore_channels">بازگرداندن کانال‌های پنهان</string>
+    <string name="prefs_lock">قفل کانال‌ها</string>
+    <string name="prefs_change_pin">تغییر رمز قفل</string>
+    <string name="prefs_application">برنامه</string>
+    <string name="prefs_motion">حرکت</string>
+    <string name="prefs_motion_full">کامل</string>
+    <string name="prefs_motion_reduced">کاهش‌یافته</string>
+    <string name="prefs_motion_none">هیچ</string>
+    <string name="prefs_clear_pictures">پاک کردن حافظهٔ موقت تصاویر</string>
+    <string name="prefs_about">دربارهٔ برنامه</string>
+    <string name="prefs_help">راهنما</string>
+    <string name="prefs_support">راهنما و پشتیبانی</string>
+    <string name="prefs_privacy">سیاست حریم خصوصی</string>
+    <string name="prefs_terms">شرایط استفاده</string>
+    <string name="prefs_scan">برای باز کردن این صفحه، کد را با دوربین تلفن خود اسکن کنید.</string>
+    <string name="prefs_support_detail">شمارهٔ تلفن، ساعات کاری و پرسش‌های رایج در صفحهٔ پشتیبانی است.</string>
+    <string name="prefs_on_site">متن کامل در وب‌سایت است.</string>
+    <string name="prefs_open_browser">باز کردن در مرورگر</string>
+</resources>

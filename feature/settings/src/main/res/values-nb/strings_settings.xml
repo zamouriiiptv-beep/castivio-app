@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prefs_title">Innstillinger</string>
+    <string name="prefs_back">Tilbake</string>
+    <string name="prefs_player">Avspiller</string>
+    <string name="prefs_audio_language">Foretrukket lydspråk</string>
+    <string name="prefs_subtitle_language">Foretrukket teksting</string>
+    <string name="prefs_audio_original">Originallyd</string>
+    <string name="prefs_subtitles_none">Ingen teksting</string>
+    <string name="prefs_audio_detail">Har en film eller kanal lyd på dette språket, spilles den av på det. Ellers beholder den sin egen.</string>
+    <string name="prefs_subtitle_detail">Har en film teksting på dette språket, slås den på. Ellers forblir den som den er.</string>
+    <string name="prefs_hidden">Skjulte elementer</string>
+    <string name="prefs_restore_bouquets">Gjenopprett skjulte pakker</string>
+    <string name="prefs_restore_channels">Gjenopprett skjulte kanaler</string>
+    <string name="prefs_lock">Kanallås</string>
+    <string name="prefs_change_pin">Endre låsepassordet</string>
+    <string name="prefs_application">App</string>
+    <string name="prefs_motion">Bevegelse</string>
+    <string name="prefs_motion_full">Full</string>
+    <string name="prefs_motion_reduced">Redusert</string>
+    <string name="prefs_motion_none">Ingen</string>
+    <string name="prefs_clear_pictures">Tøm bildebufferen</string>
+    <string name="prefs_about">Om</string>
+    <string name="prefs_help">Hjelp</string>
+    <string name="prefs_support">Hjelp og støtte</string>
+    <string name="prefs_privacy">Personvernerklæring</string>
+    <string name="prefs_terms">Bruksvilkår</string>
+    <string name="prefs_scan">Skann koden med kameraet på telefonen for å åpne denne siden.</string>
+    <string name="prefs_support_detail">Telefonnummer, åpningstider og vanlige spørsmål står på støttesiden.</string>
+    <string name="prefs_on_site">Hele teksten står på nettstedet.</string>
+    <string name="prefs_open_browser">Åpne i nettleseren</string>
+</resources>

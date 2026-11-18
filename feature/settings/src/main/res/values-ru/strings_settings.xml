@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prefs_title">Настройки</string>
+    <string name="prefs_back">Назад</string>
+    <string name="prefs_player">Плеер</string>
+    <string name="prefs_audio_language">Предпочитаемый язык звука</string>
+    <string name="prefs_subtitle_language">Предпочитаемый язык субтитров</string>
+    <string name="prefs_audio_original">Оригинальный звук</string>
+    <string name="prefs_subtitles_none">Без субтитров</string>
+    <string name="prefs_audio_detail">Если у фильма или канала есть звук на этом языке, он воспроизводится на нём. Иначе остаётся свой.</string>
+    <string name="prefs_subtitle_detail">Если у фильма есть субтитры на этом языке, они включаются. Иначе остаются как есть.</string>
+    <string name="prefs_hidden">Скрытое</string>
+    <string name="prefs_restore_bouquets">Вернуть скрытые пакеты</string>
+    <string name="prefs_restore_channels">Вернуть скрытые каналы</string>
+    <string name="prefs_lock">Блокировка каналов</string>
+    <string name="prefs_change_pin">Сменить пароль блокировки</string>
+    <string name="prefs_application">Приложение</string>
+    <string name="prefs_motion">Анимация</string>
+    <string name="prefs_motion_full">Полная</string>
+    <string name="prefs_motion_reduced">Уменьшенная</string>
+    <string name="prefs_motion_none">Нет</string>
+    <string name="prefs_clear_pictures">Очистить кэш изображений</string>
+    <string name="prefs_about">О приложении</string>
+    <string name="prefs_help">Помощь</string>
+    <string name="prefs_support">Помощь и поддержка</string>
+    <string name="prefs_privacy">Политика конфиденциальности</string>
+    <string name="prefs_terms">Условия использования</string>
+    <string name="prefs_scan">Отсканируйте код камерой телефона, чтобы открыть эту страницу.</string>
+    <string name="prefs_support_detail">Телефон, часы работы и частые вопросы — на странице поддержки.</string>
+    <string name="prefs_on_site">Полный текст — на сайте.</string>
+    <string name="prefs_open_browser">Открыть в браузере</string>
+</resources>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prefs_title">Inställningar</string>
+    <string name="prefs_back">Tillbaka</string>
+    <string name="prefs_player">Spelare</string>
+    <string name="prefs_audio_language">Föredraget ljudspråk</string>
+    <string name="prefs_subtitle_language">Föredraget undertextspråk</string>
+    <string name="prefs_audio_original">Originalljud</string>
+    <string name="prefs_subtitles_none">Inga undertexter</string>
+    <string name="prefs_audio_detail">Har en film eller kanal ljud på det här språket spelas den på det. Annars behåller den sitt eget.</string>
+    <string name="prefs_subtitle_detail">Har en film undertexter på det här språket slås de på. Annars förblir de som de är.</string>
+    <string name="prefs_hidden">Dolda objekt</string>
+    <string name="prefs_restore_bouquets">Återställ dolda paket</string>
+    <string name="prefs_restore_channels">Återställ dolda kanaler</string>
+    <string name="prefs_lock">Kanallås</string>
+    <string name="prefs_change_pin">Byt låsets lösenord</string>
+    <string name="prefs_application">App</string>
+    <string name="prefs_motion">Rörelse</string>
+    <string name="prefs_motion_full">Full</string>
+    <string name="prefs_motion_reduced">Reducerad</string>
+    <string name="prefs_motion_none">Ingen</string>
+    <string name="prefs_clear_pictures">Rensa bildcachen</string>
+    <string name="prefs_about">Om</string>
+    <string name="prefs_help">Hjälp</string>
+    <string name="prefs_support">Hjälp och support</string>
+    <string name="prefs_privacy">Integritetspolicy</string>
+    <string name="prefs_terms">Användarvillkor</string>
+    <string name="prefs_scan">Skanna koden med telefonens kamera för att öppna sidan.</string>
+    <string name="prefs_support_detail">Telefonnummer, öppettider och vanliga frågor finns på supportsidan.</string>
+    <string name="prefs_on_site">Hela texten finns på webbplatsen.</string>
+    <string name="prefs_open_browser">Öppna i webbläsaren</string>
+</resources>

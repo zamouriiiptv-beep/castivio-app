@@ -21,15 +21,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.LiveTv
 import androidx.compose.material.icons.filled.Movie
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Radio
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Tv
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VideoLibrary
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -64,6 +60,8 @@ import com.castivio.core.design.theme.CastivioMetrics
 import com.castivio.core.design.theme.CastivioTheme
 import com.castivio.core.design.theme.CastivioType
 import com.castivio.core.design.theme.MotionLevel
+import com.castivio.feature.settings.DeveloperRow
+import com.castivio.feature.settings.SettingsScreen
 import com.castivio.core.design.theme.Radius
 import com.castivio.core.design.theme.Spacing
 import com.castivio.core.design.theme.castivioBackdrop
@@ -114,7 +112,6 @@ import com.castivio.feature.home.SeriesScreen
 import com.castivio.feature.home.ShowScreen
 import com.castivio.feature.home.asSelection
 import com.castivio.feature.home.watchedChannel
-import com.castivio.feature.licence.R as LicenceStrings
 import com.castivio.feature.player.ChannelListContent
 import com.castivio.feature.player.OpeningFace
 import com.castivio.feature.player.PlayerMode
@@ -774,18 +771,33 @@ fun ShellScreen(
                     Dest.Favourites -> FavouritesScreen()
                     Dest.Library -> LibraryScreen(onOpenSection = { dest = it })
                     Dest.Search -> CatalogSearchScreen(onPlay = play, restrictTo = searchKind)
+                    // Settings (design/mockups/settings-ar.html): what the shell owns -- the motion level, the hidden items,
+                    // the lock's password, the licence -- goes in; the languages, the pictures' cache and the help pages are
+                    // the feature's own. The developer's doors are this build's alone.
                     Dest.Settings -> SettingsScreen(
-                        motionLevel = motionLevel,
-                        onMotionLevel = onMotionLevel,
-                        dark = dark,
-                        onDark = onDark,
-                        onShowStateBoard = { overlay = Overlay.StateBoard },
-                        onShowLicence = { overlay = Overlay.Licence },
-                        onChangePin = { asking = ShellPin(PinPurpose.Change) {} },
+                        motion = motionLevel,
+                        onMotion = onMotionLevel,
                         hiddenBouquets = hiddenBouquets,
                         hiddenChannels = hiddenChannels,
                         onRestoreBouquets = { hidingModel.restore(HiddenKind.BOUQUET) },
                         onRestoreChannels = { hidingModel.restore(HiddenKind.CHANNEL) },
+                        onChangePin = { asking = ShellPin(PinPurpose.Change) {} },
+                        onAbout = { overlay = Overlay.Licence },
+                        version = BuildConfig.VERSION_NAME,
+                        onBack = { dest = Dest.Home },
+                        developerTitle = if (BuildConfig.DEBUG) {
+                            stringResource(R.string.settings_design)
+                        } else {
+                            null
+                        },
+                        developer = if (BuildConfig.DEBUG) {
+                            listOf(
+                                DeveloperRow(stringResource(R.string.settings_state_board), onClick = { overlay = Overlay.StateBoard }),
+                                DeveloperRow(stringResource(R.string.settings_device_class), value = CastivioTheme.device.name),
+                            )
+                        } else {
+                            emptyList()
+                        },
                     )
                 }
             }
@@ -1069,198 +1081,6 @@ private fun LibraryScreen(onOpenSection: (Dest) -> Unit) {
     }
 }
 
-// ------------------------------------------------------------------ settings
-
-@Composable
-private fun SettingsScreen(
-    motionLevel: MotionLevel,
-    onMotionLevel: (MotionLevel) -> Unit,
-    dark: Boolean,
-    onDark: (Boolean) -> Unit,
-    onShowStateBoard: () -> Unit,
-    onShowLicence: () -> Unit,
-    onChangePin: () -> Unit,
-    /** How many bouquets and channels the viewer has hidden from the channel board, and the way to bring them back. */
-    hiddenBouquets: Int,
-    hiddenChannels: Int,
-    onRestoreBouquets: () -> Unit,
-    onRestoreChannels: () -> Unit,
-) {
-    val colors = CastivioTheme.colors
-    PlaceholderStage { frame ->
-    Column(
-        Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(frame.edge),
-        verticalArrangement = Arrangement.spacedBy(frame.bandTop),
-    ) {
-        SectionHeader(title = stringResource(R.string.settings_title))
-
-        // Two chips and nothing else: the same control the motion level takes, so a
-        // reader meets one pattern rather than a switch here and chips there.
-        Text(
-            stringResource(R.string.settings_appearance),
-            style = CastivioType.titleMedium,
-            color = colors.onBackground,
-        )
-        Text(
-            stringResource(R.string.settings_appearance_detail),
-            style = CastivioType.bodySmall,
-            color = colors.onBackgroundMuted,
-        )
-        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-            CategoryChipPlain(
-                label = stringResource(R.string.settings_ground_deep),
-                selected = dark,
-                onClick = { onDark(true) },
-            )
-            CategoryChipPlain(
-                label = stringResource(R.string.settings_ground_slate),
-                selected = !dark,
-                onClick = { onDark(false) },
-            )
-        }
-
-        Text(
-            stringResource(R.string.settings_motion),
-            style = CastivioType.titleMedium,
-            color = colors.onBackground,
-        )
-        Text(
-            stringResource(R.string.settings_motion_detail),
-            style = CastivioType.bodySmall,
-            color = colors.onBackgroundMuted,
-        )
-        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-            MotionLevel.entries.forEach { level ->
-                CategoryChipPlain(
-                    label = stringResource(level.label),
-                    selected = level == motionLevel,
-                    onClick = { onMotionLevel(level) },
-                )
-            }
-        }
-
-        // The channel lock's password, which is 0000 until it is changed here. Asked for the current
-        // one first, then the new one twice -- see `PinPromptState`.
-        Text(
-            stringResource(CatalogStrings.string.settings_pin_section),
-            style = CastivioType.titleMedium,
-            color = colors.onBackground,
-        )
-        Text(
-            stringResource(CatalogStrings.string.settings_pin_detail),
-            style = CastivioType.bodySmall,
-            color = colors.onBackgroundMuted,
-        )
-        SettingRow(
-            icon = Icons.Filled.Lock,
-            label = stringResource(CatalogStrings.string.settings_pin_change),
-            onClick = onChangePin,
-        )
-
-        // What was hidden from the channel board, and the way back. Hiding is local: nothing was deleted
-        // from the subscription, so restoring only stops leaving the items out. Each row says how many it
-        // would bring back and, with none hidden, is a line of information and nothing to press.
-        Text(
-            stringResource(CatalogStrings.string.settings_hidden_section),
-            style = CastivioType.titleMedium,
-            color = colors.onBackground,
-        )
-        Text(
-            stringResource(CatalogStrings.string.settings_hidden_detail),
-            style = CastivioType.bodySmall,
-            color = colors.onBackgroundMuted,
-        )
-        SettingRow(
-            icon = Icons.Filled.Visibility,
-            label = stringResource(CatalogStrings.string.settings_hidden_bouquets),
-            value = hiddenBouquets.toString(),
-            onClick = if (hiddenBouquets > 0) onRestoreBouquets else null,
-        )
-        SettingRow(
-            icon = Icons.Filled.Visibility,
-            label = stringResource(CatalogStrings.string.settings_hidden_channels),
-            value = hiddenChannels.toString(),
-            onClick = if (hiddenChannels > 0) onRestoreChannels else null,
-        )
-
-        Text(
-            stringResource(R.string.settings_player),
-            style = CastivioType.titleMedium,
-            color = colors.onBackground,
-        )
-        SettingRow(
-            icon = Icons.Filled.PlayArrow,
-            label = stringResource(R.string.settings_internal_player),
-            value = stringResource(R.string.settings_player_default),
-        )
-
-        // **The design board is a development tool, and a viewer is not shown it.** It draws cards with no data behind them, in English, to
-        // check the state language; a development build keeps it, and a release build does not carry the row at all -- the constant is
-        // folded by the compiler. The check-invariants script fails the build if this call loses the check.
-        if (BuildConfig.DEBUG) {
-            Text(
-                stringResource(R.string.settings_design),
-                style = CastivioType.titleMedium,
-                color = colors.onBackground,
-            )
-            SettingRow(
-                icon = Icons.Filled.VideoLibrary,
-                label = stringResource(R.string.settings_state_board),
-                onClick = onShowStateBoard,
-            )
-        }
-        // Castivio's licence, which is not the provider's subscription. The two
-        // are separate systems and this row says so by living under its own
-        // heading rather than beside the playlist.
-        Text(
-            stringResource(R.string.settings_licence),
-            style = CastivioType.titleMedium,
-            color = colors.onBackground,
-        )
-        SettingRow(
-            icon = Icons.Filled.Settings,
-            label = stringResource(LicenceStrings.string.licence_title),
-            onClick = onShowLicence,
-        )
-
-        // The device's class is a programming constant -- Compact, Medium, Expanded, Television -- read by whoever is checking the
-        // layouts, so it is a development build's row and not a viewer's.
-        if (BuildConfig.DEBUG) {
-            SettingRow(
-                icon = Icons.Filled.Settings,
-                label = stringResource(R.string.settings_device_class),
-                value = CastivioTheme.device.name,
-            )
-        }
-        SettingRow(
-            icon = Icons.Filled.Settings,
-            label = stringResource(R.string.settings_version),
-            value = "1.0.0",
-        )
-    }
-    }
-}
-
-/**
- * What each animation level is called on screen.
- *
- * The chips used to be labelled `level.name.lowercase().replaceFirstChar { it.uppercase() }`
- * — the enum constant, title-cased. That is a programming detail arriving in front of a
- * user: untranslatable by construction, so the row stayed English on an Arabic device,
- * and `DISABLED` is not a word anybody chose for it. A `when` instead, which the
- * compiler makes exhaustive: a fourth level cannot be added without deciding what to
- * call it.
- */
-private val MotionLevel.label: Int
-    get() = when (this) {
-        MotionLevel.FULL -> R.string.settings_motion_full
-        MotionLevel.REDUCED -> R.string.settings_motion_reduced
-        MotionLevel.DISABLED -> R.string.settings_motion_disabled
-    }
-
 @Composable
 private fun SettingRow(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
@@ -1291,27 +1111,6 @@ private fun SettingRow(
             Text(value, style = CastivioType.bodySmall, color = colors.onBackgroundMuted)
         }
     }
-}
-
-@Composable
-private fun CategoryChipPlain(label: String, selected: Boolean, onClick: () -> Unit) {
-    val colors = CastivioTheme.colors
-    val interaction = remember { MutableInteractionSource() }
-    Text(
-        label,
-        style = CastivioType.labelLarge,
-        color = if (selected) colors.onBackground else colors.onBackgroundVariant,
-        modifier = Modifier
-            .clip(RoundedCornerShape(Radius.pill))
-            .background(if (selected) colors.secondaryContainer.copy(alpha = 0.6f) else colors.glassFill)
-            .border(
-                1.dp,
-                if (selected) colors.secondary else colors.glassBorderSoft,
-                RoundedCornerShape(Radius.pill),
-            )
-            .clickable(interaction, indication = null, onClick = onClick)
-            .padding(horizontal = Spacing.lg, vertical = Spacing.sm),
-    )
 }
 
 /**

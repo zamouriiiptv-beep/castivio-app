@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prefs_title">การตั้งค่า</string>
+    <string name="prefs_back">ย้อนกลับ</string>
+    <string name="prefs_player">เครื่องเล่น</string>
+    <string name="prefs_audio_language">ภาษาเสียงที่ต้องการ</string>
+    <string name="prefs_subtitle_language">ภาษาคำบรรยายที่ต้องการ</string>
+    <string name="prefs_audio_original">เสียงต้นฉบับ</string>
+    <string name="prefs_subtitles_none">ไม่มีคำบรรยาย</string>
+    <string name="prefs_audio_detail">หากภาพยนตร์หรือช่องมีเสียงภาษานี้ จะเล่นด้วยภาษานั้น หากไม่มีจะใช้เสียงเดิม</string>
+    <string name="prefs_subtitle_detail">หากภาพยนตร์มีคำบรรยายภาษานี้ จะเปิดคำบรรยาย หากไม่มีจะคงไว้ตามเดิม</string>
+    <string name="prefs_hidden">รายการที่ซ่อน</string>
+    <string name="prefs_restore_bouquets">คืนค่าแพ็กเกจที่ซ่อน</string>
+    <string name="prefs_restore_channels">คืนค่าช่องที่ซ่อน</string>
+    <string name="prefs_lock">ล็อกช่อง</string>
+    <string name="prefs_change_pin">เปลี่ยนรหัสผ่านล็อก</string>
+    <string name="prefs_application">แอป</string>
+    <string name="prefs_motion">การเคลื่อนไหว</string>
+    <string name="prefs_motion_full">เต็ม</string>
+    <string name="prefs_motion_reduced">ลดลง</string>
+    <string name="prefs_motion_none">ไม่มี</string>
+    <string name="prefs_clear_pictures">ล้างแคชรูปภาพ</string>
+    <string name="prefs_about">เกี่ยวกับ</string>
+    <string name="prefs_help">ความช่วยเหลือ</string>
+    <string name="prefs_support">ความช่วยเหลือและการสนับสนุน</string>
+    <string name="prefs_privacy">นโยบายความเป็นส่วนตัว</string>
+    <string name="prefs_terms">ข้อกำหนดการใช้งาน</string>
+    <string name="prefs_scan">สแกนโค้ดด้วยกล้องโทรศัพท์เพื่อเปิดหน้านี้</string>
+    <string name="prefs_support_detail">หมายเลขโทรศัพท์ เวลาทำการ และคำถามที่พบบ่อยอยู่ในหน้าการสนับสนุน</string>
+    <string name="prefs_on_site">ข้อความฉบับเต็มอยู่บนเว็บไซต์</string>
+    <string name="prefs_open_browser">เปิดในเบราว์เซอร์</string>
+</resources>

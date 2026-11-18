@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prefs_title">Ρυθμίσεις</string>
+    <string name="prefs_back">Πίσω</string>
+    <string name="prefs_player">Πρόγραμμα αναπαραγωγής</string>
+    <string name="prefs_audio_language">Προτιμώμενη γλώσσα ήχου</string>
+    <string name="prefs_subtitle_language">Προτιμώμενη γλώσσα υποτίτλων</string>
+    <string name="prefs_audio_original">Αρχικός ήχος</string>
+    <string name="prefs_subtitles_none">Χωρίς υπότιτλους</string>
+    <string name="prefs_audio_detail">Αν μια ταινία ή ένα κανάλι έχει ήχο σε αυτή τη γλώσσα, παίζει σε αυτήν. Αλλιώς κρατά τον δικό του.</string>
+    <string name="prefs_subtitle_detail">Αν μια ταινία έχει υπότιτλους σε αυτή τη γλώσσα, ενεργοποιούνται. Αλλιώς μένουν όπως είναι.</string>
+    <string name="prefs_hidden">Κρυφά στοιχεία</string>
+    <string name="prefs_restore_bouquets">Επαναφορά κρυφών πακέτων</string>
+    <string name="prefs_restore_channels">Επαναφορά κρυφών καναλιών</string>
+    <string name="prefs_lock">Κλείδωμα καναλιών</string>
+    <string name="prefs_change_pin">Αλλαγή κωδικού κλειδώματος</string>
+    <string name="prefs_application">Εφαρμογή</string>
+    <string name="prefs_motion">Κίνηση</string>
+    <string name="prefs_motion_full">Πλήρης</string>
+    <string name="prefs_motion_reduced">Μειωμένη</string>
+    <string name="prefs_motion_none">Καμία</string>
+    <string name="prefs_clear_pictures">Εκκαθάριση προσωρινής μνήμης εικόνων</string>
+    <string name="prefs_about">Σχετικά</string>
+    <string name="prefs_help">Βοήθεια</string>
+    <string name="prefs_support">Βοήθεια και υποστήριξη</string>
+    <string name="prefs_privacy">Πολιτική απορρήτου</string>
+    <string name="prefs_terms">Όροι χρήσης</string>
+    <string name="prefs_scan">Σαρώστε τον κωδικό με την κάμερα του τηλεφώνου σας για να ανοίξετε αυτή τη σελίδα.</string>
+    <string name="prefs_support_detail">Το τηλέφωνο, οι ώρες και οι συχνές ερωτήσεις βρίσκονται στη σελίδα υποστήριξης.</string>
+    <string name="prefs_on_site">Το πλήρες κείμενο βρίσκεται στον ιστότοπο.</string>
+    <string name="prefs_open_browser">Άνοιγμα στο πρόγραμμα περιήγησης</string>
+</resources>

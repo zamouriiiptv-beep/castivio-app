@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Settings (design/mockups/settings-ar.html). Prefixed "prefs_": `:app` and `:feature:home` already own
+  "settings_" names, and two modules may not declare one string. Every key is translated in every locale
+  (scripts/check-invariants.sh). The languages a viewer prefers are named in themselves in code (`TrackLanguage`).
+-->
+<resources>
+    <string name="prefs_title">Settings</string>
+    <string name="prefs_back">Back</string>
+    <string name="prefs_player">Player</string>
+    <string name="prefs_audio_language">Preferred audio language</string>
+    <string name="prefs_subtitle_language">Preferred subtitle language</string>
+    <string name="prefs_audio_original">Original sound</string>
+    <string name="prefs_subtitles_none">No subtitles</string>
+    <string name="prefs_audio_detail">If a film or channel has a sound in this language, it plays in it. Otherwise it keeps its own.</string>
+    <string name="prefs_subtitle_detail">If a film has subtitles in this language, they are turned on. Otherwise they stay as they are.</string>
+    <string name="prefs_hidden">Hidden items</string>
+    <string name="prefs_restore_bouquets">Restore hidden bouquets</string>
+    <string name="prefs_restore_channels">Restore hidden channels</string>
+    <string name="prefs_lock">Channel lock</string>
+    <string name="prefs_change_pin">Change the lock password</string>
+    <string name="prefs_application">Application</string>
+    <string name="prefs_motion">Motion</string>
+    <string name="prefs_motion_full">Full</string>
+    <string name="prefs_motion_reduced">Reduced</string>
+    <string name="prefs_motion_none">None</string>
+    <string name="prefs_clear_pictures">Clear picture cache</string>
+    <string name="prefs_about">About</string>
+    <string name="prefs_help">Help</string>
+    <string name="prefs_support">Help and support</string>
+    <string name="prefs_privacy">Privacy policy</string>
+    <string name="prefs_terms">Terms of use</string>
+    <string name="prefs_scan">Scan the code with your phone\'s camera to open this page.</string>
+    <string name="prefs_support_detail">Phone number, opening hours and common questions are on the support page.</string>
+    <string name="prefs_on_site">The full text is on the website.</string>
+    <string name="prefs_open_browser">Open in the browser</string>
+</resources>

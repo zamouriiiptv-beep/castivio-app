@@ -10,6 +10,8 @@ import com.castivio.domain.PlayerPulse
 import com.castivio.domain.TimeShiftAddress
 import com.castivio.domain.TimeShiftChoice
 import com.castivio.domain.TimeShiftSource
+import com.castivio.domain.TrackLanguage
+import com.castivio.domain.TrackLanguagePreferences
 import com.castivio.playback.api.AspectMode
 import com.castivio.playback.api.EngineId
 import com.castivio.playback.api.EngineMemory
@@ -25,6 +27,7 @@ import com.castivio.playback.api.PlaybackState
 import com.castivio.playback.api.PrimaryVerdict
 import com.castivio.playback.api.StreamQualityMonitor
 import com.castivio.playback.api.Track
+import com.castivio.playback.api.TrackType
 import com.castivio.playback.api.VideoOutput
 import com.castivio.playback.api.EngineFactory
 import com.castivio.data.subtitles.SubtitleAllowance
@@ -100,6 +103,11 @@ class PlayerViewModel @Inject constructor(
      * to set. The defect it exists for was a screen reporting a number nobody was keeping.
      */
     private val allowance: SubtitleAllowance,
+    /**
+     * The languages the viewer prefers for sound and subtitles (Settings → Player): see [preferLanguages]. Defaulted to
+     * none, which is what a player with no Settings behind it -- a test -- has.
+     */
+    private val languages: TrackLanguagePreferences = TrackLanguagePreferences.None,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<PlayerState?>(null)
@@ -169,6 +177,12 @@ class PlayerViewModel @Inject constructor(
     private var shapeJob: Job? = null
     private var sizeJob: Job? = null
     private var cueJob: Job? = null
+
+    /** The preferred languages being looked for in what the engine opened: see [preferLanguages]. */
+    private var languageJob: Job? = null
+
+    /** The kinds of track the viewer picked by hand in this opening: a preference never undoes their choice. */
+    private val pickedByHand = mutableSetOf<TrackType>()
     private var huntJob: Job? = null
     private var captionJob: Job? = null
 
@@ -432,6 +446,7 @@ class PlayerViewModel @Inject constructor(
         setupNanos = 0
         preparedAtNanos = System.nanoTime()
         kept.open(request.media())
+        preferLanguages(kept)
         opening = timing()
         deadline = deadlineFor(kept, engineId)
         if (!isDeviceFile(request.url)) watchQuality(kept)
@@ -510,6 +525,7 @@ class PlayerViewModel @Inject constructor(
         preparedAtNanos = System.nanoTime()
         setupNanos = preparedAtNanos - building
         created.open(request.media())
+        preferLanguages(created)
         opening = timing()
 
         deadline = deadlineFor(created, id)
@@ -1548,6 +1564,7 @@ class PlayerViewModel @Inject constructor(
 
     fun selectTrack(track: Track) {
         noteInteraction()
+        pickedByHand += track.type
         engine?.selectTrack(track)
         _state.value = _state.value?.copy(sheet = null)
     }
@@ -2116,6 +2133,48 @@ class PlayerViewModel @Inject constructor(
         Log.w(TAG, "no picture on $engineId: $reason | ${timing.render()}")
     }
 
+    /**
+     * The sound and the subtitles in the viewer's languages (Settings → Player), when [running] has them.
+     *
+     * Once per opening and per kind of track: the first time the engine lists a track in the preferred language, that track
+     * is selected, and that kind is left alone from then on. A film with no track in the language keeps what it started
+     * with -- its own sound, its subtitles as they were -- and a viewer who picks a track by hand is never overruled for that
+     * kind ([pickedByHand]). The subtitles are not touched while a downloaded subtitle is in use. The engine lists its tracks
+     * after it has opened, sometimes in more than one step, so this listens until each kind is settled or the engine is let
+     * go of ([detachEngine]).
+     */
+    private fun preferLanguages(running: PlaybackEngine) {
+        languageJob?.cancel()
+        pickedByHand.clear()
+        val audio = languages.audio()
+        val subtitle = languages.subtitle()
+        if (audio == null && subtitle == null) return
+        languageJob = viewModelScope.launch {
+            var audioSettled = audio == null
+            var subtitleSettled = subtitle == null
+            running.tracks.collect { tracks ->
+                if (!audioSettled && audio != null) {
+                    audioSettled = settle(running, tracks.audio, audio, TrackType.AUDIO)
+                }
+                if (!subtitleSettled && subtitle != null && downloaded == null) {
+                    subtitleSettled = settle(running, tracks.subtitle, subtitle, TrackType.SUBTITLE)
+                }
+            }
+        }
+    }
+
+    /**
+     * Selects the first of [tracks] in [language] unless one already is, or the viewer chose this kind by hand. True once
+     * there is nothing more to do for the kind: a track in the language is playing, or the viewer chose.
+     */
+    private fun settle(running: PlaybackEngine, tracks: List<Track>, language: TrackLanguage, type: TrackType): Boolean {
+        if (type in pickedByHand) return true
+        val wanted = tracks.filter { language.matches(it.language, it.label) }
+        if (wanted.isEmpty()) return false
+        if (wanted.none { it.selected }) running.selectTrack(wanted.first())
+        return true
+    }
+
     private fun startTicker() {
         ticker?.cancel()
         lastTickPosition = null
@@ -2172,6 +2231,7 @@ class PlayerViewModel @Inject constructor(
         shapeJob?.cancel(); shapeJob = null
         sizeJob?.cancel(); sizeJob = null
         cueJob?.cancel(); cueJob = null
+        languageJob?.cancel(); languageJob = null
         val running = engine
         running?.setVideoOutput(null)
         engine = null

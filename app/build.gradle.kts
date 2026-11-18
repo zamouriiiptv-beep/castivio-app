@@ -214,6 +214,7 @@ dependencies {
     implementation(project(":feature:home"))
     implementation(project(":feature:player"))
     implementation(project(":feature:licence"))
+    implementation(project(":feature:settings"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)

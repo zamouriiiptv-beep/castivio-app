@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prefs_title">Setelan</string>
+    <string name="prefs_back">Kembali</string>
+    <string name="prefs_player">Pemutar</string>
+    <string name="prefs_audio_language">Bahasa audio pilihan</string>
+    <string name="prefs_subtitle_language">Bahasa subtitel pilihan</string>
+    <string name="prefs_audio_original">Suara asli</string>
+    <string name="prefs_subtitles_none">Tanpa subtitel</string>
+    <string name="prefs_audio_detail">Jika film atau saluran punya suara dalam bahasa ini, diputar dengan bahasa itu. Jika tidak, tetap suaranya sendiri.</string>
+    <string name="prefs_subtitle_detail">Jika film punya subtitel dalam bahasa ini, subtitel diaktifkan. Jika tidak, tetap seperti semula.</string>
+    <string name="prefs_hidden">Item tersembunyi</string>
+    <string name="prefs_restore_bouquets">Pulihkan paket tersembunyi</string>
+    <string name="prefs_restore_channels">Pulihkan saluran tersembunyi</string>
+    <string name="prefs_lock">Kunci saluran</string>
+    <string name="prefs_change_pin">Ubah sandi kunci</string>
+    <string name="prefs_application">Aplikasi</string>
+    <string name="prefs_motion">Gerakan</string>
+    <string name="prefs_motion_full">Penuh</string>
+    <string name="prefs_motion_reduced">Dikurangi</string>
+    <string name="prefs_motion_none">Tidak ada</string>
+    <string name="prefs_clear_pictures">Hapus cache gambar</string>
+    <string name="prefs_about">Tentang</string>
+    <string name="prefs_help">Bantuan</string>
+    <string name="prefs_support">Bantuan dan dukungan</string>
+    <string name="prefs_privacy">Kebijakan privasi</string>
+    <string name="prefs_terms">Ketentuan penggunaan</string>
+    <string name="prefs_scan">Pindai kode dengan kamera ponsel untuk membuka halaman ini.</string>
+    <string name="prefs_support_detail">Nomor telepon, jam layanan, dan pertanyaan umum ada di halaman dukungan.</string>
+    <string name="prefs_on_site">Teks lengkapnya ada di situs web.</string>
+    <string name="prefs_open_browser">Buka di browser</string>
+</resources>

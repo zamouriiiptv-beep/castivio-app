@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prefs_title">Impostazioni</string>
+    <string name="prefs_back">Indietro</string>
+    <string name="prefs_player">Lettore</string>
+    <string name="prefs_audio_language">Lingua audio preferita</string>
+    <string name="prefs_subtitle_language">Lingua dei sottotitoli preferita</string>
+    <string name="prefs_audio_original">Audio originale</string>
+    <string name="prefs_subtitles_none">Nessun sottotitolo</string>
+    <string name="prefs_audio_detail">Se un film o un canale ha l\'audio in questa lingua, viene riprodotto in essa. Altrimenti mantiene il suo.</string>
+    <string name="prefs_subtitle_detail">Se un film ha sottotitoli in questa lingua, vengono attivati. Altrimenti restano come sono.</string>
+    <string name="prefs_hidden">Elementi nascosti</string>
+    <string name="prefs_restore_bouquets">Ripristina i bouquet nascosti</string>
+    <string name="prefs_restore_channels">Ripristina i canali nascosti</string>
+    <string name="prefs_lock">Blocco canali</string>
+    <string name="prefs_change_pin">Cambia la password del blocco</string>
+    <string name="prefs_application">Applicazione</string>
+    <string name="prefs_motion">Animazioni</string>
+    <string name="prefs_motion_full">Complete</string>
+    <string name="prefs_motion_reduced">Ridotte</string>
+    <string name="prefs_motion_none">Nessuna</string>
+    <string name="prefs_clear_pictures">Svuota la cache delle immagini</string>
+    <string name="prefs_about">Informazioni</string>
+    <string name="prefs_help">Aiuto</string>
+    <string name="prefs_support">Aiuto e assistenza</string>
+    <string name="prefs_privacy">Informativa sulla privacy</string>
+    <string name="prefs_terms">Condizioni d\'uso</string>
+    <string name="prefs_scan">Inquadra il codice con la fotocamera del telefono per aprire questa pagina.</string>
+    <string name="prefs_support_detail">Numero di telefono, orari e domande frequenti sono nella pagina di assistenza.</string>
+    <string name="prefs_on_site">Il testo completo è sul sito.</string>
+    <string name="prefs_open_browser">Apri nel browser</string>
+</resources>
