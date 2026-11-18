@@ -33,6 +33,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
+import com.castivio.core.design.R
 import coil.compose.AsyncImage
 import coil.imageLoader
 import coil.request.Disposable
@@ -293,14 +296,33 @@ private const val BACKDROP_HEIGHT = 36
  * and the ratio; [seed] picks the placeholder, as the card's position does.
  */
 @Composable
-fun PosterFrame(url: String?, seed: Int, modifier: Modifier = Modifier, onShown: ((ArtworkShown) -> Unit)? = null) {
+fun PosterFrame(
+    url: String?,
+    seed: Int,
+    modifier: Modifier = Modifier,
+    onShown: ((ArtworkShown) -> Unit)? = null,
+    /**
+     * The ground under the picture: the films' wall's cinematic one -- deep navy with a faint film strip, the card's own
+     * (`MediaCard.cinematicBackdrop`) -- in place of the seed's colours. What an episode with no picture shows: a frame from
+     * the cinema, not a block of colour.
+     */
+    cinematic: Boolean = false,
+) {
     val shape = RoundedCornerShape(Radius.sm)
     Box(
         modifier
             .clip(shape)
-            .background(posterPlaceholderBrush(seed))
+            .then(if (cinematic) Modifier else Modifier.background(posterPlaceholderBrush(seed)))
             .border(1.dp, CastivioTheme.colors.glassBorderSoft, shape),
     ) {
+        if (cinematic) {
+            Image(
+                painter = painterResource(R.drawable.poster_backdrop),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize(),
+            )
+        }
         if (!url.isNullOrBlank()) PosterArtwork(url, Modifier.fillMaxSize(), onShown = onShown)
     }
 }

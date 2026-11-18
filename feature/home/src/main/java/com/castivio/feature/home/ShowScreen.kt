@@ -978,6 +978,8 @@ private fun EpisodeRow(
                 seed = episode.episodeNumber,
                 modifier = Modifier.fillMaxSize(),
                 onShown = onStillShown,
+                // An episode with no picture, or one still coming, stands on the films' cinematic ground.
+                cinematic = true,
             )
             when (mark) {
                 EpisodeMark.Watched -> Icon(
