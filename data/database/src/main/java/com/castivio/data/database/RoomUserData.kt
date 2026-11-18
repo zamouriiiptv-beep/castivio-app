@@ -74,6 +74,13 @@ class RoomProgressRepository(
 
     override suspend fun progress(mediaId: String): PlaybackProgress? = dao.byId(mediaId)?.toDomain()
 
+    /**
+     * One read for a show's episodes rather than one each: tens to hundreds of ids, in pieces under SQLite's limit on the
+     * values one statement takes.
+     */
+    override suspend fun progressOf(mediaIds: Collection<String>): Map<String, PlaybackProgress> =
+        mediaIds.distinct().chunked(IDS_PER_READ).flatMap { dao.byIds(it) }.associate { it.mediaId to it.toDomain() }
+
     override suspend fun watched(mediaId: String) {
         dao.watched(mediaId, clock())
         onWatched()
@@ -86,5 +93,8 @@ class RoomProgressRepository(
     private companion object {
         /** Below ten seconds there is nothing worth resuming. */
         const val MIN_POSITION_MS = 10_000L
+
+        /** Ids in one `IN (...)`: under the 999 values an older SQLite takes in one statement. */
+        const val IDS_PER_READ = 500
     }
 }

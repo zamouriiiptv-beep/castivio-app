@@ -126,10 +126,17 @@ class ShowViewModelTest {
         }
     }
 
-    private class FakeProgress(val positions: Map<String, PlaybackProgress> = emptyMap()) : ProgressRepository {
+    /** The positions the test gives; with a [gate], no read answers until the test opens it -- a database busy keeping a reply. */
+    private class FakeProgress(
+        val positions: Map<String, PlaybackProgress> = emptyMap(),
+        val gate: CompletableDeferred<Unit>? = null,
+    ) : ProgressRepository {
         val watched = mutableListOf<String>()
         override suspend fun save(mediaId: String, positionMs: Long, durationMs: Long?) = Unit
-        override suspend fun progress(mediaId: String): PlaybackProgress? = positions[mediaId]
+        override suspend fun progress(mediaId: String): PlaybackProgress? {
+            gate?.await()
+            return positions[mediaId]
+        }
         override suspend fun clear(mediaId: String) = Unit
         override suspend fun clearAll() = Unit
         override suspend fun watched(mediaId: String) {
@@ -595,5 +602,32 @@ class ShowViewModelTest {
         assertEquals("show-2", model.state.value.seriesId)
         assertEquals(emptyList<Season>(), model.state.value.seasons)
         assertNull(model.state.value.details)
+    }
+
+    /**
+     * Measured on a show of five seasons: the provider's reply was read 0.3 s after the page opened and its details drawn at
+     * 0.68 s, after the catalogue had kept it -- the page read what the viewer had watched before drawing anything, and that
+     * read waited on the database the reply was being written to. The details are drawn now; the marks follow.
+     */
+    @Test
+    fun `what the provider sent is drawn while what was watched is still being read, and the marks follow`() = runTest(dispatcher) {
+        val gate = CompletableDeferred<Unit>()
+        val started = PlaybackProgress("s1e2", positionMs = 120_000, durationMs = 3_000_000, updatedAtEpochMs = 50)
+        val sent = EpisodesReady(held, SeriesDetails(plot = "A harbour town.", releaseYear = 2019), emptyMap())
+        val model = model(FakePager(emptyList()), ReadThenWait(sent), progress = FakeProgress(mapOf("s1e2" to started), gate))
+
+        model.open("show-1")
+        advanceUntilIdle()
+
+        // The positions have not been read, and the page has the show.
+        assertEquals("A harbour town.", model.state.value.details?.plot)
+        assertEquals(2, model.state.value.seasons.size)
+        assertEquals("s1e1", model.state.value.target?.episode?.id)
+
+        gate.complete(Unit)
+        advanceUntilIdle()
+
+        assertEquals("s1e2", model.state.value.target?.episode?.id)
+        assertEquals(true, model.state.value.target?.resume)
     }
 }

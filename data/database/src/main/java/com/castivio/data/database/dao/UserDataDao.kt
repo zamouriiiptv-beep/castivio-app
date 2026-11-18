@@ -75,6 +75,10 @@ interface ProgressDao {
     @Query("SELECT * FROM playback_progress WHERE media_id = :mediaId")
     suspend fun byId(mediaId: String): ProgressEntity?
 
+    /** The positions kept for [mediaIds], in one read: a show's page asks for all its episodes' at once. */
+    @Query("SELECT * FROM playback_progress WHERE media_id IN (:mediaIds)")
+    suspend fun byIds(mediaIds: List<String>): List<ProgressEntity>
+
     /**
      * A live channel's picture showed at [at]: it is the one watched last. Its row says so -- made, at
      * position 0, if it has none, which keeps it out of Continue Watching -- and a row it already has

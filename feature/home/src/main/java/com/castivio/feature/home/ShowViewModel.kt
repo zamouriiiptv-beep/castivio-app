@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -174,21 +175,34 @@ class ShowViewModel @Inject constructor(
         )
     }
 
-    private val content = combine(read, load, rereads) { held, loadState, _ -> held.copy(load = loadState) }
-        .mapLatest { held ->
-            val positions = progress.progressOf(held.seasons.flatMap { it.episodes }.map { it.id })
-            ShowState(
-                seriesId = held.seriesId,
-                seasons = held.seasons,
-                // Nothing is waited for once something is held, whatever the provider is doing behind it.
-                load = if (held.seasons.isNotEmpty()) ShowLoad.Ready else held.load,
-                marks = positions.mapValues { (_, position) -> episodeMark(position) },
-                target = continueTarget(held.seasons, positions),
-                details = held.details,
-                plots = held.plots,
-                asking = held.load == ShowLoad.Loading,
-            )
-        }
+    /**
+     * What the viewer has watched of the show's episodes, read beside the page and not in front of it: the details and the
+     * episodes the provider just sent are drawn the moment they are read, while the catalogue is still keeping them, and the
+     * marks and where Play continues from follow when this is read. Read again for new episodes, and when the player has
+     * been on top of the page ([rereads]); until then the last positions read for the same show stand.
+     */
+    private val positions = combine(
+        read.map { held -> Of(held.seriesId, held.seasons.flatMap { season -> season.episodes.map { it.id } }) }
+            .distinctUntilChanged(),
+        rereads,
+    ) { ids, _ -> ids }
+        .mapLatest { ids -> Of(ids.seriesId, progress.progressOf(ids.value)) }
+        .onStart { emit(Of("", emptyMap())) }
+
+    private val content = combine(read, load, positions) { held, loadState, watched ->
+        val positions = watched.takeIf { it.seriesId == held.seriesId }?.value.orEmpty()
+        ShowState(
+            seriesId = held.seriesId,
+            seasons = held.seasons,
+            // Nothing is waited for once something is held, whatever the provider is doing behind it.
+            load = if (held.seasons.isNotEmpty()) ShowLoad.Ready else loadState,
+            marks = positions.mapValues { (_, position) -> episodeMark(position) },
+            target = continueTarget(held.seasons, positions),
+            details = held.details,
+            plots = held.plots,
+            asking = loadState == ShowLoad.Loading,
+        )
+    }
 
     private val extras = combine(favorite, similar, failure, preparing, times) { marked, others, why, again, cost ->
         Extras(marked, others, why, again, cost)
