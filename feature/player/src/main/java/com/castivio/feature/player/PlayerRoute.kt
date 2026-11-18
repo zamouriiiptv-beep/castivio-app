@@ -20,6 +20,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.castivio.core.platform.PerformanceLog
 import com.castivio.core.design.input.KeyRelay
 import com.castivio.core.design.input.LocalKeyRelay
 import com.castivio.domain.PlayerPulse
@@ -191,8 +192,10 @@ fun PlayerRoute(
     val activity = context.findActivity()
 
     // Temporary, for development: the opening panel reads each opening from the press to its first frame -- see
-    // `OpeningDiagnostics`. On in a debug build and nowhere else, and told before the open below is asked for.
-    remember { OpeningDiagnostics.enable(BuildConfig.DEBUG) }
+    // `OpeningDiagnostics`. On wherever the measurement panels are -- a development build, and the measurement build,
+    // which is compiled as a viewer's is (`PerformanceLog.isVisibleIn`) -- and in a viewer's build never. Told before the
+    // open below is asked for.
+    remember(context) { OpeningDiagnostics.enable(PerformanceLog.isVisibleIn(context)) }
 
     LaunchedEffect(request) { model.open(request) }
 

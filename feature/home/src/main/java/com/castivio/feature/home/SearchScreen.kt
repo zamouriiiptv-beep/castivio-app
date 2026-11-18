@@ -1,5 +1,6 @@
 package com.castivio.feature.home
 
+import android.os.SystemClock
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -11,6 +12,8 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -20,6 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.castivio.core.platform.Smoothness
 import com.castivio.core.design.components.CastivioTextField
 import com.castivio.core.design.components.ChannelCard
 import com.castivio.core.design.components.EmptyState
@@ -56,6 +60,14 @@ fun CatalogSearchScreen(
 
     val state by model.state.collectAsStateWithLifecycle()
     val colors = CastivioTheme.colors
+    // The smoothness panel's search (development and measurement builds only -- `Smoothness`): from the composition that
+    // shows the last letter typed to the frame after the answer to it was drawn -- the debounce, the query and the drawing.
+    val typedAt = remember(state.query) { SystemClock.elapsedRealtimeNanos() }
+    LaunchedEffect(state.results) {
+        if (state.query.isBlank()) return@LaunchedEffect
+        withFrameNanos { }
+        Smoothness.opened(SMOOTHNESS_SEARCH, (SystemClock.elapsedRealtimeNanos() - typedAt) / 1_000_000L)
+    }
 
     BoxWithConstraints(modifier.fillMaxSize().statusBarsPadding()) {
     val m = catalogMetricsFor(tv = CastivioTheme.device.isTv, width = maxWidth, height = maxHeight)
@@ -129,3 +141,6 @@ fun CatalogSearchScreen(
     }
     }
 }
+
+/** The search's line on the smoothness panel. */
+private const val SMOOTHNESS_SEARCH = "Search: letter to answer"

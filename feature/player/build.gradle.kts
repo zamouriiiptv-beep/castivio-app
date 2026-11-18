@@ -51,6 +51,8 @@ android {
 
 dependencies {
     implementation(project(":core:common"))
+    // `PerformanceLog.isVisibleIn`: the opening panel is drawn wherever the other measurement panels are.
+    implementation(project(":core:platform"))
     implementation(project(":domain"))
     implementation(project(":core:design"))
     implementation(project(":core:navigation"))

@@ -1,5 +1,6 @@
 package com.castivio.feature.home
 
+import android.os.SystemClock
 import android.view.View
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
@@ -137,6 +138,7 @@ import com.castivio.core.design.components.ltrToken
 import com.castivio.core.design.theme.CastivioTheme
 import com.castivio.core.design.theme.Radius
 import com.castivio.core.design.theme.Sizing
+import com.castivio.core.platform.Smoothness
 import com.castivio.core.platform.CastivioTrace
 import com.castivio.core.platform.LoadTrace
 import com.castivio.core.platform.PerfSection
@@ -260,6 +262,17 @@ fun ChannelsScreen(
     LaunchedEffect(Unit) { LoadTrace.screenShown(PerfSection.CHANNELS) }
 
     val state by model.state.collectAsStateWithLifecycle()
+    // The smoothness panel's bouquet switch (development and measurement builds only -- `Smoothness`): from the composition
+    // that shows the bouquet chosen to the frame after it was drawn. Not the board's first bouquet, which is its opening.
+    val bouquet = state.selectedGroup
+    val bouquetAt = remember(bouquet) { SystemClock.elapsedRealtimeNanos() }
+    // A count, not state: the board has nothing to draw from it.
+    val bouquetsSeen = remember { intArrayOf(0) }
+    LaunchedEffect(bouquet) {
+        if (bouquetsSeen[0]++ == 0) return@LaunchedEffect
+        withFrameNanos { }
+        Smoothness.opened(SMOOTHNESS_BOUQUET, (SystemClock.elapsedRealtimeNanos() - bouquetAt) / 1_000_000L)
+    }
     val previewed by previewModel.preview.collectAsStateWithLifecycle()
     // Collected here and not inside the overlay, so the page's state survives the
     // overlay being closed and re-opened on the same channel: a second look costs no
@@ -4024,3 +4037,6 @@ internal val FIELD_INSET = 13.dp
  * category — the same trick the header's field plays against the band.
  */
 internal const val FIELD_OF_ROW = 0.86f
+
+/** The bouquet switch's line on the smoothness panel. */
+private const val SMOOTHNESS_BOUQUET = "Bouquet switch"

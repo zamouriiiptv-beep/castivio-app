@@ -69,6 +69,8 @@ import com.castivio.core.design.theme.castivioBackdrop
 import com.castivio.core.design.theme.rememberMetrics
 import com.castivio.core.navigation.BackPolicy
 import com.castivio.core.navigation.ShellBack
+import com.castivio.core.platform.PerformanceLog
+import com.castivio.core.platform.Smoothness
 import com.castivio.core.platform.DevDiagnostics
 import com.castivio.domain.CatalogQuery
 import com.castivio.domain.Channel
@@ -323,6 +325,17 @@ fun ShellScreen(
     // so that it never competes with a picture for the connection. From the same pulse the board reads, and nothing else:
     // the sound of the radio is in its own destination, where Home is not on screen and nothing waits on it.
     val playbackActivity: PlaybackActivityViewModel = hiltViewModel()
+    // The smoothness panel's screens (development and measurement builds only -- `Smoothness`): which is on display, and how
+    // long it took from the composition that brought it to the frame after it was drawn. A screen is the overlay over the
+    // shell when there is one -- the player, a film's or a show's page -- and the destination otherwise.
+    val shownName = overlay?.let { it::class.simpleName } ?: dest.name
+    val shownAt = remember(shownName) { SystemClock.elapsedRealtimeNanos() }
+    LaunchedEffect(shownName) {
+        Smoothness.showing(shownName)
+        withFrameNanos { }
+        Smoothness.opened(shownName, (SystemClock.elapsedRealtimeNanos() - shownAt) / NANOS_PER_MS)
+    }
+
     LaunchedEffect(pulse, radioSounding) {
         playbackActivity.activity.set(
             radioSounding || pulse?.phase.let { it == PulsePhase.OPENING || it == PulsePhase.SHOWING },
@@ -800,6 +813,8 @@ fun ShellScreen(
                         onAbout = { overlay = Overlay.Licence },
                         version = BuildConfig.VERSION_NAME,
                         onBack = { dest = Dest.Home },
+                        // The measurement panels' build -- development or measurement, never a viewer's.
+                        measuring = PerformanceLog.isVisibleIn(LocalContext.current),
                         developerTitle = if (BuildConfig.DEBUG) {
                             stringResource(R.string.settings_design)
                         } else {
@@ -1218,3 +1233,6 @@ private fun StateBoardOverlay(onBack: () -> Unit) {
     }
     }
 }
+
+/** For the smoothness panel's timings, which are in milliseconds. */
+private const val NANOS_PER_MS = 1_000_000L

@@ -46,6 +46,8 @@ import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.PlayCircle
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.Shield
+import androidx.compose.material.icons.rounded.Speed
+import androidx.compose.material.icons.rounded.Timeline
 import androidx.compose.material.icons.rounded.Tv
 import androidx.compose.material.icons.rounded.VideoLibrary
 import androidx.compose.material.icons.rounded.Waves
@@ -141,19 +143,25 @@ fun SettingsScreen(
     modifier: Modifier = Modifier,
     developerTitle: String? = null,
     developer: List<DeveloperRow> = emptyList(),
+    /**
+     * The measurement panels are drawn in this build -- a development or a measurement build, never a viewer's
+     * (`PerformanceLog.isVisibleIn`): Settings then offers the smoothness panel.
+     */
+    measuring: Boolean = false,
     model: SettingsViewModel = hiltViewModel(),
 ) {
     val state by model.state.collectAsStateWithLifecycle()
     // What is open over the page, if anything: a list of languages, or a page of the site. Back closes it first.
     var choosing by rememberSaveable { mutableStateOf<LanguageKind?>(null) }
     var reading by rememberSaveable { mutableStateOf<SitePage?>(null) }
+    var smoothness by rememberSaveable { mutableStateOf(false) }
     val firstRow = remember { FocusRequester() }
     val tv = CastivioTheme.device.isTv
 
     BoxWithConstraints(modifier.fillMaxSize().castivioBackdrop()) {
         val m = rememberMetrics(maxWidth, maxHeight)
         // Left out while a page of the site covers it, so the remote cannot wander into rows nobody can see.
-        if (reading == null) Column(
+        if (reading == null && !smoothness) Column(
             Modifier
                 .fillMaxSize()
                 .castivioStage(m)
@@ -228,6 +236,12 @@ fun SettingsScreen(
                         SettingRow(Icons.Rounded.Shield, stringResource(R.string.prefs_privacy), null, m, onClick = { reading = SitePage.PRIVACY })
                         SettingRow(Icons.Rounded.Description, stringResource(R.string.prefs_terms), null, m, onClick = { reading = SitePage.TERMS })
                     }
+                    if (measuring) {
+                        // A measurement tool, in English like the strips it sits beside: never in a viewer's build.
+                        Section(Icons.Rounded.Speed, SMOOTHNESS_TITLE, m) {
+                            SettingRow(Icons.Rounded.Timeline, SMOOTHNESS_ROW, null, m, onClick = { smoothness = true })
+                        }
+                    }
                     if (developerTitle != null && developer.isNotEmpty()) {
                         Section(Icons.Rounded.Code, developerTitle, m) {
                             developer.forEach { SettingRow(Icons.Rounded.Code, it.label, it.value, m, onClick = it.onClick) }
@@ -238,7 +252,7 @@ fun SettingsScreen(
             Box(Modifier.heightIn(min = Spacing.lg))
         }
         // The remote starts on the first row, as every screen of the application starts on its first control.
-        LaunchedEffect(tv, reading) { if (tv && reading == null) runCatching { firstRow.requestFocus() } }
+        LaunchedEffect(tv, reading, smoothness) { if (tv && reading == null && !smoothness) runCatching { firstRow.requestFocus() } }
 
         choosing?.let { kind ->
             LanguageSheet(
@@ -253,6 +267,7 @@ fun SettingsScreen(
             )
         }
         reading?.let { page -> SitePageView(page, tv, m, onClose = { reading = null }) }
+        if (smoothness) SmoothnessPanel(m, onClose = { smoothness = false })
     }
 }
 

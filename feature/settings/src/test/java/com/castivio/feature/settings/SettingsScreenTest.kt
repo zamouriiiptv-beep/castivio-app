@@ -71,7 +71,7 @@ class SettingsScreenTest {
     private var about = 0
     private var backed = 0
 
-    private fun settings(hiddenBouquets: Int = 3, hiddenChannels: Int = 0) {
+    private fun settings(hiddenBouquets: Int = 3, hiddenChannels: Int = 0, measuring: Boolean = false) {
         val model = SettingsViewModel(kept, NoPictures, auto)
         compose.setContent {
             CastivioTheme {
@@ -86,6 +86,7 @@ class SettingsScreenTest {
                     onAbout = { about++ },
                     version = "1.0.0",
                     onBack = { backed++ },
+                    measuring = measuring,
                     model = model,
                 )
             }
@@ -150,6 +151,28 @@ class SettingsScreenTest {
 
         assertEquals(false, auto.state.value)
         compose.onNode(isToggleable()).assertIsOff()
+    }
+
+    @Test
+    fun `a viewer's build offers no smoothness panel`() {
+        settings(measuring = false)
+
+        assertTrue(compose.onAllNodesWithText(SMOOTHNESS_ROW).fetchSemanticsNodes().isEmpty())
+    }
+
+    @Test
+    fun `a measuring build opens the smoothness panel from Settings, and Back closes it`() {
+        settings(measuring = true)
+
+        scrollTo(SMOOTHNESS_ROW)
+        compose.onNodeWithText(SMOOTHNESS_ROW).performClick()
+        compose.waitForIdle()
+        compose.onNodeWithText("Nothing measured yet: use the application, then come back.").assertExists()
+        compose.onNodeWithText("Clear").assertHasClickAction()
+
+        compose.onNodeWithContentDescription("Back").performClick()
+        compose.waitForIdle()
+        compose.onNodeWithText(SMOOTHNESS_ROW).assertExists()
     }
 
     @Test

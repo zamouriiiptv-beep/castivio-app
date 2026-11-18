@@ -1,0 +1,44 @@
+<!doctype html>
+<!--
+  The smoothness panel (owner, 2026-11-18): a measurement tool of the development and measurement builds, opened from
+  Settings → Measurement. Every screen shown since it was cleared, and the actions timed on their own (a bouquet switched,
+  a search answered): opens = median/slowest ms to the first frame; frames = main-thread frames on display, late = more than
+  25 ms after the one before, and the longest gap. A line over budget (a median over 400 ms, or more than 5% late) is drawn
+  in the warning hue. English and left to right, like the load strips. The figures are an example.
+    ?frame=tv&clean=1
+-->
+<html lang="en"><head><meta charset="utf-8"><title>Smoothness panel</title>
+<style>
+:root{--ground:#111327;--warn:#FFB547;--strong:#F4F2FA;--label:#A9A8C2;--muted:#8C8CA8;--edge:rgba(255,255,255,.08)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#05040E;font-family:Inter,"DejaVu Sans",sans-serif;color:var(--strong)}
+.screen{width:960px;height:540px;overflow:hidden;background:radial-gradient(120% 90% at 15% 0%,#1B1F3F 0%,rgba(27,31,63,0) 60%),linear-gradient(200deg,#13152D,var(--ground));padding:26px 48px}
+.top{display:flex;align-items:center;gap:12px}
+.back{width:40px;height:40px;border-radius:10px;background:rgba(6,6,16,.72);border:1px solid rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;color:#4C9BFF;font-size:20px}
+h1{flex:1;font-size:24px}
+.btn{height:40px;padding:0 18px;border-radius:12px;background:rgba(6,6,16,.72);border:1px solid rgba(255,255,255,.16);display:flex;align-items:center;gap:8px;font:600 14px Inter}
+.note{margin:10px 0 8px;font-size:11.5px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.l{border-radius:12px;background:rgba(255,255,255,.04);border:1px solid var(--edge);padding:8px 12px}
+.l b{display:block;font-size:13.5px}
+.l span{font-size:11.5px;color:var(--label)}
+.l.w{border-color:var(--warn)} .l.w b{color:var(--warn)}
+</style></head><body><div id="out"></div>
+<script>
+const L=(n,d,w)=>`<div class="l ${w?'w':''}"><b>${n}</b><span>${d}</span></div>`;
+document.getElementById('out').innerHTML=`<div class="screen">
+<div class="top"><div class="back">←</div><h1>Smoothness</h1><div class="btn">⟳ Clear</div></div>
+<div class="note">opens: median/slowest ms to the first frame · frames: main-thread frames on screen, late = more than 25 ms after the one before · budgets: 16.6 ms a frame, Home in 400 ms</div>
+<div class="grid">
+${L('Home','opens 6 · 140/380 ms · frames 3,812 · late 9 (0.2%) · longest 61 ms')}
+${L('Live','opens 4 · 220/510 ms · frames 9,410 · late 31 (0.3%) · longest 120 ms')}
+${L('Bouquet switch','opens 18 · 60/190 ms')}
+${L('Movies','opens 3 · 450/900 ms · frames 6,020 · late 402 (6.7%) · longest 240 ms',true)}
+${L('Series','opens 2 · 300/420 ms · frames 2,210 · late 21 (1.0%) · longest 90 ms')}
+${L('Show','opens 5 · 110/260 ms · frames 1,540 · late 4 (0.3%) · longest 48 ms')}
+${L('Search: letter to answer','opens 22 · 170/320 ms')}
+${L('Play','opens 9 · 90/150 ms · frames 18,300 · late 12 (0.1%) · longest 70 ms')}
+${L('Settings','opens 2 · 80/95 ms · frames 640 · late 0 (0.0%) · longest 18 ms')}
+${L('Radio','opens 1 · 160/160 ms · frames 1,020 · late 2 (0.2%) · longest 33 ms')}
+</div></div>`;
+</script></body></html>
