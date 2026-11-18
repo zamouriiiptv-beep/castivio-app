@@ -31,6 +31,7 @@
         <item quantity="one">%d قسمت</item>
         <item quantity="other">%d قسمت</item>
     </plurals>
+    <string name="show_info">اطلاعات</string>
     <string name="show_back">بازگشت</string>
     <string name="show_nav_overview">نمای کلی</string>
     <string name="show_nav_seasons">فصل‌ها</string>

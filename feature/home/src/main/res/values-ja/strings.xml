@@ -29,6 +29,7 @@
     <plurals name="show_episodes">
         <item quantity="other">%d 話</item>
     </plurals>
+    <string name="show_info">情報</string>
     <string name="show_back">戻る</string>
     <string name="show_nav_overview">概要</string>
     <string name="show_nav_seasons">シーズン</string>

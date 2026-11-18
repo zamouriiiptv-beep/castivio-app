@@ -29,6 +29,7 @@
     <plurals name="show_episodes">
         <item quantity="other">%d개 에피소드</item>
     </plurals>
+    <string name="show_info">정보</string>
     <string name="show_back">뒤로</string>
     <string name="show_nav_overview">개요</string>
     <string name="show_nav_seasons">시즌</string>

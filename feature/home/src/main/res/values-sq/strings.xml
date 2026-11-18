@@ -31,6 +31,7 @@
         <item quantity="one">%d episod</item>
         <item quantity="other">%d episode</item>
     </plurals>
+    <string name="show_info">Info</string>
     <string name="show_back">Prapa</string>
     <string name="show_nav_overview">Përmbledhje</string>
     <string name="show_nav_seasons">Sezonet</string>

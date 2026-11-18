@@ -29,6 +29,7 @@
     <plurals name="show_episodes">
         <item quantity="other">%d 集</item>
     </plurals>
+    <string name="show_info">資訊</string>
     <string name="show_back">返回</string>
     <string name="show_nav_overview">總覽</string>
     <string name="show_nav_seasons">各季</string>

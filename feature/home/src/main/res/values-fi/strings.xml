@@ -31,6 +31,7 @@
         <item quantity="one">%d jakso</item>
         <item quantity="other">%d jaksoa</item>
     </plurals>
+    <string name="show_info">Tiedot</string>
     <string name="show_back">Takaisin</string>
     <string name="show_nav_overview">Yleiskatsaus</string>
     <string name="show_nav_seasons">Kaudet</string>

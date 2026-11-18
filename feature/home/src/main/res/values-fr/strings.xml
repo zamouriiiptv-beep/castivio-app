@@ -33,6 +33,7 @@
         <item quantity="many">%d épisodes</item>
         <item quantity="other">%d épisodes</item>
     </plurals>
+    <string name="show_info">Infos</string>
     <string name="show_back">Retour</string>
     <string name="show_nav_overview">Aperçu</string>
     <string name="show_nav_seasons">Saisons</string>

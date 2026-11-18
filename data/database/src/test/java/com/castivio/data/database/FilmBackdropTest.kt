@@ -76,12 +76,8 @@ class FilmBackdropTest {
     }
 
     @Test
-    fun `the migration to version 13 is the last of the chain, and the database is at 13`() {
-        val last = CastivioMigrations.ALL.maxByOrNull { it.startVersion }!!
-
-        assertEquals(12, last.startVersion)
-        assertEquals(13, last.endVersion)
-        assertEquals(13, database.openHelper.readableDatabase.version)
+    fun `the migration to version 13 is in the chain`() {
+        assertEquals(13, CastivioMigrations.ALL.single { it.startVersion == 12 }.endVersion)
     }
 
     // ------------------------------------------------------------------ helpers

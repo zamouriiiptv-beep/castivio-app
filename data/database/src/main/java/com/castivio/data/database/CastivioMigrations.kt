@@ -52,7 +52,7 @@ object CastivioMigrations {
         get() = arrayOf(
             REKEY_SOURCES, SCOPE_TO_SOURCE, KEY_SEARCH_BY_ROW, ADD_CUSTOM_ORDER, ADD_HIDDEN_ITEM, ADD_VOD_DETAIL,
             ADD_SERIES_DETAIL, guarded(DROP_EPG_INDEX), guarded(ADD_CATCH_UP), guarded(ADD_RATING),
-            guarded(ADD_PROVIDER_IDS), guarded(ADD_FILM_BACKDROP),
+            guarded(ADD_PROVIDER_IDS), guarded(ADD_FILM_BACKDROP), guarded(ADD_SHOW_CREDITS),
         )
 
     /** The first version a database may be in with the sort-title index out: see [guarded]. */
@@ -410,6 +410,18 @@ object CastivioMigrations {
         override fun migrate(db: SupportSQLiteDatabase) {
             db.execSQL("ALTER TABLE `vod_detail` ADD COLUMN `backdrop_url` TEXT")
             db.execSQL("UPDATE `vod_detail` SET `ids_read` = 0")
+        }
+    }
+
+    /**
+     * 13 → 14: `series_detail.director` and `added_epoch`, what the show's information screen and its added date draw
+     * (design/mockups/series-info-ar.html). Two nullable columns. A show's details are asked for each time its page opens, so a
+     * row kept before them has them the next time it is: no flag, no row touched.
+     */
+    private val ADD_SHOW_CREDITS = object : Migration(13, 14) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE `series_detail` ADD COLUMN `director` TEXT")
+            db.execSQL("ALTER TABLE `series_detail` ADD COLUMN `added_epoch` INTEGER")
         }
     }
 

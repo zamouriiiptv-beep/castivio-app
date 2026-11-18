@@ -29,6 +29,7 @@
     <plurals name="show_episodes">
         <item quantity="other">%d episode</item>
     </plurals>
+    <string name="show_info">Info</string>
     <string name="show_back">Kembali</string>
     <string name="show_nav_overview">Ikhtisar</string>
     <string name="show_nav_seasons">Musim</string>

@@ -29,6 +29,7 @@
     <plurals name="show_episodes">
         <item quantity="other">%d tập</item>
     </plurals>
+    <string name="show_info">Thông tin</string>
     <string name="show_back">Quay lại</string>
     <string name="show_nav_overview">Tổng quan</string>
     <string name="show_nav_seasons">Các mùa</string>

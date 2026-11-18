@@ -31,6 +31,7 @@
         <item quantity="one">%d epizód</item>
         <item quantity="other">%d epizód</item>
     </plurals>
+    <string name="show_info">Információ</string>
     <string name="show_back">Vissza</string>
     <string name="show_nav_overview">Áttekintés</string>
     <string name="show_nav_seasons">Évadok</string>

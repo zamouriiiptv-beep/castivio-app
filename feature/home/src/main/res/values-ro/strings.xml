@@ -33,6 +33,7 @@
         <item quantity="few">%d episoade</item>
         <item quantity="other">%d de episoade</item>
     </plurals>
+    <string name="show_info">Informații</string>
     <string name="show_back">Înapoi</string>
     <string name="show_nav_overview">Prezentare generală</string>
     <string name="show_nav_seasons">Sezoane</string>

@@ -126,4 +126,6 @@ private fun XtreamSeriesInfo.toDomain() = SeriesDetails(
     backdropUrl = backdropUrl,
     tmdbId = tmdbId,
     imdbId = imdbId,
+    director = director,
+    addedEpochSeconds = lastModifiedEpochSeconds,
 )

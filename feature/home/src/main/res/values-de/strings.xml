@@ -31,6 +31,7 @@
         <item quantity="one">%d Folge</item>
         <item quantity="other">%d Folgen</item>
     </plurals>
+    <string name="show_info">Info</string>
     <string name="show_back">Zurück</string>
     <string name="show_nav_overview">Übersicht</string>
     <string name="show_nav_seasons">Staffeln</string>

@@ -35,6 +35,7 @@
         <item quantity="many">%d серій</item>
         <item quantity="other">%d серії</item>
     </plurals>
+    <string name="show_info">Інформація</string>
     <string name="show_back">Назад</string>
     <string name="show_nav_overview">Огляд</string>
     <string name="show_nav_seasons">Сезони</string>

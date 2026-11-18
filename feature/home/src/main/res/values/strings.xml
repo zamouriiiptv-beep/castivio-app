@@ -42,6 +42,7 @@
         <item quantity="one">%d episode</item>
         <item quantity="other">%d episodes</item>
     </plurals>
+    <string name="show_info">Info</string>
     <string name="show_back">Back</string>
     <string name="show_nav_overview">Overview</string>
     <string name="show_nav_seasons">Seasons</string>

@@ -29,6 +29,7 @@
     <plurals name="show_episodes">
         <item quantity="other">%d ตอน</item>
     </plurals>
+    <string name="show_info">ข้อมูล</string>
     <string name="show_back">ย้อนกลับ</string>
     <string name="show_nav_overview">ภาพรวม</string>
     <string name="show_nav_seasons">ซีซัน</string>

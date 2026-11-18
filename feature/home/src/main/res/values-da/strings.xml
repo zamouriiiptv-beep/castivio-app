@@ -31,6 +31,7 @@
         <item quantity="one">%d afsnit</item>
         <item quantity="other">%d afsnit</item>
     </plurals>
+    <string name="show_info">Info</string>
     <string name="show_back">Tilbage</string>
     <string name="show_nav_overview">Oversigt</string>
     <string name="show_nav_seasons">Sæsoner</string>

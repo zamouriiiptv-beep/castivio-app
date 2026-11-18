@@ -312,13 +312,15 @@ class ShowScreenTest {
     // ---------------------------------------------------------------------------------------- seasons and episodes
 
     @Test
-    fun `the selector names the open season and how many episodes it holds`() {
+    fun `the seasons are a bar on the page, each with how many episodes it holds`() {
         show()
 
+        // Every season is on the page at once (design/mockups/series-info-ar.html): no window to open.
         compose.onNodeWithText("Season 1").assertIsDisplayed()
-        compose.onNodeWithText("(2 episodes)").assertIsDisplayed()
-        // The other season is a line of the menu, which is closed: nothing of it is on the page until the selector is pressed.
-        assertTrue(compose.onAllNodesWithText("Season 2", substring = true).fetchSemanticsNodes().isEmpty())
+        compose.onNodeWithText("2 episodes").assertIsDisplayed()
+        compose.onNodeWithText("Season 2").assertIsDisplayed()
+        compose.onNodeWithText("1 episode").assertIsDisplayed()
+        compose.onNodeWithText("Episode 1-1").assertIsDisplayed()
     }
 
     /** A show of one season has nothing to choose between, so its season is named and is not a control. */
@@ -357,18 +359,43 @@ class ShowScreenTest {
     }
 
     @Test
-    fun `a pick of another season from the selector's menu lists that season's episodes`() {
+    fun `a press on another season in the bar lists that season's episodes under it`() {
         show()
 
-        // The selector opens a menu of the seasons, each with its count, and the pick closes it.
-        compose.onNodeWithText("Season 1").performClick()
-        compose.waitForIdle()
-        compose.onNodeWithText("Season 2 \u00B7 1 episode").performClick()
+        compose.onNodeWithText("Season 2").performClick()
         compose.waitForIdle()
 
         compose.onNodeWithText("Episode 2-1").assertIsDisplayed()
         assertTrue(compose.onAllNodesWithText("Episode 1-1").fetchSemanticsNodes().isEmpty())
-        compose.onNodeWithText("Season 2").assertIsDisplayed()
+    }
+
+    // ---------------------------------------------------------------------------------------- the information screen
+
+    @Test
+    fun `the plot is not on the page, and Info opens it with the whole cast, and Back closes it`() {
+        show()
+
+        assertTrue(compose.onAllNodesWithText("An emotional thrill ride.").fetchSemanticsNodes().isEmpty())
+        compose.onNodeWithText("Info").performClick()
+        compose.waitForIdle()
+
+        compose.onNodeWithText("An emotional thrill ride.").assertIsDisplayed()
+        // The whole cast as one credit line -- "Cast: Nick Gehlfuss, Yaya DaCosta" -- which the page's own cast section is not.
+        compose.onNodeWithText("Nick Gehlfuss, Yaya DaCosta", substring = true).assertIsDisplayed()
+
+        compose.onAllNodesWithContentDescription("Back").fetchSemanticsNodes().size.let { backs ->
+            assertTrue("the information screen has its own way back", backs >= 2)
+        }
+        compose.onAllNodesWithContentDescription("Back")[1].performClick()
+        compose.waitForIdle()
+        assertTrue(compose.onAllNodesWithText("An emotional thrill ride.").fetchSemanticsNodes().isEmpty())
+    }
+
+    @Test
+    fun `a show the provider said nothing of has no Info to open`() {
+        show(details = null, plots = emptyMap(), similar = emptyList())
+
+        assertTrue(compose.onAllNodesWithText("Info").fetchSemanticsNodes().isEmpty())
     }
 
     // ------------------------------------------------------------------------------------ cast and similar shows

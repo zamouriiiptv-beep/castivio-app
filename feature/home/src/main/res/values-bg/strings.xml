@@ -31,6 +31,7 @@
         <item quantity="one">%d епизод</item>
         <item quantity="other">%d епизода</item>
     </plurals>
+    <string name="show_info">Информация</string>
     <string name="show_back">Назад</string>
     <string name="show_nav_overview">Общ преглед</string>
     <string name="show_nav_seasons">Сезони</string>

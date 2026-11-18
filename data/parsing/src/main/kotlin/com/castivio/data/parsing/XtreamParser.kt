@@ -354,6 +354,8 @@ object XtreamParser {
     private fun readSeriesInfo(scanner: JsonScanner): XtreamSeriesInfo? {
         var rating: Double? = null
         var plot: String? = null
+        var director: String? = null
+        var lastModified: Long? = null
         var cast: List<String> = emptyList()
         var genres: List<String> = emptyList()
         var releaseDate: String? = null
@@ -364,6 +366,10 @@ object XtreamParser {
         scanner.readObject { field ->
             when (field) {
                 "rating" -> rating = ratingOf(scanner.string())
+                "director" -> director = scanner.string()?.takeIf { it.isNotBlank() }
+                // When the panel last changed the show -- which panels show as its "added" date, and move when they add
+                // episodes. Sent as text or as a number; read as text, and only a positive one is a date.
+                "last_modified" -> lastModified = scanner.string()?.trim()?.toLongOrNull()?.takeIf { it > 0 }
                 "plot", "description" -> plot = scanner.string()?.takeIf { it.isNotBlank() }
                 "cast", "actors" -> cast = listOfNames(scanner.string())
                 "genre" -> genres = listOfNames(scanner.string())
@@ -390,6 +396,8 @@ object XtreamParser {
             backdropUrl = backdrop,
             tmdbId = tmdbId ?: tmdbAlias,
             imdbId = imdbId,
+            director = director,
+            lastModifiedEpochSeconds = lastModified,
         ).takeIf { it.saysAnything }
     }
 
@@ -692,11 +700,16 @@ data class XtreamSeriesInfo(
     val tmdbId: Long? = null,
     /** The show's IMDb id (`tt0903747`), when the panel sent one. */
     val imdbId: String? = null,
+    /** The show's director, as the panel wrote it. */
+    val director: String? = null,
+    /** `info.last_modified`: when the panel last changed the show, in seconds -- what panels show as its added date. */
+    val lastModifiedEpochSeconds: Long? = null,
 ) {
     /** Whether the block held a single fact -- an id is one -- and `"info":[]` held none. */
     val saysAnything: Boolean
         get() = rating != null || plot != null || cast.isNotEmpty() || genres.isNotEmpty() ||
-            releaseYear != null || backdropUrl != null || tmdbId != null || imdbId != null
+            releaseYear != null || backdropUrl != null || tmdbId != null || imdbId != null || director != null ||
+            lastModifiedEpochSeconds != null
 }
 
 /** The account behind the credentials, including why it might not work. */

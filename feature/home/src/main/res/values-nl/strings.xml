@@ -31,6 +31,7 @@
         <item quantity="one">%d aflevering</item>
         <item quantity="other">%d afleveringen</item>
     </plurals>
+    <string name="show_info">Info</string>
     <string name="show_back">Terug</string>
     <string name="show_nav_overview">Overzicht</string>
     <string name="show_nav_seasons">Seizoenen</string>

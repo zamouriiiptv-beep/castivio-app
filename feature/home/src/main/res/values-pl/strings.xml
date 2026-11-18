@@ -35,6 +35,7 @@
         <item quantity="many">%d odcinków</item>
         <item quantity="other">%d odcinka</item>
     </plurals>
+    <string name="show_info">Informacje</string>
     <string name="show_back">Wstecz</string>
     <string name="show_nav_overview">Przegląd</string>
     <string name="show_nav_seasons">Sezony</string>

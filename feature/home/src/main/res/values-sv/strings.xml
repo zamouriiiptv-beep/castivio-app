@@ -31,6 +31,7 @@
         <item quantity="one">%d avsnitt</item>
         <item quantity="other">%d avsnitt</item>
     </plurals>
+    <string name="show_info">Info</string>
     <string name="show_back">Tillbaka</string>
     <string name="show_nav_overview">Översikt</string>
     <string name="show_nav_seasons">Säsonger</string>

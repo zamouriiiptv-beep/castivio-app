@@ -31,6 +31,7 @@
         <item quantity="one">%d एपिसोड</item>
         <item quantity="other">%d एपिसोड</item>
     </plurals>
+    <string name="show_info">जानकारी</string>
     <string name="show_back">वापस</string>
     <string name="show_nav_overview">अवलोकन</string>
     <string name="show_nav_seasons">सीज़न</string>

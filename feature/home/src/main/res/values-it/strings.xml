@@ -33,6 +33,7 @@
         <item quantity="many">%d episodi</item>
         <item quantity="other">%d episodi</item>
     </plurals>
+    <string name="show_info">Info</string>
     <string name="show_back">Indietro</string>
     <string name="show_nav_overview">Panoramica</string>
     <string name="show_nav_seasons">Stagioni</string>

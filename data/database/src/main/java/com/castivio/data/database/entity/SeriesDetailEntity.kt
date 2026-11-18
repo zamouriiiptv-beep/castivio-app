@@ -48,6 +48,14 @@ data class SeriesDetailEntity(
     /** The show's IMDb id, as the provider's reply gave it; null when it gave none. */
     @ColumnInfo(name = "imdb_id")
     val imdbId: String? = null,
+
+    /** The show's director, as the reply gave it -- `CastivioMigrations.ADD_SHOW_CREDITS`. */
+    @ColumnInfo(name = "director")
+    val director: String? = null,
+
+    /** `info.last_modified`, the show's added date as panels show it, in seconds -- `CastivioMigrations.ADD_SHOW_CREDITS`. */
+    @ColumnInfo(name = "added_epoch")
+    val addedEpochSeconds: Long? = null,
 )
 
 /** One episode's plot, by the id of the catalogue row the episode was written as. */

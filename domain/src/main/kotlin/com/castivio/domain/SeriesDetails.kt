@@ -25,6 +25,13 @@ data class SeriesDetails(
     val tmdbId: Long? = null,
     /** The show's IMDb id (`tt0903747`), when the provider sent one. */
     val imdbId: String? = null,
+    /** The show's director, as the provider wrote it: drawn on the show's information screen. */
+    val director: String? = null,
+    /**
+     * When the provider last changed the show, in seconds: what panels show as a show's added date ("أُضيف في"), and move when
+     * they add episodes.
+     */
+    val addedEpochSeconds: Long? = null,
 )
 
 /**

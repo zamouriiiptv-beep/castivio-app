@@ -31,6 +31,7 @@
         <item quantity="one">%dটি পর্ব</item>
         <item quantity="other">%dটি পর্ব</item>
     </plurals>
+    <string name="show_info">তথ্য</string>
     <string name="show_back">ফিরুন</string>
     <string name="show_nav_overview">সংক্ষিপ্ত বিবরণ</string>
     <string name="show_nav_seasons">সিজন</string>

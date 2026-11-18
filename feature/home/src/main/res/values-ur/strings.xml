@@ -31,6 +31,7 @@
         <item quantity="one">%d قسط</item>
         <item quantity="other">%d اقساط</item>
     </plurals>
+    <string name="show_info">معلومات</string>
     <string name="show_back">واپس</string>
     <string name="show_nav_overview">جائزہ</string>
     <string name="show_nav_seasons">سیزن</string>

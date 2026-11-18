@@ -23,6 +23,7 @@
     <string name="show_preparing">المزوّد يجهّز الحلقات…</string>
     <string name="show_no_episodes_title">لا توجد حلقات بعد</string>
     <string name="show_no_episodes_detail">مزوّدك يعرض هذا العمل لكنه لم يرسل أي حلقة له.</string>
+    <string name="show_info">معلومات</string>
     <string name="show_back">رجوع</string>
     <string name="show_nav_overview">نظرة عامة</string>
     <string name="show_nav_seasons">المواسم</string>

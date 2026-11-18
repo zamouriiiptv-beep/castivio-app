@@ -33,6 +33,8 @@ class RoomSeriesDetailsStore(private val dao: SeriesDetailDao) : SeriesDetailsSt
                     fetchedAt = now,
                     tmdbId = details.tmdbId,
                     imdbId = details.imdbId,
+                    director = details.director,
+                    addedEpochSeconds = details.addedEpochSeconds,
                 ),
             )
         }
@@ -48,5 +50,7 @@ class RoomSeriesDetailsStore(private val dao: SeriesDetailDao) : SeriesDetailsSt
         backdropUrl = backdropUrl,
         tmdbId = tmdbId,
         imdbId = imdbId,
+        director = director,
+        addedEpochSeconds = addedEpochSeconds,
     )
 }

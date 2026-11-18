@@ -31,6 +31,7 @@
         <item quantity="one">%d episode</item>
         <item quantity="other">%d episode</item>
     </plurals>
+    <string name="show_info">Impormasyon</string>
     <string name="show_back">Bumalik</string>
     <string name="show_nav_overview">Pangkalahatang-ideya</string>
     <string name="show_nav_seasons">Mga Season</string>

@@ -166,6 +166,24 @@ class XtreamParserTest {
     }
 
     @Test
+    fun `series info reads the director and the day the panel last changed the show, as text or as a number`() {
+        fun info(fields: String): XtreamSeriesInfo? {
+            val infos = mutableListOf<XtreamSeriesInfo>()
+            XtreamParser.parseSeriesInfo(StringReader("""{"seasons":[],"info":{$fields},"episodes":{}}"""), onInfo = { infos.add(it) }) { }
+            return infos.singleOrNull()
+        }
+
+        val text = info(""""plot":"A story.","director":"Gustavo Lipsztein","last_modified":"1773446400"""")!!
+        assertEquals("Gustavo Lipsztein", text.director)
+        assertEquals(1773446400L, text.lastModifiedEpochSeconds)
+        assertEquals(1773446400L, info(""""plot":"A story.","last_modified":1773446400""")!!.lastModifiedEpochSeconds)
+        val none = info(""""plot":"A story.","director":"  ","last_modified":"0"""")!!
+        assertNull(none.director)
+        assertNull(none.lastModifiedEpochSeconds)
+        assertEquals("a date alone is a fact", 5L, info(""""last_modified":"5"""")!!.lastModifiedEpochSeconds)
+    }
+
+    @Test
     fun `series info yields the show's details and each episode's plot`() {
         val json = """
             {"seasons":[],

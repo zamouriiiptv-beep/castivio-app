@@ -1,5 +1,10 @@
 package com.castivio.feature.home
 
+import com.castivio.core.design.components.CastivioChip
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import android.os.SystemClock
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -41,8 +46,6 @@ import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.TheaterComedy
 import androidx.compose.material.icons.rounded.ThumbUp
 import androidx.compose.material.icons.rounded.VideoLibrary
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -82,7 +85,6 @@ import com.castivio.core.design.components.ButtonWeight
 import com.castivio.core.design.components.CardShape
 import com.castivio.core.design.components.CastivioButton
 import com.castivio.core.design.components.CastivioIconButton
-import com.castivio.core.design.components.CastivioNoticeDialog
 import com.castivio.core.design.components.EmptyState
 import com.castivio.core.design.components.MediaCard
 import com.castivio.core.design.components.PosterFrame
@@ -169,8 +171,9 @@ fun ShowScreen(
         }
     }
 
-    // The plot, whole: a link under it and a small dialog, offered only where the page had to cut it.
-    var plotOpen by remember(show.seriesId) { mutableStateOf(false) }
+    // The show's information on a screen of its own, over the page; Back from it returns to the Info button.
+    var infoOpen by remember(show.seriesId) { mutableStateOf(false) }
+    val infoFocus = remember { FocusRequester() }
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
 
@@ -258,9 +261,10 @@ fun ShowScreen(
                         playFocus = playFocus,
                         onPlay = { target?.let { start(it.episode) } },
                         onFavorite = model::toggleFavorite,
-                        onMorePlot = { plotOpen = true },
                         onBack = onBack,
                         onPosterShown = { posterShown = it },
+                        onInfo = { infoOpen = true },
+                        infoFocus = infoFocus,
                     )
                 }
                 if (instrumented) {
@@ -305,6 +309,11 @@ fun ShowScreen(
                         )
                     }
                 } else {
+                    if (state.seasons.size > 1) {
+                    // The seasons as a bar, the chosen one lit and kept in view, left and right on the remote between them, and
+                    // the episodes straight under it (design/mockups/series-info-ar.html) -- in place of a drop-down window.
+                    item(key = "seasons") { SeasonChips(state.seasons, season, m, tv) { picked = it } }
+                    } else {
                     item(key = "episodes-heading") {
                         val episodes = season?.episodes.orEmpty()
                         val panelShape = RoundedCornerShape(Radius.md)
@@ -320,12 +329,9 @@ fun ShowScreen(
                         ) {
                             SectionTitle(plural(R.plurals.show_episodes, episodes.size), m)
                             // A show of one season has nothing to choose: it is named, and is no control that opens a list of one.
-                            if (state.seasons.size > 1) {
-                                SeasonSelector(state.seasons, season, m, tv) { picked = it }
-                            } else {
-                                SeasonLabel(season, m)
-                            }
+                            SeasonLabel(season, m)
                         }
+                    }
                     }
                     items(season?.episodes.orEmpty(), key = { it.id }) { episode ->
                         EpisodeRow(
@@ -347,18 +353,131 @@ fun ShowScreen(
             }
         }
 
-        // The dialog is the application's own, and follows its language as the page does -- the plot inside it takes the
-        // direction of its words and is set against the start edge.
-        if (plotOpen) {
-            CastivioNoticeDialog(
-                title = show.title,
-                body = details?.plot.orEmpty(),
-                closeLabel = stringResource(R.string.movie_plot_close),
-                onClose = { plotOpen = false },
-                maxFraction = PLOT_DIALOG_FRACTION,
+        if (infoOpen) {
+            ShowInfo(
+                show = show,
+                state = state,
+                m = m,
+                tv = tv,
+                onClose = {
+                    infoOpen = false
+                    scope.launch {
+                        withFrameNanos { }
+                        runCatching { infoFocus.requestFocus() }
+                    }
+                },
             )
         }
+
     }
+}
+
+/**
+ * Everything the provider said of the show, on a screen of its own over the page (design/mockups/series-info-ar.html): the
+ * facts, the rating and the added date, the whole plot, the director and the whole cast -- none of it cut, since the screen
+ * scrolls. Over the same softened picture as the page, and on the details' dark ground. Back, or the way back at the end of the
+ * name's row, closes it; the page then gives the focus back to its Info button.
+ */
+@Composable
+private fun ShowInfo(show: SeriesSummary, state: ShowState, m: CatalogMetrics, tv: Boolean, onClose: () -> Unit) {
+    val colors = CastivioTheme.colors
+    val details = state.details
+    val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+    val backFocus = remember { FocusRequester() }
+    BackHandler(onBack = onClose)
+    LaunchedEffect(Unit) { runCatching { backFocus.requestFocus() } }
+    Box(
+        Modifier
+            .fillMaxSize()
+            // Over the page: it takes the touches the page underneath would otherwise have.
+            .pointerInput(Unit) {}
+            .castivioBackdrop(),
+    ) {
+        details?.backdropUrl?.let { url -> ShowBackdrop(url, Modifier.fillMaxSize()) }
+        Column(
+            Modifier
+                .fillMaxSize()
+                .castivioStage(m.frame)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(m.rowGap),
+        ) {
+            Row(horizontalArrangement = Arrangement.spacedBy(m.rowGap), verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = show.title,
+                    style = castivioTitleStyle(m.frame.fsTitle * TITLE_OF_PANE),
+                    color = colors.onBackground,
+                    maxLines = SHOW_TITLE_LINES,
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = startEdgeAlign(show.title),
+                    modifier = Modifier.weight(1f),
+                )
+                PageBack(onClose, Modifier.focusRequester(backFocus))
+            }
+            val panelShape = RoundedCornerShape(Radius.md)
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .clip(panelShape)
+                    .background(detailsGround())
+                    .border(1.dp, colors.glassBorderSoft, panelShape)
+                    .padding(horizontal = m.cardPad, vertical = m.cardPad),
+                verticalArrangement = Arrangement.spacedBy(m.bandGap),
+            ) {
+                ShowFacts(state, waiting = false, m = m)
+                if (details?.rating != null || details?.addedEpochSeconds != null) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(m.rowGap), verticalAlignment = Alignment.CenterVertically) {
+                        details.rating?.let {
+                            RatingBadge(
+                                rating = ratingText(it),
+                                labelStyle = castivioChipStyle(m.frame.fsChip),
+                                iconSize = m.frame.fsBody * FACT_ICON_OF_BODY,
+                                padH = m.entryPadH,
+                                padV = m.entryPadV,
+                            )
+                        }
+                        details.addedEpochSeconds?.let {
+                            DetailsDateChip(stringResource(R.string.movie_added, ltrToken(addedDateText(it))), m)
+                        }
+                    }
+                }
+                details?.plot?.let { plot ->
+                    InfoHeading(stringResource(R.string.movie_plot_title), m)
+                    Text(
+                        text = plot,
+                        style = castivioBodyStyle(m.frame.fsBody).copy(textDirection = TextDirection.Content),
+                        color = colors.onBackground,
+                        textAlign = startEdgeAlign(plot),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+                details?.director?.let { director ->
+                    Text(
+                        text = creditText(stringResource(R.string.movie_director), creditNames(listOf(director), rtl)),
+                        style = castivioBodyStyle(m.frame.fsBody).copy(textDirection = TextDirection.Content),
+                        color = colors.onBackground,
+                    )
+                }
+                details?.cast?.filter { it.isNotBlank() }?.takeIf { it.isNotEmpty() }?.let { cast ->
+                    Text(
+                        text = creditText(stringResource(R.string.movie_cast), creditNames(cast, rtl)),
+                        style = castivioBodyStyle(m.frame.fsBody).copy(textDirection = TextDirection.Content),
+                        color = colors.onBackground,
+                    )
+                }
+                if (tv) Spacer(Modifier.height(m.rowGap))
+            }
+        }
+    }
+}
+
+/** A heading of the information screen, in the film page's own step for "Plot". */
+@Composable
+private fun InfoHeading(text: String, m: CatalogMetrics) {
+    Text(
+        text = text,
+        style = castivioChipStyle(m.frame.fsLabel).copy(fontWeight = FontWeight.Bold),
+        color = CastivioTheme.colors.onBackgroundVariant,
+    )
 }
 
 /** The rail: the page's sections, the one the page is at lit. The way back is not in it: see [PageBack]. */
@@ -459,16 +578,16 @@ private fun ShowTop(
     playFocus: FocusRequester,
     onPlay: () -> Unit,
     onFavorite: () -> Unit,
-    onMorePlot: () -> Unit,
     onBack: () -> Unit,
     onPosterShown: (ArtworkShown) -> Unit,
+    onInfo: () -> Unit,
+    infoFocus: FocusRequester,
 ) {
     val colors = CastivioTheme.colors
     val details = state.details
     // The provider has not answered yet, and may have something to say: quiet bars stand where it would go.
     val waiting = state.asking && details == null
     val target = state.target
-    var plotCut by remember(details?.plot) { mutableStateOf(false) }
 
     Box(Modifier.fillMaxWidth()) {
         val heroShape = RoundedCornerShape(Radius.md)
@@ -527,69 +646,40 @@ private fun ShowTop(
                         onClick = onFavorite,
                     )
                 }
-                // The rating on a row of its own, as the film page draws it (details-template-ar.html).
-                details?.rating?.let {
-                    RatingBadge(
-                        rating = ratingText(it),
-                        labelStyle = castivioChipStyle(m.frame.fsChip),
-                        iconSize = m.frame.fsBody * FACT_ICON_OF_BODY,
-                        padH = m.entryPadH,
-                        padV = m.entryPadV,
-                        modifier = Modifier.clip(RoundedCornerShape(Radius.pill)).background(detailsGround()),
-                    )
-                }
-                val plot = details?.plot
-                if (plot != null) {
-                    // The plot's heading, and at its end the link to the whole of it where the page had to cut it: the
-                    // film page's own row.
-                    Row(
-                        Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(
-                            text = stringResource(R.string.movie_plot_title),
-                            style = castivioChipStyle(m.frame.fsLabel).copy(fontWeight = FontWeight.Bold),
-                            color = colors.onBackground,
+                // The rating, the day the provider gives the show, and the way to everything else it said: the plot, the
+                // director, the cast -- on a screen of their own (design/mockups/series-info-ar.html), so the seasons and the
+                // episodes are on the first screen of the page.
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(m.rowGap),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    details?.rating?.let {
+                        RatingBadge(
+                            rating = ratingText(it),
+                            labelStyle = castivioChipStyle(m.frame.fsChip),
+                            iconSize = m.frame.fsBody * FACT_ICON_OF_BODY,
+                            padH = m.entryPadH,
+                            padV = m.entryPadV,
+                            modifier = Modifier.clip(RoundedCornerShape(Radius.pill)).background(detailsGround()),
                         )
-                        if (plotCut) PlotMore(m, onClick = onMorePlot)
                     }
-                    Text(
-                        text = plot,
-                        // The strong ink, and the plot's own direction from its first letter, so a Dutch or English
-                        // plot on an Arabic page keeps its full stop at its end.
-                        style = castivioBodyStyle(m.frame.fsBody).copy(textDirection = TextDirection.Content),
-                        color = colors.onBackground,
-                        maxLines = if (tv) PLOT_LINES_TV else PLOT_LINES,
-                        overflow = TextOverflow.Ellipsis,
-                        textAlign = startEdgeAlign(plot),
-                        onTextLayout = { plotCut = it.hasVisualOverflow },
-                        modifier = if (plotCut) {
-                            Modifier.focusProperties { canFocus = false }.clickable(
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = null,
-                                onClickLabel = stringResource(R.string.movie_plot_more),
-                                onClick = onMorePlot,
-                            )
-                        } else {
-                            Modifier
-                        },
-                    )
-                } else if (waiting) {
-                    PlotPlaceholder(m, tv)
-                }
-                // The cast in one line, as the film page sets a credit: the label quieter, the names in the strong ink.
-                details?.cast?.filter { it.isNotBlank() }?.takeIf { it.isNotEmpty() }?.let { cast ->
-                    Text(
-                        text = creditText(
-                            stringResource(R.string.movie_cast),
-                            creditNames(cast, rtl = LocalLayoutDirection.current == LayoutDirection.Rtl),
-                        ),
-                        style = castivioBodyStyle(m.frame.fsBody).copy(textDirection = TextDirection.Content),
-                        color = colors.onBackground,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
+                    details?.addedEpochSeconds?.let {
+                        DetailsDateChip(stringResource(R.string.movie_added, ltrToken(addedDateText(it))), m)
+                    }
+                    if (details != null) {
+                        CastivioChip(
+                            text = stringResource(R.string.show_info),
+                            onClick = onInfo,
+                            icon = Icons.Rounded.Info,
+                            labelStyle = castivioChipStyle(m.frame.fsChip),
+                            padH = m.entryPadH,
+                            padV = m.entryPadV,
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(Radius.pill))
+                                .background(detailsGround())
+                                .focusRequester(infoFocus),
+                        )
+                    }
                 }
             }
         }
@@ -639,15 +729,6 @@ private fun Fact(icon: ImageVector, text: String, iconSize: Dp, style: androidx.
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(FACT_GAP)) {
         Icon(icon, contentDescription = null, tint = colors.onBackgroundMuted, modifier = Modifier.size(iconSize))
         Text(text = text, style = style, color = colors.onBackground, maxLines = 1, overflow = TextOverflow.Ellipsis)
-    }
-}
-
-@Composable
-private fun PlotPlaceholder(m: CatalogMetrics, tv: Boolean) {
-    Column(verticalArrangement = Arrangement.spacedBy(m.rowGap / 2)) {
-        Bar(Modifier.fillMaxWidth().height(m.frame.fsBody))
-        Bar(Modifier.fillMaxWidth(PLOT_BAR_SECOND).height(m.frame.fsBody))
-        if (tv) Bar(Modifier.fillMaxWidth(PLOT_BAR_THIRD).height(m.frame.fsBody))
     }
 }
 
@@ -712,62 +793,6 @@ private fun SeasonName(chosen: Season?, m: CatalogMetrics) {
 private fun SeasonLabel(chosen: Season?, m: CatalogMetrics) {
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(m.rowGap)) {
         SeasonName(chosen, m)
-    }
-}
-
-@Composable
-private fun SeasonSelector(
-    seasons: List<Season>,
-    chosen: Season?,
-    m: CatalogMetrics,
-    tv: Boolean,
-    onSeason: (Int) -> Unit,
-) {
-    var expanded by remember { mutableStateOf(false) }
-    val colors = CastivioTheme.colors
-    val shape = RoundedCornerShape(Radius.md)
-    val current = chosen
-    Box {
-        Row(
-            Modifier
-                .clip(shape)
-                .background(colors.selectedFill)
-                .border(1.5.dp, colors.focusRing, shape)
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                ) { expanded = true }
-                .padding(horizontal = m.entryPadH, vertical = m.rowGap),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(m.rowGap),
-        ) {
-            Icon(
-                Icons.Rounded.ExpandMore,
-                contentDescription = null,
-                tint = colors.onBackground,
-                modifier = Modifier.size(m.frame.fsBody * 1.25f),
-            )
-            SeasonName(current, m)
-        }
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-        ) {
-            seasons.forEach { item ->
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            text = "${stringResource(R.string.show_season, item.number)} · ${plural(R.plurals.show_episodes, item.episodes.size)}",
-                            style = castivioChipStyle(m.frame.fsChip),
-                        )
-                    },
-                    onClick = {
-                        expanded = false
-                        onSeason(item.number)
-                    },
-                )
-            }
-        }
     }
 }
 
@@ -1088,9 +1113,6 @@ private const val TITLE_OF_PANE = 0.82f
 
 private const val SHOW_TITLE_LINES = 3
 
-/** The plot's lines: a television has the room for three, a handset two. */
-private const val PLOT_LINES = 2
-private const val PLOT_LINES_TV = 3
 
 /** A quiet glass ground that groups the show's identity and actions without obscuring its backdrop. */
 private const val HERO_PANEL_ALPHA = 0.72f

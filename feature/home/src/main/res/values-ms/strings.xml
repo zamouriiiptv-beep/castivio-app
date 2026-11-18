@@ -29,6 +29,7 @@
     <plurals name="show_episodes">
         <item quantity="other">%d episod</item>
     </plurals>
+    <string name="show_info">Maklumat</string>
     <string name="show_back">Kembali</string>
     <string name="show_nav_overview">Gambaran keseluruhan</string>
     <string name="show_nav_seasons">Musim</string>

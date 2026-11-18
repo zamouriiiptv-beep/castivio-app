@@ -33,6 +33,7 @@
         <item quantity="few">%d epizode</item>
         <item quantity="other">%d epizoda</item>
     </plurals>
+    <string name="show_info">Informacije</string>
     <string name="show_back">Natrag</string>
     <string name="show_nav_overview">Pregled</string>
     <string name="show_nav_seasons">Sezone</string>

@@ -31,6 +31,7 @@
         <item quantity="one">%d episode</item>
         <item quantity="other">%d episoder</item>
     </plurals>
+    <string name="show_info">Info</string>
     <string name="show_back">Tilbake</string>
     <string name="show_nav_overview">Oversikt</string>
     <string name="show_nav_seasons">Sesonger</string>

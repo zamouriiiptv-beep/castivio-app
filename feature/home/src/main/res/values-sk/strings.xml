@@ -35,6 +35,7 @@
         <item quantity="many">%d epizódy</item>
         <item quantity="other">%d epizód</item>
     </plurals>
+    <string name="show_info">Informácie</string>
     <string name="show_back">Späť</string>
     <string name="show_nav_overview">Prehľad</string>
     <string name="show_nav_seasons">Série</string>
