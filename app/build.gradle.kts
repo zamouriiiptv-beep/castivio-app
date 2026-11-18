@@ -167,6 +167,9 @@ android {
             matchingFallbacks += listOf("debug")
             isDebuggable = false
             isMinifyEnabled = false
+            // The development portal, as a debug build has: this build is installed over one, on the same device and the same
+            // activation, to measure what a viewer's build costs (`com.castivio.measure` in this type's manifest).
+            buildConfigField("String", "PORTAL_BASE_URL", "\"${portalBaseUrlOverride ?: portalTestBaseUrl}\"")
         }
     }
 

@@ -2,6 +2,7 @@ package com.castivio.core.platform
 
 import android.content.Context
 import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
 import android.os.SystemClock
 import android.util.Log
 import com.castivio.core.common.artwork.ReplySpan
@@ -461,9 +462,24 @@ object PerformanceLog {
      */
     const val TAG = "CastivioPerf"
 
-    /** Whether the performance panel may be drawn: a debuggable build, and nothing else. */
-    fun isVisibleIn(context: Context): Boolean =
-        context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0
+    /**
+     * Whether the performance panel may be drawn: a debuggable build, or the measurement build -- compiled as a viewer's is,
+     * which a debuggable build is not -- whose manifest says [MEASURE_KEY]. Never a viewer's build.
+     */
+    fun isVisibleIn(context: Context): Boolean {
+        // The application's context, never the screen's: the flag outlives every screen that asks.
+        val app = context.applicationContext
+        val flag = measure ?: MeasureFlag {
+            app.packageManager.getApplicationInfo(app.packageName, PackageManager.GET_META_DATA)
+                .metaData?.getBoolean(MEASURE_KEY, false) == true
+        }.also { measure = it }
+        return flag.isOn(debuggable = context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0)
+    }
+
+    /** The measurement build's manifest flag: see `app/src/benchmark/AndroidManifest.xml`. */
+    const val MEASURE_KEY = "com.castivio.measure"
+
+    @Volatile private var measure: MeasureFlag? = null
 }
 
 /** The five things Phase B was asked to time, named once. */

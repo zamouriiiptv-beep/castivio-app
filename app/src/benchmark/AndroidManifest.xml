@@ -23,5 +23,15 @@
         <profileable
             android:shell="true"
             tools:targetApi="q" />
+
+        <!--
+          The measurement panels and lines a debug build draws, drawn here too: a debug build's
+          timings are not measurements (its optimising compiler is off), and this build is the
+          one compiled as a viewer's is. Read by `PerformanceLog.isVisibleIn`. Neither `debug`,
+          which is debuggable already, nor `release` carries it.
+        -->
+        <meta-data
+            android:name="com.castivio.measure"
+            android:value="true" />
     </application>
 </manifest>

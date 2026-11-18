@@ -195,6 +195,21 @@ jobs:
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: ./scripts/verify-room-schema.sh
 
+      # **The measurement APK.** A debug build's timings are not measurements: the debuggable flag turns ART's
+      # optimising compiler off, and a parse that takes 0.23 s on a desktop JVM read 18.43 s on a phone. The app's
+      # `benchmark` build type is compiled as a viewer's build is -- not debuggable -- with a debug build's licensing and
+      # portal, and its manifest turns the measurement panels on (`com.castivio.measure`). It is built after the tests so a
+      # failure here costs nothing the debug APK and the tests did not already deliver; `:app` only, never
+      # `:benchmark:macro` (see above).
+      - name: Build the measurement APK
+        id: measure
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        env:
+          OPENSUBTITLES_API_KEY: ${{ secrets.OPENSUBTITLES_API_KEY }}
+          OPENSUBTITLES_USERNAME: ${{ secrets.OPENSUBTITLES_USERNAME }}
+          OPENSUBTITLES_PASSWORD: ${{ secrets.OPENSUBTITLES_PASSWORD }}
+        run: ./gradlew :app:assembleBenchmark -Pcastivio.abiSplit=true --no-daemon --console=plain
+
       - name: Upload exported schema
         if: always()
         uses: actions/upload-artifact@v4
@@ -257,4 +272,21 @@ jobs:
         with:
           name: castivio-tv-debug-armv7
           path: app/build/outputs/apk/debug/*armeabi-v7a*.apk
+          if-no-files-found: error
+
+      # The measurement APK, installed over the debug one (same key, same application id) to read what a viewer's build costs.
+      - name: Upload measurement APK (64-bit)
+        if: ${{ !cancelled() && steps.measure.outcome == 'success' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: castivio-tv-measure-arm64
+          path: app/build/outputs/apk/benchmark/*arm64-v8a*.apk
+          if-no-files-found: error
+
+      - name: Upload measurement APK (32-bit)
+        if: ${{ !cancelled() && steps.measure.outcome == 'success' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: castivio-tv-measure-armv7
+          path: app/build/outputs/apk/benchmark/*armeabi-v7a*.apk
           if-no-files-found: error
