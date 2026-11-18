@@ -53,6 +53,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -80,6 +81,8 @@ import com.castivio.core.common.artwork.ArtworkShown
 import com.castivio.core.common.artwork.PageOpen
 import com.castivio.core.common.artwork.PageOpenLine
 import com.castivio.core.common.artwork.PageOpenTimes
+import com.castivio.core.common.artwork.PosterSize
+import com.castivio.core.common.artwork.StillsTimes
 import com.castivio.core.design.components.RatingBadge
 import com.castivio.core.design.components.ButtonWeight
 import com.castivio.core.design.components.CardShape
@@ -201,6 +204,8 @@ fun ShowScreen(
         }
     }
     var posterShown by remember(show.seriesId) { mutableStateOf<ArtworkShown?>(null) }
+    // The open season's episode pictures as they come, by episode: what the line says of them.
+    val stillsShown = remember(show.seriesId) { mutableStateMapOf<String, ArtworkShown>() }
     var backdropShown by remember(show.seriesId) { mutableStateOf<ArtworkShown?>(null) }
     val sections = showSections(
         hasSeasons = state.seasons.isNotEmpty(),
@@ -279,6 +284,17 @@ fun ShowScreen(
                             posterAsked = !show.artworkUrl.isNullOrBlank(),
                             backdrop = backdropShown?.since(openStart),
                             backdropAsked = details?.backdropUrl != null,
+                            stills = season?.episodes?.takeIf { it.isNotEmpty() }?.let { episodes ->
+                                val urls = episodes.mapNotNull { it.artworkUrl?.takeIf(String::isNotBlank) }
+                                val sizes = urls.mapNotNull(PosterSize::sizeOf)
+                                StillsTimes(
+                                    asked = urls.size,
+                                    withoutPicture = episodes.size - urls.size,
+                                    shown = episodes.mapNotNull { stillsShown[it.id]?.since(openStart) },
+                                    tmdbSizes = sizes.groupingBy { it }.eachCount(),
+                                    otherHosts = urls.size - sizes.size,
+                                )
+                            },
                         ),
                     )?.let { line ->
                         item(key = "pictures") {
@@ -341,6 +357,11 @@ fun ShowScreen(
                             waiting = state.asking && state.plots.isEmpty(),
                             m = m,
                             onStart = start,
+                            onStillShown = if (instrumented) {
+                                { shown: ArtworkShown -> if (episode.id !in stillsShown) stillsShown[episode.id] = shown }
+                            } else {
+                                null
+                            },
                         )
                     }
                 }
@@ -924,6 +945,8 @@ private fun EpisodeRow(
     waiting: Boolean,
     m: CatalogMetrics,
     onStart: (Episode) -> Unit,
+    /** Told how the episode's picture came, once it is on screen: the page prints it in a development build. */
+    onStillShown: ((ArtworkShown) -> Unit)? = null,
 ) {
     val colors = CastivioTheme.colors
     val shape = RoundedCornerShape(Radius.md)
@@ -950,7 +973,12 @@ private fun EpisodeRow(
             modifier = Modifier.width(m.frame.fsLabel * NUMBER_WIDTH_OF_LABEL),
         )
         Box(Modifier.height(thumbHeight).aspectRatio(THUMB_ASPECT)) {
-            PosterFrame(url = episode.artworkUrl, seed = episode.episodeNumber, modifier = Modifier.fillMaxSize())
+            PosterFrame(
+                url = episode.artworkUrl,
+                seed = episode.episodeNumber,
+                modifier = Modifier.fillMaxSize(),
+                onShown = onStillShown,
+            )
             when (mark) {
                 EpisodeMark.Watched -> Icon(
                     Icons.Rounded.CheckCircle,

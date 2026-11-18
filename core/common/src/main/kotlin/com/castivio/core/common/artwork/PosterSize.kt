@@ -63,6 +63,22 @@ object PosterSize {
      */
     fun forScreen(url: String): String = atMost(url, SCREEN_SIZE, SCREEN_WIDTH)
 
+    /**
+     * The size step of a TMDB picture address -- `original`, `w300`, `w600_and_h900_bestv2` -- or null for any other address.
+     * What a development build prints of a page's pictures, to say whether a provider hands over originals.
+     */
+    fun sizeOf(url: String): String? {
+        val hostAt = url.indexOf("://")
+        if (hostAt < 0) return null
+        val rest = hostAt + 3
+        val pathAt = url.indexOf('/', rest)
+        if (pathAt < 0 || !url.substring(rest, pathAt).equals(HOST, ignoreCase = true) || !url.startsWith(PATH, pathAt)) return null
+        val sizeAt = pathAt + PATH.length
+        val sizeEnd = url.indexOf('/', sizeAt)
+        if (sizeEnd <= sizeAt) return null
+        return url.substring(sizeAt, sizeEnd).takeIf(::isSize)
+    }
+
     private fun atMost(url: String, sizeName: String, width: Int): String {
         val hostAt = url.indexOf("://")
         if (hostAt < 0) return url

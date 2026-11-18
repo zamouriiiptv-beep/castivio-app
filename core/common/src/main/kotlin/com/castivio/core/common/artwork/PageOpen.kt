@@ -54,6 +54,26 @@ data class PageOpenTimes(
     val posterAsked: Boolean = false,
     val backdrop: ArtworkShown? = null,
     val backdropAsked: Boolean = false,
+    /** A show's episode pictures, the open season's: see [StillsTimes]. */
+    val stills: StillsTimes? = null,
+)
+
+/**
+ * The episode pictures of a show's open season, for the page's line: how many there are to show, how many have come and when
+ * (each in milliseconds from the press), how many episodes have no picture at all, and the sizes their addresses ask TMDB for --
+ * `original` is a provider handing over full pictures for a frame a hundred pixels wide.
+ */
+data class StillsTimes(
+    /** Episodes with a picture address. */
+    val asked: Int,
+    /** Episodes with none: the frame keeps its colours. */
+    val withoutPicture: Int,
+    /** The pictures that came, each counted from the press. */
+    val shown: List<ArtworkShown>,
+    /** How many of the addresses are TMDB's, by the size step they ask for (`original` 8, `w300` 2); others not counted. */
+    val tmdbSizes: Map<String, Int>,
+    /** Addresses that are not TMDB's. */
+    val otherHosts: Int,
 )
 
 /**
@@ -69,9 +89,38 @@ object PageOpenLine {
             timed("details", t.details, t.detailsPending),
             ArtworkShownLine.describe(t.poster, t.posterAsked, t.backdrop, t.backdropAsked),
             timed("episodes", t.episodes, t.episodesPending),
+            t.stills?.let(::stills),
         )
         return parts.takeIf { it.isNotEmpty() }?.joinToString(" · ")
     }
+
+    /**
+     * `stills 6/10 · 0.80/1.20/2.00 s · net · tmdb original 10 · 2 without`: shown of those with a picture, the first, median and
+     * last to come, where the first came from, the sizes the addresses ask for, and the episodes with no picture.
+     */
+    private fun stills(s: StillsTimes): String? {
+        if (s.asked == 0 && s.withoutPicture == 0) return null
+        val times = s.shown.map { it.millis }.sorted()
+        val parts = mutableListOf("stills ${s.shown.size}/${s.asked}")
+        if (times.isNotEmpty()) {
+            parts += "${plain(times.first())}/${plain(times[(times.size - 1) / 2])}/${plain(times.last())} s"
+            parts += s.shown.minByOrNull { it.millis }!!.let { "${word(it.source)} ${it.width}x${it.height}" }
+        }
+        if (s.tmdbSizes.isNotEmpty()) {
+            parts += "tmdb " + s.tmdbSizes.entries.sortedByDescending { it.value }.joinToString(" ") { "${it.key} ${it.value}" }
+        }
+        if (s.otherHosts > 0) parts += "other ${s.otherHosts}"
+        if (s.withoutPicture > 0) parts += "${s.withoutPicture} without"
+        return parts.joinToString(" · ")
+    }
+
+    private fun word(source: ArtworkSource): String = when (source) {
+        ArtworkSource.MEMORY -> "mem"
+        ArtworkSource.DISK -> "disk"
+        ArtworkSource.NETWORK -> "net"
+    }
+
+    private fun plain(millis: Long): String = String.format(Locale.ROOT, "%.2f", millis.coerceAtLeast(0L) / 1000.0)
 
     private fun timed(name: String, millis: Long?, pending: Boolean): String? = when {
         millis != null -> "$name ${secs(millis)}"
