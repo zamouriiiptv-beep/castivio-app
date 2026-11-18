@@ -207,6 +207,10 @@ fun ShowScreen(
     BoxWithConstraints(
         modifier
             .fillMaxSize()
+            // This page is drawn over the still-composed series wall, as the film's is over the films': a pointer input
+            // here takes the touches no control of the page handles, so they cannot reach a poster underneath and replace
+            // the open show with another. Not `clickable`, for the reasons the film's page gives.
+            .pointerInput(Unit) {}
             // Drawn over the destination underneath it, so it brings the application's own ground.
             .castivioBackdrop()
             .statusBarsPadding(),

@@ -386,13 +386,14 @@ fun ShellScreen(
     // What the list of channels says on a row besides the name: which are locked and what each was measured at.
     val lockedIds = lockModel.locked.collectAsState().value.orEmpty()
     val qualities by board.quality.collectAsState()
-    val play: (CatalogSelection) -> Unit = { selection ->
+    // [back] is the page the player returns to -- a show's, for its episodes -- or none, for the board it was started from.
+    val playFrom: (CatalogSelection, Overlay?) -> Unit = { selection, back ->
         val start = {
             val request = selection.asPlayerRequest(timeShifts)
             // A live channel is one the channel keys step from. Remembered with the request it was
             // started by, so the keys only ever step from the channel that is actually on screen.
             zapping = selection.mediaId?.takeIf { selection.live }?.let { Zapping(request, it, selection.listed) }
-            overlay = Overlay.Play(request)
+            overlay = Overlay.Play(request, back = back)
         }
         val id = selection.mediaId
         when (pressVerdictFor(live = selection.live, channelId = id, known = lockModel.locked.value)) {
@@ -405,6 +406,7 @@ fun ShellScreen(
             }
         }
     }
+    val play: (CatalogSelection) -> Unit = { selection -> playFrom(selection, null) }
 
     // Live is the one section where a press does not open the large player.
     //
@@ -817,9 +819,11 @@ fun ShellScreen(
         }
 
         when (val o = overlay) {
+            // An episode is played from its show's page, and the player's Back returns to that page -- its seasons and its
+            // episodes -- as a film's returns to the film's.
             is Overlay.Show -> ShowScreen(
                 show = o.show,
-                onPlay = play,
+                onPlay = { selection -> playFrom(selection, o) },
                 onBack = { overlay = null },
                 // A similar show's page replaces this one: Back from it returns to the wall, not to this page.
                 onOpenShow = {
