@@ -32,12 +32,11 @@ import javax.inject.Singleton
 /**
  * The licence, wired.
  *
- * The one binding that is absent is the important one. [EntitlementSource] — Castivio's
- * licence server, the only thing that can establish a purchase or withdraw one — has no
- * implementation in this build, so [DefaultEntitlementRepository] is given null and says
- * so plainly when asked to verify. Adding the server later is a single `@Provides` here
- * and nothing else: no domain type changes, no repository signature changes, and every
- * rule that governs what the server's answer means is already written and tested.
+ * [EntitlementSource] — Castivio's licence server, the only thing that can establish a
+ * purchase or withdraw one — is the portal's `device/licence`, implemented and bound in
+ * `:data:networking` (`HttpEntitlementSource`, `PortalModule`). Binding it was the single
+ * change this module needed: no domain type changed, and every rule that governs what the
+ * server's answer means was already written and tested.
  */
 @Module
 @InstallIn(SingletonComponent::class)
@@ -84,19 +83,18 @@ object EntitlementModule {
      * exists. A release build gets [Licensing.Production], which has **nowhere to put a
      * trial grantor** — the mistake is not guarded against, it is unrepresentable.
      *
-     * `source` is null in both today. In production that means the build fails closed:
-     * every device reads as
-     * [com.castivio.domain.entitlement.EntitlementState.ServiceUnavailable] and the app
-     * says so. That is why a release APK is not fit to publish until the server exists —
-     * see `RELEASE_CHECKLIST.md`.
+     * `source` is Castivio's licence server in both (the portal's `device/licence`, bound in
+     * `PortalModule`). A debug build still grants its local trial on a first launch with no
+     * connection, and the server's signed answer replaces it as soon as it is had; a release
+     * build establishes nothing on its own, the trial included.
      */
     @Provides
     @Singleton
-    fun licensing(config: PricingConfig): Licensing =
+    fun licensing(config: PricingConfig, source: EntitlementSource): Licensing =
         if (BuildConfig.DEBUG) {
-            Licensing.Development(trials = LocalEntitlementSource(config), source = null)
+            Licensing.Development(trials = LocalEntitlementSource(config), source = source)
         } else {
-            Licensing.Production(source = null)
+            Licensing.Production(source = source)
         }
 
     @Provides

@@ -18,8 +18,12 @@ import java.io.IOException
 import java.io.InterruptedIOException
 import java.io.Reader
 
-/** What the device reports about itself when it announces. Either may be absent: nothing is guessed. */
-internal data class PortalDevice(val modelName: String? = null, val platform: String? = null)
+/**
+ * What the device reports about itself when it announces and when it asks for its licence. Any may be absent:
+ * nothing is guessed. The app's version is counted in the owner's statistics, and is nothing a person can be
+ * told apart by.
+ */
+internal data class PortalDevice(val modelName: String? = null, val platform: String? = null, val appVersion: String? = null)
 
 /**
  * The portal's device mailbox, over HTTPS.

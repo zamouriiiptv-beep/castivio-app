@@ -1,7 +1,9 @@
 package com.castivio.domain.portal
 
+import com.castivio.core.common.Outcome
 import com.castivio.domain.SourceRepository
 import com.castivio.domain.entitlement.EntitlementRepository
+import com.castivio.domain.entitlement.EntitlementState
 import com.castivio.domain.entitlement.StartDestination
 import com.castivio.domain.entitlement.startDestination
 import kotlinx.coroutines.flow.Flow
@@ -38,6 +40,14 @@ import kotlinx.coroutines.withTimeoutOrNull
  *
  * The decision itself stays [startDestination], unchanged and still free of any wait or
  * network. This class only feeds it, and only decides how long to wait before doing so.
+ *
+ * ## Why the licence server is asked on every launch
+ *
+ * A licence changes where the device is not: the owner activates it from the panel, a reseller
+ * renews it, the owner revokes it, or it moves to the customer's new television. The device learns
+ * of it by asking, so every launch asks, for at most [LICENCE_PATIENCE_MS]. A signed answer is the
+ * licence; no answer in time, or no answer at all, is silence, and the launch goes on with what
+ * the device already held, exactly as before. Nothing is taken away by a server that did not reply.
  */
 class AppOpening(
     private val entitlement: EntitlementRepository,
@@ -52,6 +62,19 @@ class AppOpening(
     suspend fun settled(): StartDestination = startDestination(entitlement.establish(), sources.activeNow())
 
     /**
+     * What this device holds, then what the licence server says of it if it says so in time.
+     *
+     * The server's word replaces the held state either way -- a licence bought for a device whose trial
+     * had ended opens it, and a revoked one closes it -- while a failure or a slow answer leaves the held
+     * state as it was.
+     */
+    private suspend fun licence(patienceMs: Long): EntitlementState {
+        val held = entitlement.establish()
+        val told = withTimeoutOrNull(patienceMs) { entitlement.refresh() }
+        return (told as? Outcome.Success)?.value ?: held
+    }
+
+    /**
      * Where the app opens: the first destination as soon as it can be known, and a second one
      * only if a slow answer from the website changes it.
      *
@@ -61,9 +84,11 @@ class AppOpening(
      *
      * @param patienceMs how long a device with nothing on it waits for the website before it
      *   shows the activation screen.
+     * @param licencePatienceMs how long the launch waits for the licence server before it goes on
+     *   with the licence the device already holds.
      */
-    fun opening(patienceMs: Long = PATIENCE_MS): Flow<StartDestination> = flow {
-        val licence = entitlement.establish()
+    fun opening(patienceMs: Long = PATIENCE_MS, licencePatienceMs: Long = LICENCE_PATIENCE_MS): Flow<StartDestination> = flow {
+        val licence = licence(licencePatienceMs)
         if (!licence.allowsUse) {
             emit(startDestination(licence, source = null))
             return@flow
@@ -124,5 +149,12 @@ class AppOpening(
          * that works without a connection, so it is kept short.
          */
         const val PATIENCE_MS = 5_000L
+
+        /**
+         * What a launch waits for the licence server. One small request, answered in well under a
+         * second where there is a connection; where there is none the launch should not feel it, so
+         * the figure is short and the device opens on what it holds.
+         */
+        const val LICENCE_PATIENCE_MS = 3_000L
     }
 }

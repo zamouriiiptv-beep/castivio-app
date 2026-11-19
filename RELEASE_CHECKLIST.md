@@ -5,11 +5,12 @@ customer, and Castivio's licensing is the part of it that can go wrong quietly.
 This file is the list of things that must exist before one is fit to publish, and
 it is deliberately short enough to read in full every time.
 
-> **Today, no release APK is fit to publish.** `Licensing.Production` is bound with
-> no `EntitlementSource`, so a release build fails closed: every device reads as
-> `ServiceUnavailable(NOT_CONFIGURED)` and the licence screen says so. That is the
-> intended behaviour of a build with no authority behind it — not a bug to work
-> around, and not a reason to switch it to `Licensing.Development`.
+> **Today, no release APK is fit to publish** — the rest of this list is not done. Since
+> 2026-11-19 `Licensing.Production` is bound to Castivio's licence server (the portal's
+> `POST /api/v1/device/licence`, `HttpEntitlementSource`), so a release build establishes
+> what the server says and nothing else. Until the server's signing key is set on
+> Cloudflare it answers 503 and a release build still fails closed, which remains the
+> intended behaviour of a build with no authority behind it.
 
 ## Debug builds are unaffected
 
@@ -22,17 +23,21 @@ typography and the feel long before any of this exists.
 
 None of these are client work, and none of them can be faked locally.
 
-- [ ] **Licensing backend deployed**, with a stable host Castivio can pin trust to.
-- [ ] **`EntitlementSource` implemented and bound** in
-      `data/entitlement/di/EntitlementModule.kt` — one `@Provides`, no domain change.
-- [ ] **Trial registration is server-side.** The server remembers the MAC address and
-      refuses a second free week. A local trial cannot: clearing app data removes the
-      record and it would grant another, which is precisely why
-      `LocalEntitlementSource` is unreachable in production.
-- [ ] **Annual activation** — purchase receipt redeemed, expiry stated by the server.
-- [ ] **Lifetime activation** — same path, no expiry.
-- [ ] **Revocation** — the server can withdraw an entitlement, including a lifetime
-      one. The client already honours it and never infers one locally.
+- [x] **Licensing backend deployed**, with a stable host Castivio can pin trust to:
+      castivio.app, and its answers are signed with ECDSA P-256 against the public key
+      pinned in `LicenceKey` (the portal's `docs/licence-api.md`).
+- [ ] **The signing key set on Cloudflare** (`LICENCE_SIGNING_KEY`). Without it the
+      server answers 503 and signs nothing.
+- [x] **`EntitlementSource` implemented and bound** — `HttpEntitlementSource`, bound in
+      `PortalModule` and passed to `Licensing` in `EntitlementModule`. No domain change.
+- [x] **Trial registration is server-side.** Seven days from the first time the address
+      reached the server, remembered whatever the device clears.
+- [x] **Annual and lifetime activation** — sold in the owner's or a reseller's panel against
+      the device's address; the server states the expiry. (Not a store receipt: a receipt
+      path is still open if the app is ever sold in a store, and `redeem` answers
+      `NOT_CONFIGURED` until then.)
+- [x] **Revocation** — the owner's panel withdraws a licence, including a lifetime one; the
+      server states when, and the client honours it at the next launch (`AppOpening`).
 - [ ] **Recovery flow** — a random, high-entropy, server-issued code, not derived from
       the MAC, stored as a hash and never in the clear. It is the only way back for a
       device after a factory reset, or after an installation-scoped identity loses its
@@ -45,9 +50,9 @@ device is entitled to — carries `macAddress`, `identityVersion`, `provenance`,
 the legacy addresses and the cached record. Every one of those identifies the
 device. **Not one of them authenticates it.**
 
-- [ ] **A device secret in the verification contract.** Until there is one, any
-      party who learns an address can impersonate that device to the licence
-      server: read its entitlement, and depending on the endpoint, move it.
+- [x] **A device secret in the verification contract.** The device's key travels with its
+      address in the body of `device/licence`, as for its mailbox; a wrong key is refused
+      and counted. An address alone reads nothing.
 
 This is harmless today only because there is no server to lie to. It stops being
 harmless the day one exists, which is the day the rest of section 1 gets built —

@@ -1,5 +1,6 @@
 package com.castivio.domain.portal
 
+import com.castivio.core.common.AppError
 import com.castivio.core.common.Outcome
 import com.castivio.domain.PlaylistSource
 import com.castivio.domain.ProviderSource
@@ -13,6 +14,7 @@ import com.castivio.domain.entitlement.RedemptionCredential
 import com.castivio.domain.entitlement.StartDestination
 import com.castivio.domain.identity.DeviceIdentityRecord
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.toList
@@ -42,6 +44,11 @@ class AppOpeningTest {
 
     private class Entitlements(var granted: EntitlementState) : EntitlementRepository {
         var established = 0
+        var refreshed = 0
+
+        /** What the licence server answers, and how long it takes. By default there is nobody to ask. */
+        var server: Outcome<EntitlementState> = Outcome.Failure(AppError.NOT_CONFIGURED)
+        var serverDelayMs = 0L
         override val state: Flow<EntitlementState> = emptyFlow()
         override suspend fun current(): EntitlementState = granted
         override suspend fun establish(): EntitlementState {
@@ -49,7 +56,14 @@ class AppOpeningTest {
             return granted
         }
 
-        override suspend fun refresh(): Outcome<EntitlementState> = throw UnsupportedOperationException()
+        override suspend fun refresh(): Outcome<EntitlementState> {
+            if (serverDelayMs > 0) delay(serverDelayMs)
+            refreshed++
+            val answer = server
+            if (answer is Outcome.Success) granted = answer.value
+            return answer
+        }
+
         override suspend fun redeem(credential: RedemptionCredential): Outcome<EntitlementState> =
             throw UnsupportedOperationException()
 
@@ -375,5 +389,47 @@ class AppOpeningTest {
         runCurrent()
         assertEquals(0, receiver.asked)
         assertEquals("nothing is established, nothing is granted", 0, entitlements.established)
+    }
+
+    // --------------------------------------------------------- the licence server at launch
+
+    @Test
+    fun `a licence the owner revoked closes the app at the next launch`() = runTest {
+        sources.active = existing
+        entitlements.server = Outcome.Success(EntitlementState.Revoked(revokedAtMs = 1L))
+
+        val shown = appOpening().opening().toList()
+
+        assertEquals(1, entitlements.refreshed)
+        assertEquals(listOf<StartDestination>(StartDestination.Licence(LicenceReason.REVOKED)), shown)
+    }
+
+    @Test
+    fun `a year bought in the panel for a device whose trial had ended opens it at the next launch`() = runTest {
+        sources.active = existing
+        entitlements.granted = EntitlementState.TrialExpired
+        entitlements.server = Outcome.Success(EntitlementState.AnnualActive(expiresAtMs = 1_900_000_000_000L, daysRemaining = 365))
+
+        assertEquals(listOf<StartDestination>(StartDestination.Home), appOpening().opening().toList())
+    }
+
+    @Test
+    fun `an unreachable licence server is silence and the device opens on what it holds`() = runTest {
+        sources.active = existing
+        entitlements.server = Outcome.Failure(AppError.NETWORK_UNAVAILABLE)
+
+        assertEquals(listOf<StartDestination>(StartDestination.Home), appOpening().opening().toList())
+    }
+
+    @Test
+    fun `a slow licence server is waited for a moment, and no longer`() = runTest {
+        sources.active = existing
+        entitlements.server = Outcome.Success(EntitlementState.Revoked(revokedAtMs = 1L))
+        entitlements.serverDelayMs = 60_000L
+
+        val shown = appOpening().opening().toList()
+
+        assertEquals(AppOpening.LICENCE_PATIENCE_MS, currentTime)
+        assertEquals(listOf<StartDestination>(StartDestination.Home), shown)
     }
 }

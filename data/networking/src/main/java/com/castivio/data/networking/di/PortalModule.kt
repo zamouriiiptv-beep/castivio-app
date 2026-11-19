@@ -4,10 +4,13 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import com.castivio.core.common.AppDispatchers
+import com.castivio.core.common.config.LicenceKey
 import com.castivio.core.common.config.PortalConfig
+import com.castivio.data.networking.HttpEntitlementSource
 import com.castivio.data.networking.HttpSubscriptionInbox
 import com.castivio.data.networking.PortalDevice
 import com.castivio.domain.activation.ActivateProvider
+import com.castivio.domain.entitlement.EntitlementSource
 import com.castivio.domain.identity.DeviceIdentity
 import com.castivio.domain.portal.ReceiveSentSubscriptions
 import com.castivio.domain.portal.SentSubscriptionReceiver
@@ -57,6 +60,29 @@ object PortalModule {
     }
 
     /**
+     * Castivio's licence server: the portal's `device/licence`, on the same short timeouts as the mailbox.
+     * The launch waits on it only briefly (`AppOpening`), and a slow answer changes the licence when it lands.
+     */
+    @Provides
+    @Singleton
+    fun entitlementSource(
+        client: OkHttpClient,
+        config: PortalConfig,
+        key: LicenceKey,
+        identity: DeviceIdentity,
+        dispatchers: AppDispatchers,
+        @ApplicationContext context: Context,
+    ): EntitlementSource {
+        val http = client.newBuilder()
+            .eventListener(EventListener.NONE)
+            .connectTimeout(CONNECT_SECONDS, TimeUnit.SECONDS)
+            .readTimeout(READ_SECONDS, TimeUnit.SECONDS)
+            .callTimeout(CALL_SECONDS, TimeUnit.SECONDS)
+            .build()
+        return HttpEntitlementSource(http, config, key, identity, dispatchers, reportedDevice(context))
+    }
+
+    /**
      * Lives here, and not in the activation feature, because it needs the activation's
      * contract and the sequence that adds a subscription: both are already on the graph, and
      * this is the module that holds the contract's implementation.
@@ -84,9 +110,11 @@ object PortalModule {
             else -> "$maker $model"
         }
         val television = context.packageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK)
+        val version = runCatching { context.packageManager.getPackageInfo(context.packageName, 0).versionName }.getOrNull()
         return PortalDevice(
             modelName = name.ifEmpty { null },
             platform = if (television) "Android TV" else "Android",
+            appVersion = version?.takeIf { it.isNotBlank() },
         )
     }
 

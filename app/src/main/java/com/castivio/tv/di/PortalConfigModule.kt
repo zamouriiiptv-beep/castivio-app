@@ -1,5 +1,6 @@
 package com.castivio.tv.di
 
+import com.castivio.core.common.config.LicenceKey
 import com.castivio.core.common.config.PortalConfig
 import com.castivio.tv.BuildConfig
 import dagger.Module
@@ -23,4 +24,12 @@ object PortalConfigModule {
     @Provides
     @Singleton
     fun portalConfig(): PortalConfig = PortalConfig.of(BuildConfig.PORTAL_BASE_URL)
+
+    /**
+     * The licence server's public key. One for every build, because every build asks the same server:
+     * the production key, pinned in `LicenceKey`.
+     */
+    @Provides
+    @Singleton
+    fun licenceKey(): LicenceKey = LicenceKey.of(null)
 }
