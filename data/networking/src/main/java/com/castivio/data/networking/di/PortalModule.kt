@@ -61,7 +61,7 @@ object PortalModule {
 
     /**
      * Castivio's licence server: the portal's `device/licence`, on the same short timeouts as the mailbox.
-     * The launch waits on it only briefly (`AppOpening`), and a slow answer changes the licence when it lands.
+     * The launch waits on it only briefly (`AppOpening`); an answer slower than that is left for the next launch.
      */
     @Provides
     @Singleton
