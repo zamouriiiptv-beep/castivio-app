@@ -38,8 +38,11 @@ val debugKeystoreAlias = "androiddebugkey"
  * `-Pcastivio.portalBaseUrl=https://...` overrides both, for a build that has to ask somewhere else.
  */
 
-/** The deployment the website is built on until the product's own domain serves it. */
-val portalTestBaseUrl = "https://castivio-activation-portal.vercel.app"
+/**
+ * The website test builds ask: the product's own domain since 2026-11-19, served by Cloudflare Workers with
+ * D1, where a device and what was sent to it last. (The Vercel deployment before it kept them in memory.)
+ */
+val portalTestBaseUrl = "https://castivio.app"
 
 val portalBaseUrlOverride: String? = providers.gradleProperty("castivio.portalBaseUrl").orNull
 
