@@ -6,6 +6,7 @@ import com.castivio.domain.entitlement.EntitlementRepository
 import com.castivio.domain.entitlement.EntitlementState
 import com.castivio.domain.entitlement.StartDestination
 import com.castivio.domain.entitlement.startDestination
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withTimeoutOrNull
@@ -70,7 +71,15 @@ class AppOpening(
      */
     private suspend fun licence(patienceMs: Long): EntitlementState {
         val held = entitlement.establish()
-        val told = withTimeoutOrNull(patienceMs) { entitlement.refresh() }
+        // A fault in the ask is not the reason the app does not open: it is silence, like no answer.
+        // Cancellation is not a fault, and passes through.
+        val told = try {
+            withTimeoutOrNull(patienceMs) { entitlement.refresh() }
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (fault: Exception) {
+            null
+        }
         return (told as? Outcome.Success)?.value ?: held
     }
 

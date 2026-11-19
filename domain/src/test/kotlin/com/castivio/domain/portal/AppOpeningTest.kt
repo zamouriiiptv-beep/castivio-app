@@ -49,6 +49,7 @@ class AppOpeningTest {
         /** What the licence server answers, and how long it takes. By default there is nobody to ask. */
         var server: Outcome<EntitlementState> = Outcome.Failure(AppError.NOT_CONFIGURED)
         var serverDelayMs = 0L
+        var serverThrows: Exception? = null
         override val state: Flow<EntitlementState> = emptyFlow()
         override suspend fun current(): EntitlementState = granted
         override suspend fun establish(): EntitlementState {
@@ -59,6 +60,7 @@ class AppOpeningTest {
         override suspend fun refresh(): Outcome<EntitlementState> {
             if (serverDelayMs > 0) delay(serverDelayMs)
             refreshed++
+            serverThrows?.let { throw it }
             val answer = server
             if (answer is Outcome.Success) granted = answer.value
             return answer
@@ -431,5 +433,13 @@ class AppOpeningTest {
 
         assertEquals(AppOpening.LICENCE_PATIENCE_MS, currentTime)
         assertEquals(listOf<StartDestination>(StartDestination.Home), shown)
+    }
+
+    @Test
+    fun `a fault in the licence ask does not stop the app opening`() = runTest {
+        sources.active = existing
+        entitlements.serverThrows = IllegalStateException("the licence client broke")
+
+        assertEquals(listOf<StartDestination>(StartDestination.Home), appOpening().opening().toList())
     }
 }

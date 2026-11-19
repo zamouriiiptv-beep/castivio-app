@@ -1,5 +1,6 @@
 package com.castivio.tv.gate
 
+import com.castivio.core.common.AppError
 import com.castivio.core.common.Outcome
 import com.castivio.domain.PlaylistSource
 import com.castivio.domain.ProviderSource
@@ -65,7 +66,8 @@ class SplashViewModelTest {
         override val state: Flow<EntitlementState> = emptyFlow()
         override suspend fun current(): EntitlementState = granted
         override suspend fun establish(): EntitlementState = granted
-        override suspend fun refresh(): Outcome<EntitlementState> = throw UnsupportedOperationException()
+        // No licence server in these tests: the launch asks, hears nothing, and goes on with what it holds.
+        override suspend fun refresh(): Outcome<EntitlementState> = Outcome.Failure(AppError.NOT_CONFIGURED)
         override suspend fun redeem(credential: RedemptionCredential): Outcome<EntitlementState> =
             throw UnsupportedOperationException()
 
