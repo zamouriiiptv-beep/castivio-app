@@ -335,7 +335,7 @@ fun HomeScreen(
                 .padding(vertical = rhythm.stage),
             verticalArrangement = Arrangement.spacedBy(rhythm.group),
         ) {
-            DashboardHeader(state, frame, plan.headerHeight) {
+            DashboardHeader(\n                state = state,\n                frame = frame,\n                height = plan.headerHeight,\n                onRefresh = model::refresh,\n                onChangeList = onManageSources,\n                onCatchUp = onCatchUp,\n                onSettings = onSettings,\n                onExit = onExit,\n            ) {
                 // The trailing end of the header, in the order the other five screens
                 // use: the page's own control keeps the outer end and the theme sits
                 // just inside it. `CastivioThemeSwitchChip` draws nothing where no
@@ -620,82 +620,86 @@ internal fun DashboardHeader(
     state: HomeState,
     frame: CastivioMetrics,
     height: Dp,
+    onRefresh: () -> Unit = {},
+    onChangeList: () -> Unit = {},
+    onCatchUp: () -> Unit = {},
+    onSettings: () -> Unit = {},
+    onExit: () -> Unit = {},
     modifier: Modifier = Modifier,
-    /** The trailing controls. Home fills it; the Channels board leaves it empty. */
     trailing: @Composable RowScope.() -> Unit = {},
 ) {
     val colors = CastivioTheme.colors
-    // **Captured before the pin below overwrites it.** The band's *order* is physical
-    // on purpose — the signature does not change sides per locale — but the words
-    // inside it are still Arabic, and an Arabic sentence laid out in a pinned
-    // left-to-right subtree is read backwards. The cards take this back for their own
-    // content, which is the narrow exception the pin was always going to need.
-    val reading = LocalLayoutDirection.current
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
         Row(
             modifier.fillMaxWidth().height(height),
             verticalAlignment = Alignment.CenterVertically,
-            // Half the header step, which is the gap the approved drawing measures at
-            // this geometry. The full step between six children was spending 113dp of
-            // an 801dp row on air, and the cards were paying for it in truncation.
             horizontalArrangement = Arrangement.spacedBy(frame.headGap / 2),
         ) {
-            // The lockup alone. The strapline that sat under it — "Premium IPTV
-            // player" — described the application to a user already inside it, and
-            // it was taking the height the two terms below now spend on their dates.
             CastivioLockup(
                 markSize = frame.brand,
                 wordSize = (frame.fsTitle.value * WORD_RATIO).sp,
             )
-
-            // **The two terms are one group, spaced as one.** They sat directly in
-            // the header row, so the gap between them was `headGap` — the step that
-            // separates the lockup from the clock from the chips — and five of those
-            // steps were spending 113dp of an 801dp row on air. Nested in a row of
-            // their own at `chipPad`, the pair keeps the header's spacing on the
-            // outside and takes back what was between them, which is width the dates
-            // then have to print in.
-            Row(
-                Modifier.weight(1f),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(frame.chipPad),
-            ) {
-                // Each card is handed a finished sentence rather than the parts of
-                // one. Composing it here keeps the two compositions — "expires on a
-                // date" and "a plan, and when it runs out" — beside the facts they
-                // are made from, and leaves `TermCard` with nothing to arbitrate.
-                val tone = providerTone(state.subscription)
-                TermCard(
-                    icon = when (tone) {
-                        ProviderTone.Usable -> Icons.Rounded.CheckCircle
-                        ProviderTone.Refused -> Icons.Rounded.ErrorOutline
-                        ProviderTone.Unchecked -> Icons.Rounded.RadioButtonUnchecked
-                    },
-                    label = stringResource(R.string.home_term_provider),
-                    value = providerSentence(state.subscription),
-                    hue = when (tone) {
-                        ProviderTone.Usable -> colors.hueGreen
-                        ProviderTone.Refused -> colors.danger
-                        ProviderTone.Unchecked -> colors.onBackgroundMuted
-                    },
-                    reading = reading,
-                    frame = frame,
-                    modifier = Modifier.weight(1f),
-                )
-
-                TermCard(
-                    icon = Icons.Rounded.Shield,
-                    label = stringResource(R.string.home_term_licence),
-                    value = licenceSentence(licenceTerm(state.entitlement)),
-                    hue = if (state.licenceHolds) colors.hueAzure else colors.danger,
-                    reading = reading,
-                    frame = frame,
-                    modifier = Modifier.weight(1f),
-                )
-            }
-
-            CastivioClock(fsTime = frame.fsTitle, fsDate = frame.fsChip)
+            HeaderAction(
+                icon = Icons.Rounded.PowerSettingsNew,
+                label = stringResource(R.string.home_exit),
+                frame = frame,
+                tint = colors.hueViolet,
+                onClick = onExit,
+            )
+            Spacer(Modifier.weight(1f))
+            HeaderAction(
+                icon = Icons.Rounded.Refresh,
+                label = stringResource(R.string.home_refresh),
+                frame = frame,
+                onClick = onRefresh,
+            )
+            HeaderAction(
+                icon = Icons.Rounded.PlaylistAdd,
+                label = stringResource(R.string.home_change),
+                frame = frame,
+                onClick = onChangeList,
+            )
+            HeaderAction(
+                icon = CastivioIcons.ReplayArc,
+                label = stringResource(R.string.catchup_title),
+                frame = frame,
+                onClick = onCatchUp,
+            )
+            HeaderAction(
+                icon = Icons.Rounded.Settings,
+                label = stringResource(R.string.home_settings),
+                frame = frame,
+                onClick = onSettings,
+            )
             trailing()
+            CastivioClock(fsTime = frame.fsTitle, fsDate = frame.fsChip)
+        }
+    }
+}
+
+@Composable
+private fun HeaderAction(
+    icon: ImageVector,
+    label: String,
+    frame: CastivioMetrics,
+    tint: Color = CastivioTheme.colors.onBackgroundVariant,
+    onClick: () -> Unit,
+) {
+    val shape = RoundedCornerShape(frame.radius / 2)
+    InteractiveGlassCard(
+        onClick = onClick,
+        modifier = Modifier.size(frame.touchTarget),
+        shape = shape,
+        fill = CastivioTheme.colors.homeCardSurface,
+        restBorder = CastivioTheme.colors.cardSurfaceEdge,
+    ) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Icon(
+                imageVector = icon,
+                contentDescription = label,
+                tint = tint,
+                modifier = Modifier.size(Sizing.iconMd),
+            )
         }
     }
 }
