@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -301,7 +302,7 @@ class MainActivity : ComponentActivity() {
                         // is done -- a transparent full-screen box that stayed
                         // would eat every touch that landed on it.
                         if (!introDone) {
-                            CastivioIntro(onFinished = { introDone = true })
+                            CastivioIntro(logo = painterResource(id = R.drawable.castivio_launcher_art), onFinished = { introDone = true })
                         }
 
                         // Above even the intro, because a build that crashed on launch
