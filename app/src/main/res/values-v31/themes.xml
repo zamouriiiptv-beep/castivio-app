@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Keep Android 12+ startup neutral so the in-app Castivio intro is the
+         first branded screen. The system splash remains present to cover startup. -->
+    <style name="Theme.CastivioTV" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/castivio_window_background</item>
+        <item name="android:statusBarColor">@color/castivio_window_background</item>
+        <item name="android:navigationBarColor">@color/castivio_window_background</item>
+        <item name="android:windowSplashScreenBackground">@color/castivio_window_background</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_transparent</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">@android:color/transparent</item>
+    </style>
+</resources>
