@@ -335,7 +335,16 @@ fun HomeScreen(
                 .padding(vertical = rhythm.stage),
             verticalArrangement = Arrangement.spacedBy(rhythm.group),
         ) {
-            DashboardHeader(\n                state = state,\n                frame = frame,\n                height = plan.headerHeight,\n                onRefresh = model::refresh,\n                onChangeList = onManageSources,\n                onCatchUp = onCatchUp,\n                onSettings = onSettings,\n                onExit = onExit,\n            ) {
+            DashboardHeader(
+                state = state,
+                frame = frame,
+                height = plan.headerHeight,
+                onRefresh = model::refresh,
+                onChangeList = onManageSources,
+                onCatchUp = onCatchUp,
+                onSettings = onSettings,
+                onExit = onExit,
+            ) {
                 // The trailing end of the header, in the order the other five screens
                 // use: the page's own control keeps the outer end and the theme sits
                 // just inside it. `CastivioThemeSwitchChip` draws nothing where no
