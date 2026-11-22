@@ -200,7 +200,7 @@ private fun HomeHeaderAction(
             .widthIn(min = frame.touchTarget, max = 108.dp)
             .height(frame.touchTarget),
         shape = RoundedCornerShape(12.dp),
-        fill = Color.Transparent,
+        fill = Brush.horizontalGradient(listOf(Color.Transparent, Color.Transparent)),
         restBorder = Color.Transparent,
     ) {
         Column(
