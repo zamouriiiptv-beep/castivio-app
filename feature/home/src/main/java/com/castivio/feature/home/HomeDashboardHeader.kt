@@ -70,9 +70,7 @@ internal fun HomeDashboardHeader(
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(colors.background.copy(alpha = 0.92f)),
+            modifier = Modifier.fillMaxWidth(),
         ) {
             Row(
                 modifier = Modifier
@@ -103,7 +101,7 @@ internal fun HomeDashboardHeader(
                 // 2. الوسط: الأزرار الستة الموحدة
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     HomeHeaderAction(
                         icon = Icons.Rounded.Refresh,
