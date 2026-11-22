@@ -20,19 +20,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
@@ -288,41 +285,12 @@ fun HomeScreen(
         onStopOrDispose { model.leftHome() }
     }
 
-    // `safeDrawing`, and the metrics are read from what is left after it: turned
-    // sideways the system's own navigation sits on one *side*, so a screen that
-    // measured the display would size itself to room it does not have and draw its
-    // trailing column underneath the navigation.
-    //
-    // **The horizontal inset is symmetrised rather than applied as given**, which is
-    // the one thing this differs from `safeDrawingPadding()` in. Held sideways, the
-    // system's furniture is on the *sides*: a camera cutout on one edge and the
-    // navigation bar on the other, and they are not the same width. Insetting each
-    // edge by its own obstruction keeps the board out of both and leaves it visibly
-    // off-centre — which is what the board did on a device, sitting a few dp nearer
-    // one edge than the other with no reason a viewer could see. Taking the larger of
-    // the two and spending it on both edges costs that difference in width and buys a
-    // block that is centred on the *screen*, which is the thing being looked at.
-    //
-    // Start and end rather than left and right: the two are compared, never placed,
-    // and the maximum of the pair is the same number whichever way the text runs. The
-    // result is symmetric by construction, so this screen lays out identically in
-    // both directions — which is what invariant 9 is protecting and why reading a
-    // physical inset here does not breach it.
-    val safeArea = WindowInsets.safeDrawing.asPaddingValues()
-    val reading = LocalLayoutDirection.current
-    val gutter = maxOf(
-        safeArea.calculateStartPadding(reading),
-        safeArea.calculateEndPadding(reading),
-    )
-
+    // Match the other full-screen boards: only the status bar and display cutout
+    // constrain the measured container. Keep Home's own internal layout unchanged.
     BoxWithConstraints(
         modifier
             .fillMaxSize()
-            .padding(
-                top = safeArea.calculateTopPadding(),
-                bottom = safeArea.calculateBottomPadding(),
-            )
-            .padding(horizontal = gutter),
+            .windowInsetsPadding(WindowInsets.statusBars.union(WindowInsets.displayCutout)),
     ) {
         val frame = rememberMetrics(maxWidth, maxHeight)
         val plan = Plan.of(frame)
