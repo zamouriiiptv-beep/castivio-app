@@ -36,6 +36,9 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.DarkMode
+import androidx.compose.material.icons.rounded.History
+import androidx.compose.material.icons.rounded.LightMode
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.CloudOff
@@ -57,6 +60,7 @@ import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.Shield
 import androidx.compose.material.icons.rounded.Tv
+import androidx.compose.material.icons.rounded.SwapHoriz
 import androidx.compose.material.icons.rounded.VpnKey
 import androidx.compose.material.icons.rounded.WifiOff
 import androidx.compose.material3.CircularProgressIndicator
@@ -140,6 +144,7 @@ import com.castivio.core.design.icons.CastivioIcons
 import com.castivio.core.design.theme.CASTIVIO_ARTWORK_ASPECT
 import com.castivio.core.design.theme.CastivioMetrics
 import com.castivio.core.design.theme.CastivioTheme
+import com.castivio.core.design.theme.LocalThemeSwitch
 import com.castivio.core.design.theme.MotionLevel
 import com.castivio.core.design.theme.Sizing
 import com.castivio.core.design.theme.castivioBackdrop
@@ -306,37 +311,16 @@ fun HomeScreen(
                 .padding(vertical = rhythm.stage),
             verticalArrangement = Arrangement.spacedBy(rhythm.group),
         ) {
-            DashboardHeader(
-                state = state,
+            HomeDashboardHeader(
                 frame = frame,
-                height = plan.headerHeight,
+                height = maxOf(plan.headerHeight, frame.touchTarget),
                 onRefresh = model::refresh,
                 onChangeList = onManageSources,
                 onCatchUp = onCatchUp,
                 onSettings = onSettings,
+                onLanguage = onLanguage,
                 onExit = onExit,
-            ) {
-                // The trailing end of the header, in the order the other five screens
-                // use: the page's own control keeps the outer end and the theme sits
-                // just inside it. `CastivioThemeSwitchChip` draws nothing where no
-                // switch has been provided, so a preview or a test measuring something
-                // else does not have to know whether to ask for one.
-                CastivioThemeSwitchChip(
-                    chip = frame.chip,
-                    touchTarget = frame.touchTarget,
-                    fontSize = frame.fsChip,
-                    toLighter = stringResource(R.string.home_theme_lighter),
-                    toDarker = stringResource(R.string.home_theme_darker),
-                )
-                CastivioLanguageChip(
-                    chip = frame.chip,
-                    touchTarget = frame.touchTarget,
-                    pad = frame.chipPad,
-                    fontSize = frame.fsChip,
-                    label = stringResource(R.string.home_language),
-                    onClick = onLanguage,
-                )
-            }
+            )
 
             when {
                 state.loading -> Box(Modifier.fillMaxSize())
@@ -531,6 +515,180 @@ private data class Rhythm(
 private const val GROUP_RATIO = 1.274f
 private const val ITEM_RATIO = 0.764f
 private const val FOOT_RATIO = 0.509f
+
+
+// ---------------------------------------------------------------- Home's redesigned header
+
+/**
+ * Home's full action header. Unlike the shared dashboard header used by other boards,
+ * this one carries the labelled actions from the approved Home header design.
+ */
+@Composable
+private fun HomeDashboardHeader(
+    frame: CastivioMetrics,
+    height: Dp,
+    onRefresh: () -> Unit,
+    onChangeList: () -> Unit,
+    onCatchUp: () -> Unit,
+    onSettings: () -> Unit,
+    onLanguage: () -> Unit,
+    onExit: () -> Unit,
+) {
+    val colors = CastivioTheme.colors
+    val themeSwitch = LocalThemeSwitch.current
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .background(Color(0xFF0E0B1E)),
+        ) {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .height(height)
+                    .padding(horizontal = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    CastivioLockup(
+                        markSize = frame.brand,
+                        wordSize = (frame.fsTitle.value * WORD_RATIO).sp,
+                    )
+                    HomeHeaderDivider()
+                    HomeHeaderAction(
+                        icon = Icons.Rounded.PowerSettingsNew,
+                        label = stringResource(R.string.home_exit),
+                        frame = frame,
+                        onClick = onExit,
+                    )
+                }
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    HomeHeaderAction(
+                        icon = Icons.Rounded.Refresh,
+                        label = stringResource(R.string.home_refresh),
+                        frame = frame,
+                        onClick = onRefresh,
+                    )
+                    HomeHeaderAction(
+                        icon = Icons.Rounded.SwapHoriz,
+                        label = stringResource(R.string.home_change),
+                        frame = frame,
+                        onClick = onChangeList,
+                    )
+                    HomeHeaderAction(
+                        icon = Icons.Rounded.History,
+                        label = stringResource(R.string.catchup_title),
+                        frame = frame,
+                        onClick = onCatchUp,
+                    )
+                    HomeHeaderAction(
+                        icon = Icons.Rounded.Settings,
+                        label = stringResource(R.string.home_settings),
+                        frame = frame,
+                        onClick = onSettings,
+                    )
+                    HomeHeaderAction(
+                        icon = Icons.Rounded.Language,
+                        label = stringResource(R.string.home_language),
+                        frame = frame,
+                        onClick = onLanguage,
+                    )
+                    HomeHeaderAction(
+                        icon = if (themeSwitch?.isDark == true) Icons.Rounded.LightMode else Icons.Rounded.DarkMode,
+                        label = stringResource(
+                            if (themeSwitch?.isDark == true) R.string.home_theme_lighter
+                            else R.string.home_theme_darker,
+                        ),
+                        frame = frame,
+                        onClick = { themeSwitch?.toggle() },
+                    )
+                }
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    HomeHeaderDivider()
+                    CastivioClock(fsTime = frame.fsTitle, fsDate = frame.fsChip)
+                }
+            }
+
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .height(2.dp)
+                    .background(
+                        Brush.horizontalGradient(
+                            listOf(
+                                Color(0xFF9D4EDD),
+                                Color(0xFF5A189A).copy(alpha = 0.4f),
+                                Color.Transparent,
+                            ),
+                        ),
+                    ),
+            )
+        }
+    }
+}
+
+@Composable
+private fun HomeHeaderAction(
+    icon: ImageVector,
+    label: String,
+    frame: CastivioMetrics,
+    onClick: () -> Unit,
+) {
+    InteractiveGlassCard(
+        onClick = onClick,
+        modifier = Modifier
+            .widthIn(min = frame.touchTarget, max = 104.dp)
+            .height(frame.touchTarget),
+        shape = RoundedCornerShape(12.dp),
+        fill = Color.Transparent,
+        restBorder = Color.Transparent,
+    ) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(horizontal = 5.dp, vertical = 3.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = CastivioTheme.colors.onBackgroundVariant,
+                modifier = Modifier.size(20.dp),
+            )
+            Spacer(Modifier.height(3.dp))
+            Text(
+                text = label,
+                style = castivioChipStyle(frame.fsChip),
+                color = CastivioTheme.colors.onBackgroundMuted,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+    }
+}
+
+@Composable
+private fun HomeHeaderDivider() {
+    Box(
+        Modifier
+            .width(1.dp)
+            .height(34.dp)
+            .background(Color.White.copy(alpha = 0.2f)),
+    )
+}
 
 // ---------------------------------------------------------------- the header
 
