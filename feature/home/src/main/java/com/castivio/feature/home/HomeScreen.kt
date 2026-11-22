@@ -405,7 +405,7 @@ fun HomeScreen(
                         state = state,
                         frame = frame,
                         rhythm = rhythm,
-                        railFocus = boardFocus,
+                        contentFocus = boardFocus,
                         // The holder decides: a section on the device opens, one that is not
                         // is asked for and loads on its own card while the viewer stays here.
                         onSeeSection = { section -> if (model.press(section)) onSeeSection(section) },
@@ -975,13 +975,10 @@ internal data class Term(val word: Int, val atMs: Long?)
  * nothing — a glyph floating above two short words, with a third of the card empty
  * beneath it.
  *
- * ## And the utilities are demoted, deliberately
+ * ## The utility rail is temporarily absent
  *
- * They were six pills the width of the section cards and directly under them, which
- * gave "Refresh" the same visual claim as "Live TV". They are now a quiet column:
- * same six controls, same order, a fainter edge and a smaller label. Nothing was
- * removed. A viewer looking for Settings still finds it in one pass, and a viewer
- * looking for television no longer reads past it.
+ * The right-hand utility column is not composed during this layout experiment.
+ * Its former width remains empty; the content columns are not enlarged to consume it.
  *
  * ## Which column sits where, and why it is this way round
  *
@@ -994,11 +991,8 @@ internal data class Term(val word: Int, val atMs: Long?)
  *
  * ## The traversal, which a still picture cannot show
  *
- * Three columns, so the D-pad has a spine: the utilities, then the stack, then Live,
- * with up and down staying inside whichever column has focus. Compose's own focus
- * search resolves all of that from the geometry here — there is no focus order to
- * declare, and declaring one would be a second description of a layout that already
- * says it.
+ * The first content column receives initial focus. The empty rail-sized area is not
+ * focusable, and Compose resolves movement between the stack and Live from geometry.
  */
 @Composable
 private fun SectionBoard(
@@ -1010,7 +1004,7 @@ private fun SectionBoard(
      * control. Held by the screen rather than by the rail because the screen is what
      * knows the board has just been built; see its use in [HomeScreen].
      */
-    railFocus: FocusRequester,
+    contentFocus: FocusRequester,
     onSeeSection: (CatalogSection) -> Unit,
     onResume: (Channel) -> Unit,
     onResumeSection: (SectionResume) -> Unit,
@@ -1052,25 +1046,15 @@ private fun SectionBoard(
     )
 
     Row(modifier, horizontalArrangement = Arrangement.spacedBy(frame.bandTop)) {
-        UtilityRail(
-            state = state,
-            frame = frame,
-            rhythm = rhythm,
-            onRefresh = onRefresh,
-            onChoosePlaylist = onChoosePlaylist,
-            onAddPlaylist = onAddPlaylist,
-            onManageSources = onManageSources,
-            onCatchUp = onCatchUp,
-            onSettings = onSettings,
-            onExit = onExit,
-            modifier = Modifier
-                .weight(RAIL_SHARE)
-                .fillMaxHeight()
-                .focusRequester(railFocus),
-        )
+        // Keep the former utility-rail share empty during this layout experiment.
+        // The remaining content keeps its original proportions instead of expanding.
+        Spacer(Modifier.weight(RAIL_SHARE).fillMaxHeight())
 
         Column(
-            Modifier.weight(STACK_SHARE).fillMaxHeight(),
+            Modifier
+                .weight(STACK_SHARE)
+                .fillMaxHeight()
+                .focusRequester(contentFocus),
             verticalArrangement = Arrangement.spacedBy(rhythm.item),
         ) {
             for (section in rest) {
@@ -2804,7 +2788,7 @@ internal fun rememberDate(atMs: Long): String = remember(atMs) {
 private val PICKER_MIN_WIDTH = 180.dp
 private val PICKER_MAX_WIDTH = 320.dp
 
-private const val RAIL_SHARE = 0.166f
+private const val RAIL_SHARE = 0.166f // Reserved empty space while the utility rail is hidden.
 private const val STACK_SHARE = 0.327f
 private const val HERO_SHARE = 0.472f
 
