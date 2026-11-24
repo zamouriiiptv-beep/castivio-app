@@ -309,6 +309,8 @@ fun HomeScreen(
         val frame = rememberMetrics(maxWidth, maxHeight)
         val plan = Plan.of(frame)
         val rhythm = Rhythm.of(frame)
+        // Read here, in the box's own scope: the column below does not answer for the box's size.
+        val labelled = CastivioTheme.device.isTv || maxHeight >= LABELLED_HEADER_MIN_HEIGHT
 
         Column(Modifier.fillMaxSize()) {
             // The header is a band across the whole width (`HomeHeader`): the logo, the page's seven buttons with their
@@ -316,7 +318,7 @@ fun HomeScreen(
             HomeHeader(
                 state = state,
                 frame = frame,
-                labelled = CastivioTheme.device.isTv || maxHeight >= LABELLED_HEADER_MIN_HEIGHT,
+                labelled = labelled,
                 onRefresh = model::refresh,
                 onChoosePlaylist = model::choosePlaylist,
                 onAddPlaylist = onAddPlaylist,
