@@ -1,0 +1,134 @@
+<!doctype html>
+<!--
+  Home's header, drawn from the owner's reference (2026-11-24): one dark band across the top with, from the left, the
+  lockup, the two terms as pills with a green tick (Castivio's licence, the provider's subscription), and on the right the
+  page's buttons as glyphs with their word under them -- refresh, switch playlist, catch-up, settings, language, the two
+  appearances, exit -- then the clock and the date. A violet-to-cyan line under the band. The order is physical, as the
+  header's is today (the band does not swap sides per language); the words inside read right to left.
+
+  Kept from the owner's notes on the full Home picture: the device key stays on Home (no change asked); the labels in Arabic.
+  The two dates are written the same way (day/month/year), where the reference had 26-11-2026 beside 2027-4-8.
+  The mark is the approved one (the television with its play button), where the reference has a C.
+
+    ?frame=tv | phone | sheet (default)      &clean=1 draws the screen alone
+-->
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Home header</title>
+<style>
+:root{
+  --ground:#0D0B22; --strong:#F4F2FA; --label:#B9B7D3; --muted:#8C8CA8;
+  --violet:#B694FF; --violetDeep:#6E4BD8; --cyan:#3FD0FF; --green:#22C55E;
+  --glass:rgba(255,255,255,.06); --glassEdge:rgba(255,255,255,.14);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#05040E;color:var(--strong);font-family:Inter,"Noto Sans Arabic","DejaVu Sans",sans-serif;padding:24px;display:flex;flex-direction:column;gap:28px;align-items:center}
+body.clean{padding:0;gap:0}
+svg{display:block;flex:none}
+.cap{width:960px;font:600 14px "Noto Sans Arabic",sans-serif;color:var(--label);direction:rtl}
+.screen{position:relative;overflow:hidden;background:radial-gradient(120% 90% at 85% 0%,#1B1F3F 0%,rgba(27,31,63,0) 60%),linear-gradient(200deg,#13152D,var(--ground))}
+.tv{width:960px;height:540px}
+.phone{width:833px;height:385px}
+
+/* the band */
+.band{position:absolute;top:0;left:0;right:0;direction:ltr;display:flex;align-items:center;
+  background:linear-gradient(90deg,rgba(76,29,149,.55) 0%,rgba(20,16,48,.92) 22%,rgba(10,12,30,.96) 60%,rgba(8,22,40,.96) 100%);
+  border-bottom:0}
+.band::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:linear-gradient(90deg,#A855F7,#7C3AED 35%,#3B82F6 70%,#22D3EE)}
+.band::before{content:"";position:absolute;left:-40px;top:0;bottom:0;width:260px;background:radial-gradient(80% 120% at 10% 100%,rgba(168,85,247,.45),rgba(168,85,247,0) 70%);pointer-events:none}
+.tv .band{height:86px;padding:0 24px;gap:12px}
+.phone .band{height:62px;padding:0 18px;gap:9px}
+
+.lockup{display:flex;align-items:center;gap:8px;position:relative}
+.lockup img{object-fit:contain}
+.tv .lockup img{width:40px;height:40px}
+.phone .lockup img{width:30px;height:30px}
+.word{font:700 22px Inter,sans-serif;letter-spacing:.2px}
+.phone .word{font-size:17px}
+
+.rule{width:1px;align-self:stretch;margin:22px 2px;background:rgba(255,255,255,.14)}
+.phone .rule{margin:16px 0}
+
+.terms{display:flex;flex-direction:column;align-items:stretch;gap:5px;direction:ltr}
+.pill{direction:rtl;display:flex;align-items:center;gap:8px;border-radius:999px;background:var(--glass);border:1px solid var(--glassEdge);white-space:nowrap}
+.tv .pill{height:28px;padding:0 12px 0 10px;font:600 12.5px "Noto Sans Arabic",Inter,sans-serif}
+.phone .pill{height:22px;padding:0 9px 0 7px;font:600 10.5px "Noto Sans Arabic",Inter,sans-serif;gap:6px}
+.pill .tick{border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center}
+.tv .pill .tick{width:16px;height:16px}
+.phone .pill .tick{width:13px;height:13px}
+.pill .tick svg{width:70%;height:70%;fill:none;stroke:#fff;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
+.pill .date{direction:ltr;font-family:Inter,sans-serif;font-weight:600}
+
+.spacer{flex:1}
+.buttons{display:flex;direction:ltr}
+.tv .buttons{gap:1px}
+.phone .buttons{gap:2px}
+.btn{display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:14px;border:1px solid transparent;position:relative}
+.tv .btn{min-width:50px;padding:0 5px;height:64px;gap:5px}
+.phone .btn{width:40px;height:44px}
+.btn svg{fill:none;stroke:var(--strong);stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.tv .btn svg{width:24px;height:24px}
+.phone .btn svg{width:21px;height:21px}
+.btn span{font:500 10.5px "Noto Sans Arabic",sans-serif;color:var(--label);white-space:nowrap}
+.phone .btn span{display:none}
+.btn.on{background:linear-gradient(180deg,rgba(124,58,237,.42),rgba(91,33,182,.30));border-color:#A78BFA;box-shadow:0 0 0 1px rgba(167,139,250,.35),0 0 18px rgba(139,92,246,.55)}
+.btn.on span{color:var(--strong)}
+
+.clock{display:flex;flex-direction:column;align-items:flex-end;direction:ltr}
+.tv .clock .t{font:700 30px Inter,sans-serif;letter-spacing:.5px;line-height:1}
+.tv .clock .d{font:500 12.5px Inter,sans-serif;color:var(--label);margin-top:6px}
+.phone .clock .t{font:700 21px Inter,sans-serif;line-height:1}
+.phone .clock .d{font:500 10px Inter,sans-serif;color:var(--label);margin-top:4px}
+
+/* what is under the header, quiet, only to place it */
+.below{position:absolute;left:30px;right:30px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px;direction:rtl}
+.tv .below{top:112px;height:200px}
+.phone .below{top:80px;left:18px;right:18px;height:150px;gap:10px}
+.below div{border-radius:18px;background:rgba(32,34,58,.55);border:1px solid rgba(255,255,255,.07)}
+.note{position:absolute;bottom:14px;left:0;right:0;text-align:center;font:500 12px "Noto Sans Arabic",sans-serif;color:var(--muted);direction:rtl}
+</style>
+</head>
+<body>
+<template id="band">
+  <div class="band">
+    <div class="lockup"><img src="../brand/castivio-symbol.png" alt=""><span class="word">Castivio</span></div>
+    <div class="rule"></div>
+    <div class="terms">
+      <div class="pill"><span class="tick"><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4 8-9"/></svg></span>الاشتراك: <span class="date">08/04/2027</span></div>
+      <div class="pill"><span class="tick"><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4 8-9"/></svg></span>رخصة Castivio: <span class="date">26/11/2026</span></div>
+    </div>
+    <div class="spacer"></div>
+    <div class="rule"></div>
+    <div class="buttons">
+      <div class="btn"><svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.6-4.5M4 4.5v4h4"/><path d="M4 13a8 8 0 0 0 14.6 4.5M20 19.5v-4h-4"/></svg><span>تحديث</span></div>
+      <div class="btn"><svg viewBox="0 0 24 24"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg><span>تبديل القائمة</span></div>
+      <div class="btn"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>ما فاتك</span></div>
+      <div class="btn"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span>الإعدادات</span></div>
+      <div class="btn"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg><span>اللغة</span></div>
+      <div class="btn"><svg viewBox="0 0 24 24"><path d="M13 4.5a7.5 7.5 0 1 0 6.5 11.2A6 6 0 0 1 13 4.5z"/><circle cx="18.5" cy="6" r="2.2"/><path d="M18.5 1.8v.9M18.5 9.3v.9M14.3 6h.9M21.8 6h.9"/></svg><span>تبديل الوضعين</span></div>
+      <div class="btn on"><svg viewBox="0 0 24 24"><path d="M10 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4M15 8l4 4-4 4M19 12H9"/></svg><span>خروج</span></div>
+    </div>
+    <div class="rule"></div>
+    <div class="clock"><span class="t">19:40</span><span class="d">21/11/2026</span></div>
+  </div>
+  <div class="below"><div></div><div></div><div></div><div></div></div>
+</template>
+
+<script>
+const q = new URLSearchParams(location.search);
+const frame = q.get('frame') || 'sheet';
+const clean = q.get('clean') === '1';
+if (clean) document.body.classList.add('clean');
+const tpl = document.getElementById('band').innerHTML;
+const caps = {
+  tv: 'تلفاز 960×540: الشريط كاملًا، والتركيز على «خروج».',
+  phone: 'هاتف 833×385: لا يتسع للكلمات تحت الأزرار، فتبقى الأيقونات وحدها، وتُقرأ كلمتها عند الضغط المطوّل.',
+};
+for (const f of (frame === 'sheet' ? ['tv', 'phone'] : [frame])) {
+  if (!clean) { const c = document.createElement('div'); c.className = 'cap'; c.textContent = caps[f]; document.body.appendChild(c); }
+  const s = document.createElement('div'); s.className = 'screen ' + f; s.innerHTML = tpl; document.body.appendChild(s);
+}
+</script>
+</body>
+</html>
