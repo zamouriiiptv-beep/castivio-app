@@ -32,6 +32,7 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
@@ -644,13 +645,14 @@ internal data class Term(val word: Int, val atMs: Long?)
  *
  * ## Which column sits where
  *
- * The stack of three takes the **leading** edge and Live the **trailing** one: start and end rather than left and right,
- * so a `Row` lays it out in both directions from one declaration.
+ * The owner's second picture (2026-11-24): Live takes the **leading** edge, large; films over series in the middle; the
+ * radio a narrow column at the **trailing** edge. Start and end rather than left and right, so a `Row` lays it out in both
+ * directions from one declaration.
  *
  * ## The traversal
  *
- * Two columns, with up and down staying inside whichever has focus, and Up from the board reaching the header. The remote
- * starts on Live (see [HomeScreen]). Compose's own focus search resolves all of it from the geometry.
+ * Three columns, with up and down staying inside whichever has focus, and Up from the board reaching the header. The
+ * remote starts on Live (see [HomeScreen]). Compose's own focus search resolves all of it from the geometry.
  */
 @Composable
 private fun SectionBoard(
@@ -695,12 +697,24 @@ private fun SectionBoard(
         ),
     )
 
+    // The owner's second picture (2026-11-24): live at the start, large; films over series in the middle; the radio a narrow
+    // column at the end. The pictures inside the cards are the owner's to send; until then each card is its glyph and words.
+    val (lines, radio) = rest.partition { it.section != CatalogSection.Radio }
     Row(modifier, horizontalArrangement = Arrangement.spacedBy(frame.bandTop)) {
+        HeroCard(
+            section = live,
+            frame = frame,
+            resume = state.resume,
+            onClick = { onSeeSection(live.section) },
+            onResume = onResume,
+            modifier = Modifier.weight(HERO_SHARE).fillMaxHeight().focusRequester(boardFocus),
+        )
+
         Column(
             Modifier.weight(STACK_SHARE).fillMaxHeight(),
             verticalArrangement = Arrangement.spacedBy(rhythm.item),
         ) {
-            for (section in rest) {
+            for (section in lines) {
                 SectionLine(
                     section = section,
                     frame = frame,
@@ -712,14 +726,17 @@ private fun SectionBoard(
             }
         }
 
-        HeroCard(
-            section = live,
-            frame = frame,
-            resume = state.resume,
-            onClick = { onSeeSection(live.section) },
-            onResume = onResume,
-            modifier = Modifier.weight(HERO_SHARE).fillMaxHeight().focusRequester(boardFocus),
-        )
+        for (section in radio) {
+            SectionLine(
+                section = section,
+                frame = frame,
+                resume = state.resumes[section.section.kind],
+                onClick = { onSeeSection(section.section) },
+                onResume = onResumeSection,
+                upright = true,
+                modifier = Modifier.weight(RADIO_SHARE).fillMaxHeight(),
+            )
+        }
     }
 }
 
@@ -1033,6 +1050,8 @@ private fun SectionLine(
     onClick: () -> Unit,
     onResume: (SectionResume) -> Unit,
     modifier: Modifier = Modifier,
+    /** The narrow column's face: glyph, name and figure stacked and centred, as the radio's card in the owner's picture. */
+    upright: Boolean = false,
 ) {
     val colors = CastivioTheme.colors
     val arrived = section.load is CardLoad.Arrived
@@ -1053,7 +1072,9 @@ private fun SectionLine(
         fill = if (arrived) arrivedFill() else CastivioTheme.colors.homeCardSurface,
         restBorder = if (arrived) colors.success.copy(alpha = ARRIVED_EDGE_ALPHA) else colors.cardSurfaceEdge,
     ) {
-        BoxWithConstraints(Modifier.fillMaxSize()) {
+        if (upright) {
+            UprightFace(section, frame, offer, face)
+        } else BoxWithConstraints(Modifier.fillMaxSize()) {
             // Read here, in the box's own scope: the Row below is a scope of its own and does not answer for the box's size.
             val lineHeight = maxHeight
             Row(
@@ -1087,9 +1108,68 @@ private fun SectionLine(
                 }
                 // The line's empty end is what both new faces use.
                 if (face == HeroFace.NotLoaded) TileLoadPill(frame)
-                if (offer != null) TileThumb(offer, height = lineHeight)
+                if (offer != null) TileThumb(offer, height = lineHeight) else if (face != HeroFace.NotLoaded) PlayMark(frame)
             }
         }
+    }
+}
+
+/**
+ * The radio's narrow card: its glyph on a disc, its name, and under it what its load says -- or, once something was played,
+ * the station last played. Centred, as the owner drew it.
+ */
+@Composable
+private fun UprightFace(section: Section, frame: CastivioMetrics, offer: SectionResume?, face: HeroFace) {
+    val colors = CastivioTheme.colors
+    Column(
+        Modifier.fillMaxSize().padding(frame.chipPad),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(frame.chipPad / 2, Alignment.CenterVertically),
+    ) {
+        Box(
+            Modifier
+                .size(Sizing.iconMd * UPRIGHT_DISC)
+                .clip(CircleShape)
+                .background(colors.discFill(section.hue)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(section.icon, contentDescription = null, tint = colors.discGlyph(section.hue), modifier = Modifier.size(Sizing.iconMd))
+        }
+        Text(
+            text = stringResource(section.name),
+            style = castivioTitleStyle(frame.fsLabel),
+            color = colors.onBackgroundStrong,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center,
+        )
+        if (offer != null) {
+            Text(
+                text = offer.title,
+                style = castivioBodyStyle(frame.fsBody).copy(textDirection = TextDirection.Content),
+                color = colors.onBackgroundVariant,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center,
+            )
+        } else {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) { LineLoad(section, frame) }
+            if (face == HeroFace.NotLoaded) TileLoadPill(frame)
+        }
+    }
+}
+
+/** The round play mark at the end of a line, as in the owner's picture: drawn, not a control -- the whole card is pressed. */
+@Composable
+private fun PlayMark(frame: CastivioMetrics) {
+    val colors = CastivioTheme.colors
+    Box(
+        Modifier
+            .size(Sizing.iconMd + frame.chipPad)
+            .border(BorderStroke(PLAY_MARK_EDGE, colors.onBackgroundVariant), CircleShape),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(Icons.Rounded.PlayArrow, contentDescription = null, tint = colors.onBackgroundStrong, modifier = Modifier.size(Sizing.iconSm))
     }
 }
 
@@ -2182,8 +2262,8 @@ internal fun rememberDate(atMs: Long): String = remember(atMs) {
 }
 
 /**
- * How the board's width is divided: the stack and the hero. Weights rather than widths; the rail that took the first
- * share went to the header (2026-11-24), and the two keep the proportion they had between them, the hero the larger.
+ * How the board's width is divided, as in the owner's second picture (2026-11-24): live the largest, films and series in the
+ * middle, the radio a narrow column. Weights rather than widths.
  */
 /**
  * How wide the playlist menu is allowed to be.
@@ -2203,8 +2283,13 @@ internal fun rememberDate(atMs: Long): String = remember(atMs) {
 private val PICKER_MIN_WIDTH = 180.dp
 private val PICKER_MAX_WIDTH = 320.dp
 
-private const val STACK_SHARE = 0.327f
-private const val HERO_SHARE = 0.472f
+private const val STACK_SHARE = 0.40f
+private const val HERO_SHARE = 0.47f
+private const val RADIO_SHARE = 0.15f
+
+/** The radio's glyph disc, against the glyph. */
+private const val UPRIGHT_DISC = 1.9f
+private val PLAY_MARK_EDGE = 1.5.dp
 
 /**
  * The watermark: how much of the hero panel's height its glyph takes, and how far it

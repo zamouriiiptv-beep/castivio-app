@@ -90,7 +90,8 @@ svg{display:block;flex:none}
 
 /* ---- the three ways to give the two dates their full size ---- */
 .sw{display:none}
-.screen:not(.v5) .v5board,.screen:not(.v5) .cfoot{display:none}
+.screen:not(.v5) .v5board{display:none}
+.screen:not(.v5):not(.v6):not(.v7):not(.v8) .cfoot{display:none}
 .v5 .below:not(.v5board){display:none}
 .v5 .v5board{display:grid}
 .dates{display:none}
@@ -136,6 +137,48 @@ svg{display:block;flex:none}
 .cfoot .tick{width:16px;height:16px;border-radius:50%;background:var(--green);display:inline-flex;align-items:center;justify-content:center;flex:none}
 .cfoot .tick svg{width:70%;height:70%;fill:none;stroke:#fff;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
 .cfoot .warn .tick{background:#F5B321}.cfoot .warn .state{color:#F5B321}
+
+/* v6: the middle of the owner's second picture, between the approved header and footer */
+.v6 .band .terms,.v6 .lockup + .rule,.v6 .below:not(.v6board){display:none}
+.screen:not(.v6) .v6board{display:none}
+.v6 .cfoot{display:grid}
+.v6board{position:absolute;top:106px;bottom:76px;left:30px;right:30px;direction:rtl;display:grid;grid-template-columns:1.18fr 1fr .38fr;gap:14px}
+.v6board .col{display:grid;grid-template-rows:1fr 1fr;gap:12px}
+.card{position:relative;overflow:hidden;border-radius:18px;border:1px solid rgba(167,139,250,.22);background:linear-gradient(135deg,rgba(76,29,149,.42),rgba(20,18,48,.88) 60%);display:flex;align-items:center}
+.card h3{font:800 25px "Noto Sans Arabic",sans-serif;line-height:1.1}
+.card .n{font:600 16px Inter,"Noto Sans Arabic",sans-serif;color:var(--label);margin-top:6px}
+.card .n b{font-family:Inter,sans-serif;color:var(--strong);font-weight:600}
+/* live: the large card, focused */
+.live{flex-direction:column;justify-content:flex-end;padding-bottom:30px;border:2px solid #A78BFA;box-shadow:0 0 0 1px rgba(167,139,250,.5),0 0 26px rgba(139,92,246,.6);
+  background:radial-gradient(60% 40% at 50% 112%,rgba(34,197,94,.45),rgba(34,197,94,0) 70%),radial-gradient(30% 22% at 12% 10%,rgba(255,255,255,.35),rgba(255,255,255,0) 70%),radial-gradient(30% 22% at 88% 10%,rgba(255,255,255,.35),rgba(255,255,255,0) 70%),radial-gradient(80% 70% at 50% 30%,rgba(124,58,237,.55),rgba(20,18,48,.95) 75%)}
+.live .tv{width:96px;height:96px;margin-bottom:14px}
+.live h3{font-size:38px;text-align:center}
+.live .n{text-align:center;font-size:20px}
+.live .n b{font-size:24px;font-weight:700}
+/* films and series: words at the start, art at the end, a play mark */
+.line{padding:0 22px;gap:16px}
+.line .txt{flex:1}
+.line .art{width:104px;height:78px;opacity:.95;flex:none}
+.v6 .btn.on{background:none;border-color:transparent;box-shadow:none}
+.v6 .btn.on span{color:var(--label)}
+.play{width:46px;height:46px;border-radius:50%;border:2px solid rgba(255,255,255,.55);display:flex;align-items:center;justify-content:center;flex:none}
+.play svg{width:18px;height:18px;fill:#fff;margin-inline-start:3px}
+/* radio: narrow, centred */
+.radio{flex-direction:column;justify-content:center;gap:6px;text-align:center}
+.radio .disc{width:64px;height:64px;border-radius:50%;background:rgba(124,58,237,.35);display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+.radio .disc svg{width:36px;height:36px}
+.radio h3{font-size:22px}
+.radio .bars{display:flex;gap:5px;align-items:flex-end;height:28px;margin-top:10px}
+.radio .bars i{width:5px;border-radius:3px;background:linear-gradient(#A855F7,#7C3AED)}
+
+/* v7, v8: the owner's two pictures' middles, as they are, between the approved header and footer */
+.v7 .band .terms,.v7 .lockup + .rule,.v7 .below,.v8 .band .terms,.v8 .lockup + .rule,.v8 .below,.v7 .v6board,.v8 .v6board{display:none}
+.v7 .cfoot,.v8 .cfoot{display:grid}
+.v7 .btn.on,.v8 .btn.on{background:none;border-color:transparent;box-shadow:none}
+.v7 .btn.on span,.v8 .btn.on span{color:var(--label)}
+.mid{display:none;position:absolute;top:100px;bottom:72px;left:24px;right:24px}
+.mid img{width:100%;height:100%;object-fit:contain}
+.v7 .mid1,.v8 .mid2{display:block}
 </style>
 </head>
 <body>
@@ -174,6 +217,26 @@ svg{display:block;flex:none}
     <div class="c warn"><small>رخصة Castivio</small><span class="v"><span class="tick"><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4 8-9"/></svg></span><span class="ltr">26/11/2026</span><span class="state">باقي يومان</span></span></div>
     <div class="c"><small>اشتراك المزوّد</small><span class="v"><span class="tick"><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4 8-9"/></svg></span><span class="ltr">08/04/2027</span><span class="state">ساري</span></span></div>
   </div>
+  <div class="v6board">
+    <div class="card live">
+      <svg class="tv" viewBox="0 0 96 96"><defs><linearGradient id="tvg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E879F9"/><stop offset="1" stop-color="#8B5CF6"/></linearGradient></defs>
+        <path d="M34 14l14 14 14-14" fill="none" stroke="url(#tvg)" stroke-width="5" stroke-linecap="round"/><rect x="14" y="28" width="68" height="50" rx="12" fill="rgba(20,16,48,.85)" stroke="url(#tvg)" stroke-width="5"/><path d="M42 42l16 11-16 11z" fill="url(#tvg)"/></svg>
+      <h3>البث المباشر</h3><div class="n"><b>54,482</b> قناة</div>
+    </div>
+    <div class="col">
+      <div class="card line"><div class="txt"><h3>الأفلام</h3><div class="n"><b>171,845</b> فيلم</div></div>
+        <svg class="art" viewBox="0 0 120 90"><circle cx="58" cy="44" r="32" fill="none" stroke="#C4B5FD" stroke-width="5" opacity=".8"/><circle cx="58" cy="44" r="7" fill="#C4B5FD" opacity=".8"/><g fill="#8B5CF6" opacity=".85"><circle cx="58" cy="25" r="8"/><circle cx="58" cy="63" r="8"/><circle cx="39" cy="44" r="8"/><circle cx="77" cy="44" r="8"/></g><path d="M58 76 C 80 82, 100 80, 118 70" fill="none" stroke="#8B5CF6" stroke-width="6" stroke-linecap="round" opacity=".7"/></svg>
+        <span class="play"><svg viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></svg></span></div>
+      <div class="card line"><div class="txt"><h3>المسلسلات</h3><div class="n"><b>46,770</b> مسلسل</div></div>
+        <svg class="art" viewBox="0 0 120 90"><rect x="18" y="34" width="84" height="50" rx="8" fill="rgba(124,58,237,.35)" stroke="#C4B5FD" stroke-width="4"/><path d="M14 20 L100 8 L104 26 L18 38 Z" fill="#C4B5FD" opacity=".85"/><g stroke="#1B1038" stroke-width="5"><path d="M34 16 L40 34"/><path d="M58 13 L64 31"/><path d="M82 10 L88 28"/></g><path d="M52 48l18 11-18 11z" fill="#E9D5FF"/></svg>
+        <span class="play"><svg viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></svg></span></div>
+    </div>
+    <div class="card radio">
+      <div class="disc"><svg viewBox="0 0 36 36" fill="none" stroke="#E9D5FF" stroke-width="2.4" stroke-linecap="round"><circle cx="18" cy="14" r="3" fill="#E9D5FF"/><path d="M11 7a10 10 0 0 0 0 14M25 7a10 10 0 0 1 0 14M7 4a15 15 0 0 0 0 20M29 4a15 15 0 0 1 0 20M18 17l-6 15M18 17l6 15M14 27h8"/></svg></div>
+      <h3>الراديو</h3><div class="n"><b>1,083</b><br>محطة</div>
+      <div class="bars" style="justify-content:center"><i style="height:12px"></i><i style="height:22px"></i><i style="height:16px"></i><i style="height:28px"></i><i style="height:10px"></i></div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -187,6 +250,7 @@ const caps = {
   v2: '2. التاريخان في سطر تحت الشريط، والشريط للشعار والأزرار والساعة.',
   v4: 'الهيدر بلا التاريخين: ينتقلان إلى الفوتر.',
   v5: 'الرئيسية كاملة: الهيدر، واللوحة كما هي في التطبيق، والفوتر (ج) بخمس معلومات.',
+  v6: 'الرئيسية بوسط صورة المالك الثانية: البث المباشر كبير، الأفلام والمسلسلات، والراديو عمود ضيق.',
   v3: '3. نص أقصر، البطاقتان متجاورتان، والكلمات تحت كل الأزرار.',
 };
 for (const f of (frame === 'sheet' ? ['v1', 'v2', 'v3'] : [frame])) {
