@@ -98,6 +98,7 @@
     <string name="home_licence_unavailable">Niet beschikbaar</string>
     <string name="home_theme_lighter">Overschakelen naar het lichte thema</string>
     <string name="home_theme_darker">Overschakelen naar het donkere thema</string>
+    <string name="home_theme">Thema</string>
     <string name="home_refresh">Verversen</string>
     <string name="home_refresh_failed">Niet ververst</string>
     <string name="home_refresh_done">Ververst</string>

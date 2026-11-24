@@ -96,6 +96,7 @@
     <string name="home_licence_unavailable">ไม่พร้อมใช้งาน</string>
     <string name="home_theme_lighter">เปลี่ยนเป็นธีมสว่าง</string>
     <string name="home_theme_darker">เปลี่ยนเป็นธีมมืด</string>
+    <string name="home_theme">ธีม</string>
     <string name="home_refresh">รีเฟรช</string>
     <string name="home_refresh_failed">รีเฟรชไม่สำเร็จ</string>
     <string name="home_refresh_done">รีเฟรชแล้ว</string>

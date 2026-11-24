@@ -98,6 +98,7 @@
     <string name="home_licence_unavailable">Utilgængelig</string>
     <string name="home_theme_lighter">Skift til lyst tema</string>
     <string name="home_theme_darker">Skift til mørkt tema</string>
+    <string name="home_theme">Tema</string>
     <string name="home_refresh">Opdatér</string>
     <string name="home_refresh_failed">Ikke opdateret</string>
     <string name="home_refresh_done">Opdateret</string>

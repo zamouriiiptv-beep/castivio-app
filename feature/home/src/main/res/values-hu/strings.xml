@@ -98,6 +98,7 @@
     <string name="home_licence_unavailable">Nem érhető el</string>
     <string name="home_theme_lighter">Váltás világos témára</string>
     <string name="home_theme_darker">Váltás sötét témára</string>
+    <string name="home_theme">Téma</string>
     <string name="home_refresh">Frissítés</string>
     <string name="home_refresh_failed">Sikertelen</string>
     <string name="home_refresh_done">Frissítve</string>

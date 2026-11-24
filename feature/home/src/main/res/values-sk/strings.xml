@@ -102,6 +102,7 @@
     <string name="home_licence_unavailable">Nedostupná</string>
     <string name="home_theme_lighter">Prepnúť na svetlý motív</string>
     <string name="home_theme_darker">Prepnúť na tmavý motív</string>
+    <string name="home_theme">Motív</string>
     <string name="home_refresh">Obnoviť</string>
     <string name="home_refresh_failed">Neobnovené</string>
     <string name="home_refresh_done">Obnovené</string>

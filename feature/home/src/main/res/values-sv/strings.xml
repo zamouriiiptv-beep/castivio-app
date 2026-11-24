@@ -98,6 +98,7 @@
     <string name="home_licence_unavailable">Otillgänglig</string>
     <string name="home_theme_lighter">Byt till ljust tema</string>
     <string name="home_theme_darker">Byt till mörkt tema</string>
+    <string name="home_theme">Tema</string>
     <string name="home_refresh">Uppdatera</string>
     <string name="home_refresh_failed">Misslyckades</string>
     <string name="home_refresh_done">Uppdaterat</string>

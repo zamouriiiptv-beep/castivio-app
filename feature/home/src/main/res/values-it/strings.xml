@@ -100,6 +100,7 @@
     <string name="home_licence_unavailable">Non disponibile</string>
     <string name="home_theme_lighter">Passa al tema chiaro</string>
     <string name="home_theme_darker">Passa al tema scuro</string>
+    <string name="home_theme">Tema</string>
     <string name="home_refresh">Aggiorna</string>
     <string name="home_refresh_failed">Non riuscito</string>
     <string name="home_refresh_done">Aggiornato</string>

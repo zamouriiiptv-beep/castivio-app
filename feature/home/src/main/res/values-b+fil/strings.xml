@@ -98,6 +98,7 @@
     <string name="home_licence_unavailable">Hindi available</string>
     <string name="home_theme_lighter">Lumipat sa mas maliwanag na tema</string>
     <string name="home_theme_darker">Lumipat sa mas madilim na tema</string>
+    <string name="home_theme">Tema</string>
     <string name="home_refresh">I-refresh</string>
     <string name="home_refresh_failed">Nabigo</string>
     <string name="home_refresh_done">Na-refresh na</string>

@@ -98,6 +98,7 @@
     <string name="home_licence_unavailable">E padisponueshme</string>
     <string name="home_theme_lighter">Kalo në temën e çelët</string>
     <string name="home_theme_darker">Kalo në temën e errët</string>
+    <string name="home_theme">Tema</string>
     <string name="home_refresh">Rifresko</string>
     <string name="home_refresh_failed">Dështoi</string>
     <string name="home_refresh_done">U rifreskua</string>

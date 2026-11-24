@@ -98,6 +98,7 @@
     <string name="home_licence_unavailable">Недостъпен</string>
     <string name="home_theme_lighter">Превключване към светла тема</string>
     <string name="home_theme_darker">Превключване към тъмна тема</string>
+    <string name="home_theme">Тема</string>
     <string name="home_refresh">Обнови</string>
     <string name="home_refresh_failed">Не се обнови</string>
     <string name="home_refresh_done">Обновено</string>

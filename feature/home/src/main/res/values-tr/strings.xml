@@ -98,6 +98,7 @@
     <string name="home_licence_unavailable">Kullanılamıyor</string>
     <string name="home_theme_lighter">Açık temaya geç</string>
     <string name="home_theme_darker">Koyu temaya geç</string>
+    <string name="home_theme">Tema</string>
     <string name="home_refresh">Yenile</string>
     <string name="home_refresh_failed">Yenilenemedi</string>
     <string name="home_refresh_done">Yenilendi</string>

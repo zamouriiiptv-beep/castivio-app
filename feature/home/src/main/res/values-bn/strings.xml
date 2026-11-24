@@ -98,6 +98,7 @@
     <string name="home_licence_unavailable">পাওয়া যাচ্ছে না</string>
     <string name="home_theme_lighter">হালকা থিমে যান</string>
     <string name="home_theme_darker">গাঢ় থিমে যান</string>
+    <string name="home_theme">থিম</string>
     <string name="home_refresh">রিফ্রেশ</string>
     <string name="home_refresh_failed">রিফ্রেশ হয়নি</string>
     <string name="home_refresh_done">রিফ্রেশ হয়েছে</string>

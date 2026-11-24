@@ -98,6 +98,7 @@
     <string name="home_licence_unavailable">Nicht verfügbar</string>
     <string name="home_theme_lighter">Zum helleren Design wechseln</string>
     <string name="home_theme_darker">Zum dunkleren Design wechseln</string>
+    <string name="home_theme">Design</string>
     <string name="home_refresh">Aktualisieren</string>
     <string name="home_refresh_failed">Fehler</string>
     <string name="home_refresh_done">Aktualisiert</string>

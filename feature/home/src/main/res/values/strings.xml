@@ -166,6 +166,7 @@
          component may not own it. -->
     <string name="home_theme_lighter">Switch to the lighter theme</string>
     <string name="home_theme_darker">Switch to the darker theme</string>
+    <string name="home_theme">Theme</string>
 
     <!-- The action row under the section cards. -->
     <!-- Asks the provider again what it says. It downloads no catalogue — sections

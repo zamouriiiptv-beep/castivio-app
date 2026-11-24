@@ -100,6 +100,7 @@
     <string name="home_licence_unavailable">Недоступна</string>
     <string name="home_theme_lighter">Пређи на светлу тему</string>
     <string name="home_theme_darker">Пређи на тамну тему</string>
+    <string name="home_theme">Тема</string>
     <string name="home_refresh">Освежи</string>
     <string name="home_refresh_failed">Неуспешно</string>
     <string name="home_refresh_done">Освежено</string>

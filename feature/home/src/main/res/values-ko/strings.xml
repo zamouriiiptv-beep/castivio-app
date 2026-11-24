@@ -96,6 +96,7 @@
     <string name="home_licence_unavailable">사용할 수 없음</string>
     <string name="home_theme_lighter">밝은 테마로 전환</string>
     <string name="home_theme_darker">어두운 테마로 전환</string>
+    <string name="home_theme">테마</string>
     <string name="home_refresh">새로 고침</string>
     <string name="home_refresh_failed">새로 고침 실패</string>
     <string name="home_refresh_done">새로 고침 완료</string>

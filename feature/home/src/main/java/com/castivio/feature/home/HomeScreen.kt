@@ -15,9 +15,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
@@ -41,7 +39,6 @@ import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.CloudOff
 import androidx.compose.material.icons.rounded.ErrorOutline
 import androidx.compose.material.icons.rounded.Info
-import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.LiveTv
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.LockOpen
@@ -49,17 +46,13 @@ import androidx.compose.material.icons.rounded.Memory
 import androidx.compose.material.icons.rounded.Movie
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.PlaylistAdd
-import androidx.compose.material.icons.rounded.PowerSettingsNew
 import androidx.compose.material.icons.rounded.Radio
-import androidx.compose.material.icons.rounded.RadioButtonUnchecked
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.material.icons.rounded.Settings
-import androidx.compose.material.icons.rounded.Shield
 import androidx.compose.material.icons.rounded.Tv
 import androidx.compose.material.icons.rounded.VpnKey
 import androidx.compose.material.icons.rounded.WifiOff
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
@@ -104,9 +97,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -118,17 +109,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LifecycleStartEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.castivio.core.common.format.CastivioDates
 import com.castivio.core.design.components.CastivioClock
-import com.castivio.core.design.components.CastivioLanguageChip
-import com.castivio.core.design.components.CastivioLockup
-import com.castivio.core.design.components.CastivioThemeSwitchChip
 import com.castivio.core.design.components.EmptyState
-import com.castivio.core.design.components.GlassCard
 import com.castivio.core.design.components.InteractiveGlassCard
 import com.castivio.core.design.components.castivioBodyStyle
 import com.castivio.core.design.components.castivioChipStyle
@@ -136,7 +122,6 @@ import com.castivio.core.design.components.castivioTitleStyle
 import com.castivio.core.design.components.formatCount
 import com.castivio.core.design.components.ltrIsolate
 import com.castivio.core.design.components.ltrToken
-import com.castivio.core.design.icons.CastivioIcons
 import com.castivio.core.design.theme.CASTIVIO_ARTWORK_ASPECT
 import com.castivio.core.design.theme.CastivioMetrics
 import com.castivio.core.design.theme.CastivioTheme
@@ -263,13 +248,9 @@ fun HomeScreen(
     // board with no way in until a direction key has been spent entering it.
     //
     // Requested rather than restored, which is the deliberate half. The highlight lands in
-    // the same place every time the board appears — the first control on the rail — instead
-    // of wherever the last visit ended, so returning is a position a user can learn.
-    //
-    // Attached to the rail rather than to Refresh itself: a `FocusRequester` on a container
-    // enters its first focusable child, which is Refresh, and stays right while a refresh
-    // in flight has replaced that card with its busy twin. The same thing `ActivationSurface`
-    // does with the frame it hands the flow.
+    // the same place every time the board appears — the live channels' card, what most visits
+    // are for — instead of wherever the last visit ended, so returning is a position a user
+    // can learn. The header's buttons are one Up away.
     val boardFocus = remember { FocusRequester() }
 
     // Not while loading. That branch draws an empty box with nothing focusable in it, and
@@ -328,96 +309,85 @@ fun HomeScreen(
         val plan = Plan.of(frame)
         val rhythm = Rhythm.of(frame)
 
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(horizontal = frame.edge)
-                .padding(vertical = rhythm.stage),
-            verticalArrangement = Arrangement.spacedBy(rhythm.group),
-        ) {
-            DashboardHeader(state, frame, plan.headerHeight) {
-                // The trailing end of the header, in the order the other five screens
-                // use: the page's own control keeps the outer end and the theme sits
-                // just inside it. `CastivioThemeSwitchChip` draws nothing where no
-                // switch has been provided, so a preview or a test measuring something
-                // else does not have to know whether to ask for one.
-                CastivioThemeSwitchChip(
-                    chip = frame.chip,
-                    touchTarget = frame.touchTarget,
-                    fontSize = frame.fsChip,
-                    toLighter = stringResource(R.string.home_theme_lighter),
-                    toDarker = stringResource(R.string.home_theme_darker),
-                )
-                CastivioLanguageChip(
-                    chip = frame.chip,
-                    touchTarget = frame.touchTarget,
-                    pad = frame.chipPad,
-                    fontSize = frame.fsChip,
-                    label = stringResource(R.string.home_language),
-                    onClick = onLanguage,
-                )
-            }
+        Column(Modifier.fillMaxSize()) {
+            // The header is a band across the whole width (`HomeHeader`): the logo, the page's seven buttons with their
+            // words, and the clock. The board keeps the stage's own margins under it.
+            HomeHeader(
+                state = state,
+                frame = frame,
+                labelled = CastivioTheme.device.isTv || maxHeight >= LABELLED_HEADER_MIN_HEIGHT,
+                onRefresh = model::refresh,
+                onChoosePlaylist = model::choosePlaylist,
+                onAddPlaylist = onAddPlaylist,
+                onManageSources = onManageSources,
+                onCatchUp = onCatchUp,
+                onSettings = onSettings,
+                onLanguage = onLanguage,
+                onExit = onExit,
+                modifier = Modifier.fillMaxWidth().height(plan.headerHeight + rhythm.stage),
+            )
 
-            when {
-                state.loading -> Box(Modifier.fillMaxSize())
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = frame.edge)
+                    .padding(top = rhythm.group, bottom = rhythm.stage),
+                verticalArrangement = Arrangement.spacedBy(rhythm.group),
+            ) {
+                when {
+                    state.loading -> Box(Modifier.fillMaxSize())
 
-                // The empty states carry the requester too, and for the same reason the
-                // board does: their button is the only control on the screen, and this
-                // one is a door into the very flow the user is coming back from.
-                !state.hasSource -> Box(
-                    Modifier.fillMaxSize().focusRequester(boardFocus),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    EmptyState(
-                        title = stringResource(R.string.home_no_source_title),
-                        detail = stringResource(R.string.home_no_source_detail),
-                        actionLabel = stringResource(R.string.home_add_source),
-                        onAction = onAddSource,
-                        icon = Icons.Rounded.PlaylistAdd,
-                        secondaryActionLabel = stringResource(R.string.home_settings),
-                        onSecondaryAction = onSettings,
-                    )
-                }
+                    // The empty states carry the requester too, and for the same reason the
+                    // board does: their button is the only control on the screen, and this
+                    // one is a door into the very flow the user is coming back from.
+                    !state.hasSource -> Box(
+                        Modifier.fillMaxSize().focusRequester(boardFocus),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        EmptyState(
+                            title = stringResource(R.string.home_no_source_title),
+                            detail = stringResource(R.string.home_no_source_detail),
+                            actionLabel = stringResource(R.string.home_add_source),
+                            onAction = onAddSource,
+                            icon = Icons.Rounded.PlaylistAdd,
+                            secondaryActionLabel = stringResource(R.string.home_settings),
+                            onSecondaryAction = onSettings,
+                        )
+                    }
 
-                state.carriesNothing -> Box(
-                    Modifier.fillMaxSize().focusRequester(boardFocus),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    EmptyState(
-                        title = stringResource(R.string.home_empty_title),
-                        detail = stringResource(R.string.home_empty_detail),
-                        actionLabel = stringResource(R.string.home_change_source),
-                        onAction = onAddSource,
-                    )
-                }
+                    state.carriesNothing -> Box(
+                        Modifier.fillMaxSize().focusRequester(boardFocus),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        EmptyState(
+                            title = stringResource(R.string.home_empty_title),
+                            detail = stringResource(R.string.home_empty_detail),
+                            actionLabel = stringResource(R.string.home_change_source),
+                            onAction = onAddSource,
+                        )
+                    }
 
-                else -> {
-                    SectionBoard(
-                        state = state,
-                        frame = frame,
-                        rhythm = rhythm,
-                        railFocus = boardFocus,
-                        // The holder decides: a section on the device opens, one that is not
-                        // is asked for and loads on its own card while the viewer stays here.
-                        onSeeSection = { section -> if (model.press(section)) onSeeSection(section) },
-                        // The same press on the live section, and the same decision: what differs is where it goes -- on to the
-                        // channel last watched, playing, and not to the board with nothing playing.
-                        onResume = { channel -> if (model.press(CatalogSection.Live)) onResume(channel) },
-                        // The same press on the section of the card, and the same decision: only where it goes differs.
-                        onResumeSection = { offer ->
-                            val section = CatalogSection.entries.first { it.kind == offer.kind }
-                            if (model.press(section)) onResumeSection(offer)
-                        },
-                        onRefresh = model::refresh,
-                        onChoosePlaylist = model::choosePlaylist,
-                        onAddPlaylist = onAddPlaylist,
-                        onManageSources = onManageSources,
-                        onCatchUp = onCatchUp,
-                        onSettings = onSettings,
-                        onExit = onExit,
-                        modifier = Modifier.fillMaxWidth().weight(1f),
-                    )
-                    FooterLine(state, frame, rhythm)
+                    else -> {
+                        SectionBoard(
+                            state = state,
+                            frame = frame,
+                            rhythm = rhythm,
+                            boardFocus = boardFocus,
+                            // The holder decides: a section on the device opens, one that is not
+                            // is asked for and loads on its own card while the viewer stays here.
+                            onSeeSection = { section -> if (model.press(section)) onSeeSection(section) },
+                            // The same press on the live section, and the same decision: what differs is where it goes -- on to the
+                            // channel last watched, playing, and not to the board with nothing playing.
+                            onResume = { channel -> if (model.press(CatalogSection.Live)) onResume(channel) },
+                            // The same press on the section of the card, and the same decision: only where it goes differs.
+                            onResumeSection = { offer ->
+                                val section = CatalogSection.entries.first { it.kind == offer.kind }
+                                if (model.press(section)) onResumeSection(offer)
+                            },
+                            modifier = Modifier.fillMaxWidth().weight(1f),
+                        )
+                        FooterLine(state, frame, rhythm)
+                    }
                 }
             }
         }
@@ -554,242 +524,6 @@ private const val FOOT_RATIO = 0.509f
 
 // ---------------------------------------------------------------- the header
 
-/**
- * The lockup, what the licence says, and the time.
- *
- * ## The row is physical, and that is on purpose
- *
- * `CastivioHeader` — the header every other screen in the app uses — places its
- * slots with `place` rather than `placeRelative`, so the mark and the name sit on
- * the same physical edge in both text directions. A signature that swaps sides per
- * locale is two signatures, and Home disagreeing with every other screen about
- * where the brand lives is the worse kind of inconsistency: one nobody can point at,
- * that just feels unfinished.
- *
- * Home said the opposite until now. It was an ordinary `Row`, so in Arabic the
- * lockup went to the right and the clock to the left — the mirror image of the same
- * band on the activation screen, the licence screen and the pickers. Declaring this
- * subtree's own direction pins it, which is the mechanism the platform provides and
- * the one `CastivioLockup` already uses internally. Invariant 4 forbids a
- * direction-absolute *API*, not a subtree that states its direction.
- *
- * ## Two terms, and telling them apart is the point
- *
- * The provider's subscription and Castivio's own licence both run out, and a user who
- * confuses the two rings the wrong support line. The header used to carry one of them
- * across two cards — "Account status" beside "Expires on" — which left the licence
- * with no date anywhere and read as though the screen had one expiry to report.
- *
- * Each term is now one card carrying its own word *and* its own date, and the two are
- * separated four ways at once so the difference is seen rather than read: a hue that
- * is fixed per term and never shared, its own glyph, a label that names the system in
- * full, and its own edge. The hue is the term's identity, not its health — the word
- * carries health — with one exception: a term that has lapsed turns [danger], because
- * an expired licence drawn in its calm identity colour is a warning nobody sees. Two
- * cards can therefore never wear the same colour while either is good.
- *
- * Nothing here is invented. The provider's date is [Recorded.expiresAtMs] as the
- * provider last stated it, and the licence's is whatever [EntitlementState] carries —
- * see [licenceTerm], which is where the nine states become a word and a date.
- *
- * The pair is on every frame, and it shrinks rather than disappearing. A handset is
- * where a user is most likely to be checking whether their subscription is still good,
- * so hiding the two facts there would drop them from the one frame that wanted them.
- *
- * **The two cards take the row's slack, and there is no spacer between them and the
- * clock.** There was one, and it was the defect that shipped: a `Box(weight(1f))`
- * pushing the clock to the trailing end sat beside two cards at `weight(1f, fill =
- * false)`, so Compose divided the leftover width into *three* equal shares and handed
- * a third of it to a box that draws nothing. Each card got 141dp where its words
- * needed 175, and on a device the labels came out as "اشتراك الم…" with the dates
- * clipped away entirely — the header lost the very fact this revision added. With the
- * spacer gone and `fill = true`, the cards absorb the slack themselves and the clock
- * and its chips are pushed to the end by the cards rather than by an empty box.
- *
- * ## Why it is `internal` and takes a slot
- *
- * The Channels board draws this same band — the same lockup, the same two subscription
- * cards, the same clock — and a second declaration of it would be two headers that
- * agree today and disagree after the first edit to either. What differs is only what
- * hangs off the trailing end: Home keeps its theme and language controls there, and the
- * reference Channels page keeps that end clear. So the difference is a parameter, which
- * is invariant 6's rule rather than an exception to it.
- */
-@Composable
-internal fun DashboardHeader(
-    state: HomeState,
-    frame: CastivioMetrics,
-    height: Dp,
-    modifier: Modifier = Modifier,
-    /** The trailing controls. Home fills it; the Channels board leaves it empty. */
-    trailing: @Composable RowScope.() -> Unit = {},
-) {
-    val colors = CastivioTheme.colors
-    // **Captured before the pin below overwrites it.** The band's *order* is physical
-    // on purpose — the signature does not change sides per locale — but the words
-    // inside it are still Arabic, and an Arabic sentence laid out in a pinned
-    // left-to-right subtree is read backwards. The cards take this back for their own
-    // content, which is the narrow exception the pin was always going to need.
-    val reading = LocalLayoutDirection.current
-    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-        Row(
-            modifier.fillMaxWidth().height(height),
-            verticalAlignment = Alignment.CenterVertically,
-            // Half the header step, which is the gap the approved drawing measures at
-            // this geometry. The full step between six children was spending 113dp of
-            // an 801dp row on air, and the cards were paying for it in truncation.
-            horizontalArrangement = Arrangement.spacedBy(frame.headGap / 2),
-        ) {
-            // The lockup alone. The strapline that sat under it — "Premium IPTV
-            // player" — described the application to a user already inside it, and
-            // it was taking the height the two terms below now spend on their dates.
-            CastivioLockup(
-                markSize = frame.brand,
-                wordSize = (frame.fsTitle.value * WORD_RATIO).sp,
-            )
-
-            // **The two terms are one group, spaced as one.** They sat directly in
-            // the header row, so the gap between them was `headGap` — the step that
-            // separates the lockup from the clock from the chips — and five of those
-            // steps were spending 113dp of an 801dp row on air. Nested in a row of
-            // their own at `chipPad`, the pair keeps the header's spacing on the
-            // outside and takes back what was between them, which is width the dates
-            // then have to print in.
-            Row(
-                Modifier.weight(1f),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(frame.chipPad),
-            ) {
-                // Each card is handed a finished sentence rather than the parts of
-                // one. Composing it here keeps the two compositions — "expires on a
-                // date" and "a plan, and when it runs out" — beside the facts they
-                // are made from, and leaves `TermCard` with nothing to arbitrate.
-                val tone = providerTone(state.subscription)
-                TermCard(
-                    icon = when (tone) {
-                        ProviderTone.Usable -> Icons.Rounded.CheckCircle
-                        ProviderTone.Refused -> Icons.Rounded.ErrorOutline
-                        ProviderTone.Unchecked -> Icons.Rounded.RadioButtonUnchecked
-                    },
-                    label = stringResource(R.string.home_term_provider),
-                    value = providerSentence(state.subscription),
-                    hue = when (tone) {
-                        ProviderTone.Usable -> colors.hueGreen
-                        ProviderTone.Refused -> colors.danger
-                        ProviderTone.Unchecked -> colors.onBackgroundMuted
-                    },
-                    reading = reading,
-                    frame = frame,
-                    modifier = Modifier.weight(1f),
-                )
-
-                TermCard(
-                    icon = Icons.Rounded.Shield,
-                    label = stringResource(R.string.home_term_licence),
-                    value = licenceSentence(licenceTerm(state.entitlement)),
-                    hue = if (state.licenceHolds) colors.hueAzure else colors.danger,
-                    reading = reading,
-                    frame = frame,
-                    modifier = Modifier.weight(1f),
-                )
-            }
-
-            CastivioClock(fsTime = frame.fsTitle, fsDate = frame.fsChip)
-            trailing()
-        }
-    }
-}
-
-/**
- * One term: which system it belongs to, what it says, and when it runs out.
- *
- * The card is a tint of its hue -- [TERM_TINT_TOP] running to [TERM_TINT_FOOT] of it over the page -- with an edge of
- * [TERM_EDGE_ALPHA] of the same hue, its glyph and its date in the hue as well: green for a subscription that works, azure
- * for a licence that holds, the failure red for either that does not. The edge is half of what separates this card from the
- * term beside it, so it is the hue's and not the shared quiet one.
- *
- * ## The card reads in the reader's direction, and the band does not
- *
- * [DashboardHeader] pins its subtree to left-to-right so the signature does not swap
- * sides per locale. That is right for the *order of the band* and wrong for the
- * *words inside it*: an Arabic sentence laid out in a pinned left-to-right paragraph
- * comes out reversed, and on a device "حتى 08/04/2027" read as the date first and
- * "حتى" behind it — the sentence backwards. [reading] is the direction captured
- * before the pin, restored here for this card's contents only.
- *
- * ## One sentence, not three children competing for the width
- *
- * The state word and the date were separate `Text`s in a row, so the width question
- * was "which child loses", and the answer kept being the wrong one: first the date
- * was truncated, then the word was ellipsised to a single dot. A line of text is not
- * a layout problem — it is one string with one bidirectional order, so it is now one
- * `Text`.
- *
- * The date comes **first** in that string and the word second, which is what makes
- * the truncation safe: an overflow eats the end of a line, and the end is now the
- * word. Losing "نشط" costs a reader nothing they cannot see in the hue and the glyph;
- * losing "2027" costs them the fact they opened the screen for.
- *
- * The date is optional and absent means absent. A licence bought outright never
- * expires and a provider that was never asked has no date to state; either way the
- * line is the word alone rather than a dash that reads like a fault.
- */
-@Composable
-private fun TermCard(
-    icon: ImageVector,
-    label: String,
-    /** The finished second line. See [providerSentence] and [licenceSentence]. */
-    value: String,
-    hue: Color,
-    /** The reader's own direction, captured before the header pinned its subtree. */
-    reading: LayoutDirection,
-    frame: CastivioMetrics,
-    modifier: Modifier = Modifier,
-) {
-    val colors = CastivioTheme.colors
-    val shape = RoundedCornerShape(frame.radius / 2)
-
-    CompositionLocalProvider(LocalLayoutDirection provides reading) {
-        Row(
-            modifier
-                .height(frame.chip + frame.chipPad)
-                .clip(shape)
-                .background(Brush.linearGradient(listOf(hue.copy(alpha = TERM_TINT_TOP), hue.copy(alpha = TERM_TINT_FOOT))))
-                .border(BorderStroke(1.dp, hue.copy(alpha = TERM_EDGE_ALPHA)), shape)
-                .padding(horizontal = frame.chipPad),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(frame.chipPad / 2),
-        ) {
-            Icon(
-                icon,
-                contentDescription = null,
-                tint = hue,
-                modifier = Modifier.size(Sizing.iconMd),
-            )
-            // The words give way, not the card: the row above hands this a share it
-            // may be smaller than, and a line that cannot fit its share ellipsizes
-            // inside it rather than pushing the clock off the edge.
-            Column(Modifier.weight(1f, fill = false), verticalArrangement = Arrangement.Center) {
-                Text(
-                    label,
-                    style = castivioChipStyle(frame.fsChip),
-                    color = colors.onBackgroundMuted,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                Text(
-                    value,
-                    style = castivioChipStyle(frame.fsLabel),
-                    color = hue,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
-        }
-    }
-}
-
-
 // The clock and its ticker were both here, private to this file, until the activation
 // header wanted the same pair in the same corner. They are `CastivioClock` and
 // `rememberMinute` in `:core:design` now — one declaration, one isolation rule for the
@@ -842,62 +576,6 @@ internal fun providerTone(status: Recorded?): ProviderTone = when {
     status == null -> ProviderTone.Unchecked
     status.usable -> ProviderTone.Usable
     else -> ProviderTone.Refused
-}
-
-/**
- * The provider card's second line: the date the subscription runs out, and nothing
- * else.
- *
- * ## Why there is no verb in front of it
- *
- * There was: "Expires on 08/04/2027". It fits in Arabic and does not fit in English,
- * and the half it lost was the date — the line ellipsises from its end, and "Expires
- * on 08/04/2…" is the one shape this line must never take. The card is 158dp in a
- * Latin locale against 188 in Arabic, because the trailing furniture in the header is
- * wider there, and the sentence needs 128dp of the 114 that leaves.
- *
- * So the words go and the figures stay. The label directly above already says
- * *Provider subscription*; a date under it is an expiry by the same convention every
- * subscription card in the world uses, and at 65dp it fits every language this
- * application ships with and leaves 49dp spare — which is the difference between a
- * line that fits today and a line that fits after the next translation.
- *
- * A provider that stated no date falls back to its word, which is the one case where
- * the word carries the whole line: "Not checked" is a real answer and an empty second
- * line is not. Four answers, not two — see [providerTerm].
- */
-@Composable
-private fun providerSentence(status: Recorded?): String {
-    val term = providerTerm(status)
-    val at = term.atMs ?: return stringResource(term.word)
-    return rememberDate(at)
-}
-
-/**
- * The licence card's second line: the date it runs out, or what it is when it does
- * not run out.
- *
- * **The date alone where there is one**, for the reason [providerSentence] gives: a
- * verb in front of it is the half that fits in one language and not in the next, and
- * the figures are the half that cannot be recovered from anywhere else on the screen.
- * The plan name went the same way and for the same reason — trial and annual differ
- * in *when* they end, not in what the card is for, and the licence screen answers
- * which plan it is with room to answer it in.
- *
- * **The word alone where there is no date.** A lifetime licence never expires, so the
- * line is "Lifetime" and stops — a date slot filled with a dash would read as a value
- * that failed to load in something bought outright. Every other state — expired,
- * withdrawn, unverified, not established — arrives from [licenceTerm] with no date for
- * the same reason, and says its word.
- *
- * Which is to say the two branches are one rule, and it is the rule
- * [providerSentence] follows beside it: the date if there is one, the word if there
- * is not. The two cards read as a pair because they are built the same way.
- */
-@Composable
-private fun licenceSentence(term: Term): String {
-    val at = term.atMs ?: return stringResource(term.word)
-    return rememberDate(at)
 }
 
 /**
@@ -962,30 +640,21 @@ internal data class Term(val word: Int, val atMs: Long?)
  * nothing — a glyph floating above two short words, with a third of the card empty
  * beneath it.
  *
- * ## And the utilities are demoted, deliberately
+ * ## The utilities are in the header now
  *
- * They were six pills the width of the section cards and directly under them, which
- * gave "Refresh" the same visual claim as "Live TV". They are now a quiet column:
- * same six controls, same order, a fainter edge and a smaller label. Nothing was
- * removed. A viewer looking for Settings still finds it in one pass, and a viewer
- * looking for television no longer reads past it.
+ * They were a quiet column at the board's leading edge. The owner's header (`HomeHeader`, 2026-11-24) carries all seven --
+ * refresh, switch playlist, catch-up, settings, language, the appearance and exit -- each with its word, so the board is
+ * the four sections and nothing else.
  *
- * ## Which column sits where, and why it is this way round
+ * ## Which column sits where
  *
- * The menu takes the **leading** edge and Live takes the **trailing** one: on the
- * left and the right respectively in English, and mirrored in Arabic, because these
- * are start and end rather than left and right. A `Row` reverses under
- * `LayoutDirection.Rtl` on its own, so the order declared here *is* both layouts —
- * and the previous revision, which declared Live first, was therefore wrong in both
- * languages at once rather than in one of them.
+ * The stack of three takes the **leading** edge and Live the **trailing** one: start and end rather than left and right,
+ * so a `Row` lays it out in both directions from one declaration.
  *
- * ## The traversal, which a still picture cannot show
+ * ## The traversal
  *
- * Three columns, so the D-pad has a spine: the utilities, then the stack, then Live,
- * with up and down staying inside whichever column has focus. Compose's own focus
- * search resolves all of that from the geometry here — there is no focus order to
- * declare, and declaring one would be a second description of a layout that already
- * says it.
+ * Two columns, with up and down staying inside whichever has focus, and Up from the board reaching the header. The remote
+ * starts on Live (see [HomeScreen]). Compose's own focus search resolves all of it from the geometry.
  */
 @Composable
 private fun SectionBoard(
@@ -993,21 +662,13 @@ private fun SectionBoard(
     frame: CastivioMetrics,
     rhythm: Rhythm,
     /**
-     * Where the remote lands when this board appears — the rail, and so its first
-     * control. Held by the screen rather than by the rail because the screen is what
-     * knows the board has just been built; see its use in [HomeScreen].
+     * Where the remote lands when this board appears: the live channels' card, the section most visits are for. Held by the
+     * screen because the screen is what knows the board has just been built; see its use in [HomeScreen].
      */
-    railFocus: FocusRequester,
+    boardFocus: FocusRequester,
     onSeeSection: (CatalogSection) -> Unit,
     onResume: (Channel) -> Unit,
     onResumeSection: (SectionResume) -> Unit,
-    onRefresh: () -> Unit,
-    onChoosePlaylist: (String) -> Unit,
-    onAddPlaylist: () -> Unit,
-    onManageSources: () -> Unit,
-    onCatchUp: () -> Unit,
-    onSettings: () -> Unit,
-    onExit: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val colors = CastivioTheme.colors
@@ -1039,23 +700,6 @@ private fun SectionBoard(
     )
 
     Row(modifier, horizontalArrangement = Arrangement.spacedBy(frame.bandTop)) {
-        UtilityRail(
-            state = state,
-            frame = frame,
-            rhythm = rhythm,
-            onRefresh = onRefresh,
-            onChoosePlaylist = onChoosePlaylist,
-            onAddPlaylist = onAddPlaylist,
-            onManageSources = onManageSources,
-            onCatchUp = onCatchUp,
-            onSettings = onSettings,
-            onExit = onExit,
-            modifier = Modifier
-                .weight(RAIL_SHARE)
-                .fillMaxHeight()
-                .focusRequester(railFocus),
-        )
-
         Column(
             Modifier.weight(STACK_SHARE).fillMaxHeight(),
             verticalArrangement = Arrangement.spacedBy(rhythm.item),
@@ -1078,7 +722,7 @@ private fun SectionBoard(
             resume = state.resume,
             onClick = { onSeeSection(live.section) },
             onResume = onResume,
-            modifier = Modifier.weight(HERO_SHARE).fillMaxHeight(),
+            modifier = Modifier.weight(HERO_SHARE).fillMaxHeight().focusRequester(boardFocus),
         )
     }
 }
@@ -1761,105 +1405,10 @@ private fun arrivedFill(): Brush {
     return Brush.verticalGradient(listOf(success.copy(alpha = ARRIVED_FILL_TOP), success.copy(alpha = ARRIVED_FILL_BOTTOM)))
 }
 
-/** The failure red on the glass, in the proportions [arrivedFill] gives the success green. */
-@Composable
-private fun failedFill(): Brush {
-    val danger = CastivioTheme.colors.danger
-    return Brush.verticalGradient(listOf(danger.copy(alpha = ARRIVED_FILL_TOP), danger.copy(alpha = ARRIVED_FILL_BOTTOM)))
-}
-
-// --------------------------------------------------------------- the utilities
+// --------------------------------------------------------------- the playlists
 
 /**
- * What a viewer does from Home that is not "open a section": six controls, in the
- * approved order, at the trailing edge.
- *
- * They were a centred row of pills directly under the section cards, at the same
- * width and the same weight. That row read as a fifth and sixth and seventh
- * destination, and it sat in the path between the sections and everything below
- * them. As a column at the edge they are where a hand reaches for a tool and where
- * an eye looking for television does not go.
- *
- * ## Two of these needed something built behind them
- *
- * **Refresh** re-asks the provider the one cheap question and records the answer,
- * which is what moves the two facts in the header. It downloads no catalogue — see
- * [com.castivio.domain.RefreshProvider]. What came of the press is said on the card
- * itself, in the words and colours the section cards use for the same outcomes: see
- * [refreshLook].
- *
- * **New additions** -- the newest channels, films and series -- is on the rail before
- * its screen is: that screen is built after the section screens it takes its cards
- * from. What it must not be until then is silent: pressing it says so, in the app's
- * own words for a part of Castivio that is not ready yet, rather than doing nothing and
- * teaching the user that the rail cannot be trusted. It took Time Shift's card, which
- * said the same; time shift and catch-up act on what is playing, so they go to the
- * player.
- *
- * The language is not here. It sits in the header at the outer end, with the theme
- * control just inside it — the corner the other five screens keep it in.
- */
-@Composable
-private fun UtilityRail(
-    state: HomeState,
-    frame: CastivioMetrics,
-    rhythm: Rhythm,
-    onRefresh: () -> Unit,
-    onChoosePlaylist: (String) -> Unit,
-    onAddPlaylist: () -> Unit,
-    onManageSources: () -> Unit,
-    onCatchUp: () -> Unit,
-    onSettings: () -> Unit,
-    onExit: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Column(modifier, verticalArrangement = Arrangement.spacedBy(rhythm.rail)) {
-        // The refresh control, which says whether it is working and how it went.
-        //
-        // The card is the same card at the same size in every look: only its glyph, its
-        // words and its tint change, so the rail's geometry cannot move while a request
-        // is in flight or to report how one ended. Disabled while busy, because the
-        // press has already been taken — a second one would start a second request
-        // whose answer overwrites the first's.
-        when (val look = refreshLook(state)) {
-            RefreshLook.Busy -> UtilityBusy(stringResource(R.string.home_refresh), frame)
-            is RefreshLook.Failed -> UtilityOutcome(
-                icon = Icons.Rounded.ErrorOutline,
-                hue = CastivioTheme.colors.danger,
-                fill = failedFill(),
-                word = stringResource(R.string.home_refresh_failed),
-                detail = stringResource(R.string.home_load_retry_short),
-                spoken = stringResource(refreshSentence(look.fault)),
-                frame = frame,
-                onClick = onRefresh,
-            )
-            RefreshLook.Answered -> UtilityOutcome(
-                icon = Icons.Rounded.CheckCircle,
-                hue = CastivioTheme.colors.success,
-                fill = arrivedFill(),
-                word = stringResource(R.string.home_refresh_done),
-                detail = null,
-                spoken = stringResource(R.string.home_refresh_done),
-                frame = frame,
-                onClick = onRefresh,
-            )
-            RefreshLook.Idle -> Utility(Icons.Rounded.Refresh, stringResource(R.string.home_refresh), frame, onRefresh)
-        }
-        PlaylistPicker(
-            state = state,
-            frame = frame,
-            onChoose = onChoosePlaylist,
-            onAdd = onAddPlaylist,
-            onManage = onManageSources,
-        )
-        Utility(CastivioIcons.ReplayArc, stringResource(R.string.catchup_title), frame, onCatchUp)
-        Utility(Icons.Rounded.Settings, stringResource(R.string.home_settings), frame, onSettings)
-        Utility(Icons.Rounded.PowerSettingsNew, stringResource(R.string.home_exit), frame, onExit)
-    }
-}
-
-/**
- * The rail control that changes which playlist is showing.
+ * The header's control that changes which playlist is showing.
  *
  * ## Why it is a menu and not a screen
  *
@@ -1893,12 +1442,15 @@ private fun UtilityRail(
  * that glance usually succeeds.
  */
 @Composable
-private fun ColumnScope.PlaylistPicker(
+internal fun PlaylistPicker(
     state: HomeState,
     frame: CastivioMetrics,
     onChoose: (String) -> Unit,
     onAdd: () -> Unit,
     onManage: () -> Unit,
+    modifier: Modifier = Modifier,
+    /** The control the menu hangs from: given the modifier that anchors the menu and returns the remote to it, and the press. */
+    anchor: @Composable (Modifier, () -> Unit) -> Unit,
 ) {
     val colors = CastivioTheme.colors
     val shape = RoundedCornerShape(frame.radius / 2)
@@ -1963,21 +1515,16 @@ private fun ColumnScope.PlaylistPicker(
     LaunchedFocus(anchorFocus, enabled = returning)
     LaunchedEffect(returning) { if (returning) returning = false }
 
-    Box(Modifier.fillMaxWidth().weight(1f)) {
-        UtilityCard(
-            icon = Icons.Rounded.PlaylistAdd,
-            label = stringResource(R.string.home_change),
-            frame = frame,
-            onClick = { open = true },
-            modifier = Modifier
-                .fillMaxSize()
+    Box(modifier) {
+        anchor(
+            Modifier
                 .focusRequester(anchorFocus)
                 .onGloballyPositioned { coords ->
                     val onScreen = coords.backdropWindowOnScreen(view)
                     window = onScreen
                     anchorGround = onScreen?.let { coords.groundFor(it, view) }
                 },
-        )
+        ) { open = true }
 
         // **Material's own surface is switched off, not painted over.**
         //
@@ -2252,108 +1799,6 @@ private fun ColumnScope.PlaylistPicker(
 }
 
 /**
- * The refresh card while its request is in flight.
- *
- * A separate composable rather than a flag on [Utility], because the two differ in
- * more than a glyph: this one is not pressable and must not draw as though it were.
- * It keeps the card, the padding, the label and the weight, so nothing in the column
- * moves when it appears — which is the whole reason the spinner is the size of the
- * icon it replaces rather than something laid out beside it.
- */
-@Composable
-private fun ColumnScope.UtilityBusy(label: String, frame: CastivioMetrics) {
-    val colors = CastivioTheme.colors
-    GlassCard(
-        modifier = Modifier.fillMaxWidth().weight(1f),
-        shape = RoundedCornerShape(frame.radius / 2),
-    ) {
-        Row(
-            Modifier.fillMaxSize().padding(horizontal = frame.chipPad),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(frame.chipPad / 2),
-        ) {
-            CircularProgressIndicator(
-                modifier = Modifier.size(Sizing.iconSm),
-                color = colors.hueViolet,
-                strokeWidth = BUSY_STROKE,
-            )
-            Text(
-                label,
-                style = castivioChipStyle(frame.fsChip),
-                color = colors.onBackgroundMuted,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
-    }
-}
-
-/**
- * The refresh card when it has an outcome to say: a failure in the failure red, until the
- * next press, or an answer in the success green, for a few seconds.
- *
- * The section cards' language for the same two outcomes -- the tinted glass and edge, the
- * circled mark, the word in the hue -- on a card that keeps its size. The second, quieter
- * line is what to do, where there is something to do; a screen reader is given the
- * sentence the card has no room for.
- */
-@Composable
-private fun ColumnScope.UtilityOutcome(
-    icon: ImageVector,
-    hue: Color,
-    fill: Brush,
-    word: String,
-    detail: String?,
-    spoken: String,
-    frame: CastivioMetrics,
-    onClick: () -> Unit,
-) {
-    InteractiveGlassCard(
-        onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .weight(1f)
-            .semantics(mergeDescendants = true) { contentDescription = spoken },
-        shape = RoundedCornerShape(frame.radius / 2),
-        fill = fill,
-        restBorder = hue.copy(alpha = ARRIVED_EDGE_ALPHA),
-    ) {
-        Row(
-            Modifier.fillMaxSize().padding(horizontal = frame.chipPad),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(frame.chipPad / 2),
-        ) {
-            Icon(
-                icon,
-                contentDescription = null,
-                tint = hue,
-                modifier = Modifier.size(Sizing.iconSm),
-            )
-            Column(verticalArrangement = Arrangement.Center) {
-                Text(
-                    word,
-                    style = castivioChipStyle(frame.fsChip),
-                    color = hue,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.clearAndSetSemantics {},
-                )
-                if (detail != null) {
-                    Text(
-                        detail,
-                        style = castivioChipStyle(frame.fsChip * DETAIL_RATIO),
-                        color = CastivioTheme.colors.onBackgroundMuted,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.clearAndSetSemantics {},
-                    )
-                }
-            }
-        }
-    }
-}
-
-/**
  * Which look the refresh card wears: at rest, asking, failed, or just answered.
  *
  * Asking wins over everything, because a press in flight is the newest fact -- a failure
@@ -2486,61 +1931,6 @@ private fun LayoutCoordinates.groundFor(windowOnScreen: Rect, view: View): Rect?
 private fun LaunchedFocus(focus: FocusRequester, enabled: Boolean) {
     LaunchedEffect(enabled) {
         if (enabled) runCatching { focus.requestFocus() }
-    }
-}
-
-@Composable
-private fun ColumnScope.Utility(
-    icon: ImageVector,
-    label: String,
-    frame: CastivioMetrics,
-    onClick: () -> Unit,
-) {
-    UtilityCard(icon, label, frame, onClick, Modifier.fillMaxWidth().weight(1f))
-}
-
-/**
- * One rail card, without the column's weight.
- *
- * Split from [Utility] only so [PlaylistPicker] can draw the identical card inside
- * the `Box` that anchors its menu. The weight stays on the caller, which is what
- * keeps the five cards the five heights they were.
- */
-@Composable
-private fun UtilityCard(
-    icon: ImageVector,
-    label: String,
-    frame: CastivioMetrics,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val colors = CastivioTheme.colors
-    InteractiveGlassCard(
-        onClick = onClick,
-        modifier = modifier,
-        shape = RoundedCornerShape(frame.radius / 2),
-        fill = CastivioTheme.colors.homeCardSurface,
-        restBorder = CastivioTheme.colors.cardSurfaceEdge,
-    ) {
-        Row(
-            Modifier.fillMaxSize().padding(horizontal = frame.chipPad),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(frame.chipPad / 2),
-        ) {
-            Icon(
-                icon,
-                contentDescription = null,
-                tint = colors.hueViolet,
-                modifier = Modifier.size(Sizing.iconSm),
-            )
-            Text(
-                label,
-                style = castivioChipStyle(frame.fsChip),
-                color = colors.onBackgroundVariant,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
     }
 }
 
@@ -2761,17 +2151,8 @@ internal fun rememberDate(atMs: Long): String = remember(atMs) {
 }
 
 /**
- * How the board's width is divided: the rail, the stack, the hero.
- *
- * Weights rather than widths, so the three columns share whatever the frame's edge
- * and gaps leave instead of each screen size needing its own arithmetic. The figures
- * are the approved drawing's, read off it at the owner's own geometry — 833x385dp,
- * where the board is 801dp wide and the three columns measure 133, 262 and 378 with
- * two gaps of 11 between them.
- *
- * The hero is not merely the largest. It is larger than the stack *and* the rail
- * together are wide, which is what makes the board read as one destination with
- * alternatives rather than as three equal columns.
+ * How the board's width is divided: the stack and the hero. Weights rather than widths; the rail that took the first
+ * share went to the header (2026-11-24), and the two keep the proportion they had between them, the hero the larger.
  */
 /**
  * How wide the playlist menu is allowed to be.
@@ -2791,7 +2172,6 @@ internal fun rememberDate(atMs: Long): String = remember(atMs) {
 private val PICKER_MIN_WIDTH = 180.dp
 private val PICKER_MAX_WIDTH = 320.dp
 
-private const val RAIL_SHARE = 0.166f
 private const val STACK_SHARE = 0.327f
 private const val HERO_SHARE = 0.472f
 
@@ -2842,8 +2222,7 @@ private const val ARRIVED_EDGE_ALPHA = 0.55f
  * What the surfaces of Home are drawn with -- the drawing is `design/mockups/home-dark-ar.html`.
  *
  * Every card is the design system's `homeCardSurface` and `cardSurfaceEdge` -- the indigo, in `:core:design`, at the calmer weight
- * Home has (the edge is the one every other card in the application has). The two terms in the header are the exception, tinted by their own hue from [TERM_TINT_TOP] to
- * [TERM_TINT_FOOT] with an edge of [TERM_EDGE_ALPHA]. A line's figure is [LINE_FIGURE_RATIO] times the size of its words. No card has a
+ * Home has (the edge is the one every other card in the application has). A line's figure is [LINE_FIGURE_RATIO] times the size of its words. No card has a
  * glow or a shadow of its own -- the owner did not want one.
  *
  * The live channels' glyph is centred at [HERO_GLYPH_CENTRE] of the panel and [HERO_GLYPH_SHARE] of its height, and the
@@ -2851,9 +2230,6 @@ private const val ARRIVED_EDGE_ALPHA = 0.55f
  * of [HERO_ECHOES] at a ratio of [HERO_FRAME_RATIO] and a corner of [HERO_ECHO_RADIUS], and the ribbons of [HERO_RIBBONS] -- each
  * the fractions of the panel its two curves pass through, and its ink -- brightest at [HERO_RIBBON_PEAK] of their length.
  */
-private const val TERM_TINT_TOP = 0.14f
-private const val TERM_TINT_FOOT = 0.05f
-private const val TERM_EDGE_ALPHA = 0.75f
 private const val LINE_FIGURE_RATIO = 1.5f
 internal const val HERO_GLYPH_CENTRE = 0.38f
 private const val HERO_BODY_OF_GLYPH = 0.83f
@@ -2891,11 +2267,7 @@ private const val ARRIVED_FILL_BOTTOM = 0.04f
  */
 private const val DISCLAIMER_LINES = 2
 
-/** A rail card's second line: a step quieter than its word, as the section cards' captions are. */
-private const val DETAIL_RATIO = 0.85f
 
-/** The busy ring inside a rail card, in proportion to the glyph it replaces. */
-private val BUSY_STROKE = 2.dp
 
 /** The wordmark's share of the frame's title step, as the licence screen sets it. */
 private const val WORD_RATIO = 0.8f

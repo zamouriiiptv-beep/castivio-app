@@ -102,6 +102,7 @@
     <string name="home_licence_unavailable">Niedostępna</string>
     <string name="home_theme_lighter">Przełącz na jaśniejszy motyw</string>
     <string name="home_theme_darker">Przełącz na ciemniejszy motyw</string>
+    <string name="home_theme">Motyw</string>
     <string name="home_refresh">Odśwież</string>
     <string name="home_refresh_failed">Błąd</string>
     <string name="home_refresh_done">Odświeżono</string>

@@ -96,6 +96,7 @@
     <string name="home_licence_unavailable">Tidak tersedia</string>
     <string name="home_theme_lighter">Tukar ke tema cerah</string>
     <string name="home_theme_darker">Tukar ke tema gelap</string>
+    <string name="home_theme">Tema</string>
     <string name="home_refresh">Segar semula</string>
     <string name="home_refresh_failed">Gagal</string>
     <string name="home_refresh_done">Selesai</string>

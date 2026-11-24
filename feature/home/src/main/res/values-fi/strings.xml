@@ -98,6 +98,7 @@
     <string name="home_licence_unavailable">Ei saatavilla</string>
     <string name="home_theme_lighter">Vaihda vaaleaan teemaan</string>
     <string name="home_theme_darker">Vaihda tummaan teemaan</string>
+    <string name="home_theme">Teema</string>
     <string name="home_refresh">Päivitä</string>
     <string name="home_refresh_failed">Epäonnistui</string>
     <string name="home_refresh_done">Päivitetty</string>

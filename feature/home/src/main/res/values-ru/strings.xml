@@ -102,6 +102,7 @@
     <string name="home_licence_unavailable">Недоступна</string>
     <string name="home_theme_lighter">Переключить на светлую тему</string>
     <string name="home_theme_darker">Переключить на тёмную тему</string>
+    <string name="home_theme">Тема</string>
     <string name="home_refresh">Обновить</string>
     <string name="home_refresh_failed">Не обновлено</string>
     <string name="home_refresh_done">Обновлено</string>

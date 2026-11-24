@@ -96,6 +96,7 @@
     <string name="home_licence_unavailable">不可用</string>
     <string name="home_theme_lighter">切换到浅色主题</string>
     <string name="home_theme_darker">切换到深色主题</string>
+    <string name="home_theme">主题</string>
     <string name="home_refresh">刷新</string>
     <string name="home_refresh_failed">刷新失败</string>
     <string name="home_refresh_done">已刷新</string>

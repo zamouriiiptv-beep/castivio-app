@@ -96,6 +96,7 @@
     <string name="home_licence_unavailable">Không khả dụng</string>
     <string name="home_theme_lighter">Chuyển sang giao diện sáng</string>
     <string name="home_theme_darker">Chuyển sang giao diện tối</string>
+    <string name="home_theme">Giao diện</string>
     <string name="home_refresh">Làm mới</string>
     <string name="home_refresh_failed">Lỗi làm mới</string>
     <string name="home_refresh_done">Đã làm mới</string>

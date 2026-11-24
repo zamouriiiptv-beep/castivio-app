@@ -100,6 +100,7 @@
     <string name="home_licence_unavailable">Indisponibilă</string>
     <string name="home_theme_lighter">Comută pe tema deschisă</string>
     <string name="home_theme_darker">Comută pe tema închisă</string>
+    <string name="home_theme">Temă</string>
     <string name="home_refresh">Reîncarcă</string>
     <string name="home_refresh_failed">Eșuat</string>
     <string name="home_refresh_done">Reîncărcat</string>
