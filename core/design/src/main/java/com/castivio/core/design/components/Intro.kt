@@ -2,15 +2,11 @@ package com.castivio.core.design.components
 
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.material3.Text
-import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -25,8 +21,6 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
@@ -41,7 +35,7 @@ import kotlin.math.exp
 import kotlin.math.sin
 
 /* =============================================================================
-   Castivio's startup lockup: 2.5 seconds, silent, and the same on every screen.
+   Castivio's startup mark: 1.2 seconds, silent, and the same on every screen.
 
    ## It lives in :core:design rather than in :app
 
@@ -72,11 +66,11 @@ private const val OPACITY_MS = 420L
 
 /** Still, breathing. */
 private const val HOLD_FROM = 800L
-private const val HOLD_TO = 2200L
+private const val HOLD_TO = 1100L
 
 /** Into the application. */
-private const val HANDOVER_FROM = 2300L
-private const val HANDOVER_TO = 2500L
+private const val HANDOVER_FROM = 1100L
+private const val HANDOVER_TO = 1200L
 
 /** The whole of it. Nothing composes after this. */
 const val INTRO_MS = HANDOVER_TO
@@ -150,7 +144,7 @@ fun introFrame(elapsedMs: Long): IntroFrame {
  *   `Box` still eats every touch that lands on it.
  */
 @Composable
-fun CastivioIntro(logo: Painter, onFinished: () -> Unit, modifier: Modifier = Modifier) {
+fun CastivioIntro(onFinished: () -> Unit, modifier: Modifier = Modifier) {
     var elapsed by remember { mutableLongStateOf(0L) }
 
     // Driven off the frame clock rather than five `Animatable`s, because the
@@ -191,25 +185,7 @@ fun CastivioIntro(logo: Painter, onFinished: () -> Unit, modifier: Modifier = Mo
             val k = maxWidth / REFERENCE_WIDTH
 
             Glow(frame = frame, k = k)
-            val logoSize = (maxWidth * 0.22f).coerceIn(116.dp, 280.dp)
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(18.dp),
-            ) {
-                Image(
-                    painter = logo,
-                    contentDescription = null,
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier
-                        .size(logoSize)
-                        .graphicsLayer {
-                            alpha = frame.markAlpha
-                            scaleX = frame.markScale
-                            scaleY = frame.markScale
-                        },
-                )
-                Wordmark(frame = frame, k = k)
-            }
+            Wordmark(frame = frame, k = k)
         }
     }
 }
@@ -250,7 +226,7 @@ private fun Glow(frame: IntroFrame, k: Float) {
 @Composable
 private fun Wordmark(frame: IntroFrame, k: Float) {
     val density = LocalDensity.current
-    val size = (MARK_SIZE * k).coerceAtLeast(28.dp)
+    val size = MARK_SIZE * k
     val tracking = MARK_TRACKING * k
 
     Text(
