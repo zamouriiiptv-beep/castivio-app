@@ -8,6 +8,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.focusGroup
@@ -87,6 +88,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
@@ -94,6 +96,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.AnnotatedString
@@ -105,6 +108,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LifecycleStartEffect
@@ -675,6 +679,7 @@ private fun SectionBoard(
         R.string.browse_live, state.liveCount, R.string.home_count_live,
         R.string.home_section_no_live, state.sections[MediaKind.LIVE],
         state.loads[MediaKind.LIVE] ?: CardLoad.Idle,
+        R.drawable.home_art_live,
     )
     val rest = listOf(
         Section(
@@ -682,18 +687,21 @@ private fun SectionBoard(
             R.string.browse_movies, state.movieCount, R.string.home_count_movies,
             R.string.home_section_no_movies, state.sections[MediaKind.MOVIE],
             state.loads[MediaKind.MOVIE] ?: CardLoad.Idle,
+            R.drawable.home_art_movies,
         ),
         Section(
             CatalogSection.Series, Icons.Rounded.Tv, colors.hueGreen,
             R.string.browse_series, state.seriesCount, R.string.home_count_series,
             R.string.home_section_no_series, state.sections[MediaKind.SERIES],
             state.loads[MediaKind.SERIES] ?: CardLoad.Idle,
+            R.drawable.home_art_series,
         ),
         Section(
             CatalogSection.Radio, Icons.Rounded.Radio, colors.hueAmber,
             R.string.browse_radio, state.radioCount, R.string.home_count_radio,
             R.string.home_section_no_radio, state.sections[MediaKind.RADIO],
             state.loads[MediaKind.RADIO] ?: CardLoad.Idle,
+            R.drawable.home_art_radio,
         ),
     )
 
@@ -755,6 +763,8 @@ private data class Section(
     val fetchedAtMs: Long?,
     /** What the card says about the section's load, under its headline. */
     val load: CardLoad,
+    /** The owner's picture for the section (2026-11-24), behind the card's words. */
+    val art: Int,
 )
 
 /**
@@ -882,6 +892,8 @@ private fun HeroCard(
         fill = if (arrived) arrivedFill() else CastivioTheme.colors.homeCardSurface,
         restBorder = if (arrived) colors.success.copy(alpha = ARRIVED_EDGE_ALPHA) else colors.cardSurfaceEdge,
     ) {
+        Box(Modifier.fillMaxSize()) {
+        SectionArt(section.art, ArtPlacement.Whole)
         when (face) {
             HeroFace.Plain -> PlainFace(section, frame)
             HeroFace.NotLoaded -> NotLoadedFace(
@@ -902,6 +914,7 @@ private fun HeroCard(
                     frame = frame,
                 )
             }
+        }
         }
     }
 }
@@ -1072,6 +1085,9 @@ private fun SectionLine(
         fill = if (arrived) arrivedFill() else CastivioTheme.colors.homeCardSurface,
         restBorder = if (arrived) colors.success.copy(alpha = ARRIVED_EDGE_ALPHA) else colors.cardSurfaceEdge,
     ) {
+        // The picture is behind the words while the card offers nothing to carry on from: a thumbnail of what was watched
+        // takes the line's end then, and two pictures in one line would be one too many.
+        if (offer == null || upright) SectionArt(section.art, if (upright) ArtPlacement.Whole else ArtPlacement.End)
         if (upright) {
             UprightFace(section, frame, offer, face)
         } else BoxWithConstraints(Modifier.fillMaxSize()) {
@@ -1155,6 +1171,56 @@ private fun UprightFace(section: Section, frame: CastivioMetrics, offer: Section
         } else {
             Column(horizontalAlignment = Alignment.CenterHorizontally) { LineLoad(section, frame) }
             if (face == HeroFace.NotLoaded) TileLoadPill(frame)
+        }
+    }
+}
+
+/** Where a card's picture sits: across the whole card (live, radio) or at its end, fading into the card (films, series). */
+private enum class ArtPlacement { Whole, End }
+
+/**
+ * A section's picture, under its words. Across the whole card it is darkened toward the foot, where the name and the figure
+ * are; at a line's end it fills [LINE_ART_SHARE] of the width and fades out toward the start, where the words are, opaque at
+ * its own edge so it leaves no line on the card.
+ * The fade follows the reading direction, so the words never sit on the bright part in either language.
+ */
+@Composable
+private fun SectionArt(art: Int, placement: ArtPlacement) {
+    val ground = CastivioTheme.colors.background
+    val start = LocalLayoutDirection.current == LayoutDirection.Ltr
+    Box(Modifier.fillMaxSize()) {
+        Image(
+            painter = painterResource(art),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = when (placement) {
+                ArtPlacement.Whole -> Modifier.fillMaxSize()
+                ArtPlacement.End -> Modifier.fillMaxHeight().fillMaxWidth(LINE_ART_SHARE).align(Alignment.CenterEnd)
+            },
+        )
+        when (placement) {
+            ArtPlacement.Whole -> Box(
+                Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            0f to ground.copy(alpha = ART_DIM),
+                            ART_FADE_FROM to ground.copy(alpha = ART_DIM),
+                            1f to ground.copy(alpha = ART_FOOT),
+                        ),
+                    ),
+            )
+            // Over the picture only, opaque at its edge toward the words so the picture has no edge of its own there.
+            ArtPlacement.End -> {
+                val stops = listOf(ground, ground.copy(alpha = ART_FOOT), ground.copy(alpha = ART_DIM))
+                Box(
+                    Modifier
+                        .fillMaxHeight()
+                        .fillMaxWidth(LINE_ART_SHARE)
+                        .align(Alignment.CenterEnd)
+                        .background(Brush.horizontalGradient(if (start) stops else stops.reversed())),
+                )
+            }
         }
     }
 }
@@ -2286,6 +2352,12 @@ private val PICKER_MAX_WIDTH = 320.dp
 private const val STACK_SHARE = 0.40f
 private const val HERO_SHARE = 0.47f
 private const val RADIO_SHARE = 0.15f
+
+/** A line's picture, of its width; the picture's dimming at rest; where the foot's darkening starts, and how dark it ends. */
+private const val LINE_ART_SHARE = 0.62f
+private const val ART_DIM = 0.25f
+private const val ART_FADE_FROM = 0.35f
+private const val ART_FOOT = 0.88f
 
 /** The radio's glyph disc, against the glyph. */
 private const val UPRIGHT_DISC = 1.9f

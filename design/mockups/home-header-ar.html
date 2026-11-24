@@ -91,7 +91,7 @@ svg{display:block;flex:none}
 /* ---- the three ways to give the two dates their full size ---- */
 .sw{display:none}
 .screen:not(.v5) .v5board{display:none}
-.screen:not(.v5):not(.v6):not(.v7):not(.v8) .cfoot{display:none}
+.screen:not(.v5):not(.v6):not(.v7):not(.v8):not(.v9) .cfoot{display:none}
 .v5 .below:not(.v5board){display:none}
 .v5 .v5board{display:grid}
 .dates{display:none}
@@ -140,7 +140,7 @@ svg{display:block;flex:none}
 
 /* v6: the middle of the owner's second picture, between the approved header and footer */
 .v6 .band .terms,.v6 .lockup + .rule,.v6 .below:not(.v6board){display:none}
-.screen:not(.v6) .v6board{display:none}
+.screen:not(.v6):not(.v9) .v6board{display:none}
 .v6 .cfoot{display:grid}
 .v6board{position:absolute;top:106px;bottom:76px;left:30px;right:30px;direction:rtl;display:grid;grid-template-columns:1.18fr 1fr .38fr;gap:14px}
 .v6board .col{display:grid;grid-template-rows:1fr 1fr;gap:12px}
@@ -179,6 +179,24 @@ svg{display:block;flex:none}
 .mid{display:none;position:absolute;top:100px;bottom:72px;left:24px;right:24px}
 .mid img{width:100%;height:100%;object-fit:contain}
 .v7 .mid1,.v8 .mid2{display:block}
+
+/* v9: v6 with the owner's pictures, placed as the code places them */
+.v9 .band .terms,.v9 .lockup + .rule,.v9 .below:not(.v6board),.v9 .mid{display:none}
+.screen.v9 .v6board{display:grid}
+.v9 .cfoot{display:grid}
+.v9 .btn.on{background:none;border-color:transparent;box-shadow:none}.v9 .btn.on span{color:var(--label)}
+.v9 .card{background:#141031}
+.v9 .card > *{position:relative;z-index:2}
+.v9 .card::before{content:"";position:absolute;inset:0;z-index:0;background-size:cover;background-position:center}
+.v9 .card::after{content:"";position:absolute;inset:0;z-index:1}
+.v9 .live::before{background-image:url(../../feature/home/src/main/res/drawable-nodpi/home_art_live.webp)}
+.v9 .live::after,.v9 .radio::after{background:linear-gradient(rgba(13,11,34,.25) 0,rgba(13,11,34,.25) 35%,rgba(13,11,34,.88) 100%)}
+.v9 .radio::before{background-image:url(../../feature/home/src/main/res/drawable-nodpi/home_art_radio.webp)}
+.v9 .line::before{left:0;right:auto;width:62%;}
+.v9 .mov::before{background-image:url(../../feature/home/src/main/res/drawable-nodpi/home_art_movies.webp)}
+.v9 .ser::before{background-image:url(../../feature/home/src/main/res/drawable-nodpi/home_art_series.webp)}
+.v9 .line::after{left:0;right:auto;width:62%;background:linear-gradient(270deg,#141031 0,rgba(20,16,49,.88) 45%,rgba(20,16,49,.25) 100%)}
+.v9 .line .art,.v9 .live .tv,.v9 .radio .disc ~ .bars{display:none}
 </style>
 </head>
 <body>
@@ -224,10 +242,10 @@ svg{display:block;flex:none}
       <h3>البث المباشر</h3><div class="n"><b>54,482</b> قناة</div>
     </div>
     <div class="col">
-      <div class="card line"><div class="txt"><h3>الأفلام</h3><div class="n"><b>171,845</b> فيلم</div></div>
+      <div class="card line mov"><div class="txt"><h3>الأفلام</h3><div class="n"><b>171,845</b> فيلم</div></div>
         <svg class="art" viewBox="0 0 120 90"><circle cx="58" cy="44" r="32" fill="none" stroke="#C4B5FD" stroke-width="5" opacity=".8"/><circle cx="58" cy="44" r="7" fill="#C4B5FD" opacity=".8"/><g fill="#8B5CF6" opacity=".85"><circle cx="58" cy="25" r="8"/><circle cx="58" cy="63" r="8"/><circle cx="39" cy="44" r="8"/><circle cx="77" cy="44" r="8"/></g><path d="M58 76 C 80 82, 100 80, 118 70" fill="none" stroke="#8B5CF6" stroke-width="6" stroke-linecap="round" opacity=".7"/></svg>
         <span class="play"><svg viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></svg></span></div>
-      <div class="card line"><div class="txt"><h3>المسلسلات</h3><div class="n"><b>46,770</b> مسلسل</div></div>
+      <div class="card line ser"><div class="txt"><h3>المسلسلات</h3><div class="n"><b>46,770</b> مسلسل</div></div>
         <svg class="art" viewBox="0 0 120 90"><rect x="18" y="34" width="84" height="50" rx="8" fill="rgba(124,58,237,.35)" stroke="#C4B5FD" stroke-width="4"/><path d="M14 20 L100 8 L104 26 L18 38 Z" fill="#C4B5FD" opacity=".85"/><g stroke="#1B1038" stroke-width="5"><path d="M34 16 L40 34"/><path d="M58 13 L64 31"/><path d="M82 10 L88 28"/></g><path d="M52 48l18 11-18 11z" fill="#E9D5FF"/></svg>
         <span class="play"><svg viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></svg></span></div>
     </div>
@@ -251,6 +269,7 @@ const caps = {
   v4: 'الهيدر بلا التاريخين: ينتقلان إلى الفوتر.',
   v5: 'الرئيسية كاملة: الهيدر، واللوحة كما هي في التطبيق، والفوتر (ج) بخمس معلومات.',
   v6: 'الرئيسية بوسط صورة المالك الثانية: البث المباشر كبير، الأفلام والمسلسلات، والراديو عمود ضيق.',
+  v9: 'الرئيسية بصور المالك في البطاقات، كما يضعها الكود.',
   v3: '3. نص أقصر، البطاقتان متجاورتان، والكلمات تحت كل الأزرار.',
 };
 for (const f of (frame === 'sheet' ? ['v1', 'v2', 'v3'] : [frame])) {
