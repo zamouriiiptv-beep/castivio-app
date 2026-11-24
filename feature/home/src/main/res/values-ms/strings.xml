@@ -113,6 +113,9 @@
     <string name="home_device_mac">MAC: %1$s</string>
     <string name="home_device_state">Peranti: %1$s</string>
     <string name="home_device_key">Kunci peranti: %1$s</string>
+    <string name="home_label_mac">Alamat MAC</string>
+    <string name="home_label_key">Kunci peranti</string>
+    <string name="home_label_state">Status peranti</string>
     <string name="home_device_activated">Diaktifkan</string>
     <string name="home_device_locked">Berkunci</string>
     <string name="home_not_fetched">Belum dimuat turun</string>

@@ -199,6 +199,9 @@
     <!-- The short code a provider whose panel asks for one wants beside the MAC.
          Derived from the same seed as the address; see DeviceKeyV1. -->
     <string name="home_device_key">Device key: %1$s</string>
+    <string name="home_label_mac">MAC address</string>
+    <string name="home_label_key">Device key</string>
+    <string name="home_label_state">Device status</string>
     <string name="home_device_activated">Activated</string>
     <string name="home_device_locked">Locked</string>
 

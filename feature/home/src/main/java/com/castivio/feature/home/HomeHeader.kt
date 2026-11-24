@@ -81,7 +81,7 @@ import com.castivio.core.design.theme.Motion
  *
  * On a television and a tablet ([labelled]) every button carries its word; on a handset held sideways (833x385dp) seven
  * words do not fit beside the lockup and the clock, so the buttons are their glyphs and the word is what a screen reader
- * says. The licence and the subscription dates that sat here are not in this band: the owner is giving them the footer.
+ * says. The licence and the subscription dates that sat here are in the footer now (`FooterLine`).
  *
  * ## What each button does
  *

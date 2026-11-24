@@ -113,6 +113,9 @@
     <string name="home_device_mac">MAC: %1$s</string>
     <string name="home_device_state">端末: %1$s</string>
     <string name="home_device_key">デバイスキー: %1$s</string>
+    <string name="home_label_mac">MAC アドレス</string>
+    <string name="home_label_key">デバイスキー</string>
+    <string name="home_label_state">デバイスの状態</string>
     <string name="home_device_activated">有効化済み</string>
     <string name="home_device_locked">ロック中</string>
     <string name="home_not_fetched">未ダウンロード</string>

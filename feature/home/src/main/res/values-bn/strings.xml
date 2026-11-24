@@ -115,6 +115,9 @@
     <string name="home_device_mac">MAC: %1$s</string>
     <string name="home_device_state">ডিভাইস: %1$s</string>
     <string name="home_device_key">ডিভাইস কী: %1$s</string>
+    <string name="home_label_mac">MAC ঠিকানা</string>
+    <string name="home_label_key">ডিভাইস কী</string>
+    <string name="home_label_state">ডিভাইসের অবস্থা</string>
     <string name="home_device_activated">সক্রিয় করা হয়েছে</string>
     <string name="home_device_locked">লক করা</string>
     <string name="home_not_fetched">এখনও ডাউনলোড হয়নি</string>

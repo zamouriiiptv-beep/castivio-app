@@ -90,6 +90,9 @@ svg{display:block;flex:none}
 
 /* ---- the three ways to give the two dates their full size ---- */
 .sw{display:none}
+.screen:not(.v5) .v5board,.screen:not(.v5) .cfoot{display:none}
+.v5 .below:not(.v5board){display:none}
+.v5 .v5board{display:grid}
 .dates{display:none}
 .v1 .terms,.v3 .terms{flex-direction:row;gap:10px}
 .v1.tv .pill,.v2.tv .pill,.v3.tv .pill{height:36px;padding:0 14px 0 12px;font-size:13.5px}
@@ -114,6 +117,25 @@ svg{display:block;flex:none}
 .v1 .rule{margin-left:0;margin-right:0}
 .overflow{outline:3px solid #ff3b3b;outline-offset:-3px}
 .overflow::before{content:"أعرض من الشاشة";position:absolute;left:8px;bottom:8px;z-index:3;background:#ff3b3b;color:#fff;font:700 12px "Noto Sans Arabic",sans-serif;padding:3px 8px;border-radius:6px}
+
+/* the board under the header: the app's own shape -- three sections stacked at the start, live at the end -- as quiet
+   placeholders, only to place the footer */
+.v5 .below{display:grid;grid-template-columns:1fr 1.45fr;gap:14px;top:104px;bottom:78px;height:auto}
+.v5board .stack{background:none;border:0;border-radius:0}
+.stack{display:grid;grid-template-rows:repeat(3,1fr);gap:10px}
+.ph{border-radius:16px;background:rgba(32,34,58,.55);border:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font:600 15px "Noto Sans Arabic",sans-serif;color:rgba(255,255,255,.28)}
+.v5 .band .terms,.v5 .lockup + .rule{display:none}
+/* the footer, frame C: five facts on the page, no box and no lines */
+.cfoot{position:absolute;left:30px;right:30px;bottom:16px;direction:rtl;display:grid;grid-template-columns:1.3fr .9fr .8fr 1.2fr 1.2fr}
+.cfoot .c{display:flex;flex-direction:column;gap:3px}
+.cfoot small{font:500 11px "Noto Sans Arabic",sans-serif;color:var(--label)}
+.cfoot .v{display:flex;align-items:center;gap:7px;font:700 16px Inter,"Noto Sans Arabic",sans-serif;white-space:nowrap}
+.cfoot .ltr{direction:ltr;unicode-bidi:isolate;font-family:Inter,sans-serif}
+.cfoot .state{font:600 11px "Noto Sans Arabic",sans-serif;color:var(--green)}
+.cfoot .ok{color:var(--green);font-family:"Noto Sans Arabic",sans-serif}
+.cfoot .tick{width:16px;height:16px;border-radius:50%;background:var(--green);display:inline-flex;align-items:center;justify-content:center;flex:none}
+.cfoot .tick svg{width:70%;height:70%;fill:none;stroke:#fff;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
+.cfoot .warn .tick{background:#F5B321}.cfoot .warn .state{color:#F5B321}
 </style>
 </head>
 <body>
@@ -144,6 +166,14 @@ svg{display:block;flex:none}
     <span><span class="tick"><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4 8-9"/></svg></span>الاشتراك: <b class="date">08/04/2027</b></span>
   </div>
   <div class="below"><div></div><div></div><div></div><div></div></div>
+  <div class="below v5board"><div class="stack"><div class="ph">الأفلام</div><div class="ph">المسلسلات</div><div class="ph">الراديو</div></div><div class="ph">البث المباشر</div></div>
+  <div class="cfoot">
+    <div class="c"><small>عنوان MAC</small><span class="v"><span class="ltr">FE:F8:4D:83:78:9F</span></span></div>
+    <div class="c"><small>مفتاح الجهاز</small><span class="v"><span class="ltr">116822</span></span></div>
+    <div class="c"><small>حالة الجهاز</small><span class="v"><span class="tick"><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4 8-9"/></svg></span><span class="ok">مفعّل</span></span></div>
+    <div class="c warn"><small>رخصة Castivio</small><span class="v"><span class="tick"><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4 8-9"/></svg></span><span class="ltr">26/11/2026</span><span class="state">باقي يومان</span></span></div>
+    <div class="c"><small>اشتراك المزوّد</small><span class="v"><span class="tick"><svg viewBox="0 0 24 24"><path d="M6 12.5l4 4 8-9"/></svg></span><span class="ltr">08/04/2027</span><span class="state">ساري</span></span></div>
+  </div>
 </template>
 
 <script>
@@ -156,6 +186,7 @@ const caps = {
   v1: '1. الكلمة تحت الزر المحدد فقط، والبطاقتان متجاورتان بحجمهما الكامل ؛ ولا يتسع إلا بالشعار دون كلمة Castivio).',
   v2: '2. التاريخان في سطر تحت الشريط، والشريط للشعار والأزرار والساعة.',
   v4: 'الهيدر بلا التاريخين: ينتقلان إلى الفوتر.',
+  v5: 'الرئيسية كاملة: الهيدر، واللوحة كما هي في التطبيق، والفوتر (ج) بخمس معلومات.',
   v3: '3. نص أقصر، البطاقتان متجاورتان، والكلمات تحت كل الأزرار.',
 };
 for (const f of (frame === 'sheet' ? ['v1', 'v2', 'v3'] : [frame])) {

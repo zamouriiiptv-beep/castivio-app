@@ -115,6 +115,9 @@
     <string name="home_device_mac">MAC: %1$s</string>
     <string name="home_device_state">Laite: %1$s</string>
     <string name="home_device_key">Laiteavain: %1$s</string>
+    <string name="home_label_mac">MAC-osoite</string>
+    <string name="home_label_key">Laitteen avain</string>
+    <string name="home_label_state">Laitteen tila</string>
     <string name="home_device_activated">Aktivoitu</string>
     <string name="home_device_locked">Lukittu</string>
     <string name="home_not_fetched">Ei vielä ladattu</string>

@@ -119,6 +119,9 @@
     <string name="home_device_mac">MAC: %1$s</string>
     <string name="home_device_state">Zařízení: %1$s</string>
     <string name="home_device_key">Klíč zařízení: %1$s</string>
+    <string name="home_label_mac">Adresa MAC</string>
+    <string name="home_label_key">Klíč zařízení</string>
+    <string name="home_label_state">Stav zařízení</string>
     <string name="home_device_activated">Aktivováno</string>
     <string name="home_device_locked">Uzamčeno</string>
     <string name="home_not_fetched">Zatím nestaženo</string>

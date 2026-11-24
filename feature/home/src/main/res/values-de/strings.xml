@@ -115,6 +115,9 @@
     <string name="home_device_mac">MAC: %1$s</string>
     <string name="home_device_state">Gerät: %1$s</string>
     <string name="home_device_key">Geräteschlüssel: %1$s</string>
+    <string name="home_label_mac">MAC-Adresse</string>
+    <string name="home_label_key">Geräteschlüssel</string>
+    <string name="home_label_state">Gerätestatus</string>
     <string name="home_device_activated">Aktiviert</string>
     <string name="home_device_locked">Gesperrt</string>
     <string name="home_not_fetched">Noch nicht heruntergeladen</string>

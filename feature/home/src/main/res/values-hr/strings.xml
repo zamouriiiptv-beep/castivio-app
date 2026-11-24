@@ -117,6 +117,9 @@
     <string name="home_device_mac">MAC: %1$s</string>
     <string name="home_device_state">Uređaj: %1$s</string>
     <string name="home_device_key">Ključ uređaja: %1$s</string>
+    <string name="home_label_mac">MAC adresa</string>
+    <string name="home_label_key">Ključ uređaja</string>
+    <string name="home_label_state">Stanje uređaja</string>
     <string name="home_device_activated">Aktiviran</string>
     <string name="home_device_locked">Zaključan</string>
     <string name="home_not_fetched">Još nije preuzeto</string>

@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
@@ -38,11 +39,8 @@ import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.CloudOff
 import androidx.compose.material.icons.rounded.ErrorOutline
-import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.LiveTv
 import androidx.compose.material.icons.rounded.Lock
-import androidx.compose.material.icons.rounded.LockOpen
-import androidx.compose.material.icons.rounded.Memory
 import androidx.compose.material.icons.rounded.Movie
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.PlaylistAdd
@@ -51,7 +49,6 @@ import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.Tv
-import androidx.compose.material.icons.rounded.VpnKey
 import androidx.compose.material.icons.rounded.WifiOff
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -107,7 +104,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LifecycleStartEffect
@@ -1937,52 +1933,32 @@ private fun LaunchedFocus(focus: FocusRequester, enabled: Boolean) {
 // ---------------------------------------------------------------- the footer
 
 /**
- * What this device is, and what Castivio is not — in that order, on two lines.
+ * What this device is and where its two terms stand, as five facts on the page (the owner's drawing, 2026-11-24): the MAC
+ * address, the device key, the device's state, Castivio's licence and the provider's subscription.
  *
- * ## The identity is what gets photographed
+ * ## No frame, and the value before everything
  *
- * A user who cannot find their own MAC address cannot be activated by a provider who
- * works that way, and telling them to dig it out of Settings fails exactly the user
- * this footer is for. Printed here it is one photograph. That is why each fact is a
- * card of its own with its own edge rather than a run-on sentence: three bordered
- * things read as three values to copy, where `Device: Activated · MAC: FE:…` reads as
- * a status line and gets cropped out of the picture.
+ * Each fact is its name, small and quiet, over its value, large and in the ink: the address and the key are what a viewer
+ * reads out to a reseller or photographs, so they are the largest text on the line, isolated for direction because a
+ * colon-separated hex address reordered by an Arabic paragraph is not the address any more. A state is said in its colour
+ * with its mark: the success green, the amber in a licence's last week, the failure red.
  *
- * They are spread with equal weights, so the line spends the whole width instead of
- * huddling at the leading edge with half the footer empty — which is what a row of
- * intrinsically-sized facts followed by a spacer actually drew.
+ * ## The two terms came here from the header
  *
- * The address is isolated for direction, because a colon-separated hex address
- * reordered by an Arabic paragraph is not the address any more.
+ * The provider's subscription and Castivio's licence both run out, and a user who confuses the two rings the wrong support
+ * line; each keeps its own name and its own date. Nothing is invented: the provider's date is what it last stated, the
+ * licence's what [EntitlementState] carries (see [licenceTerm]).
  *
- * ## The disclaimer gets its own line, and it is never cut
+ * ## And the subscription's trouble, while there is one
  *
- * It shared the identity's line and lost, ellipsised mid-sentence — a legal statement
- * that stops at "Castivio does not provide chan…" is not a statement. On its own line
- * it has the full width, and two lines to use if a translation needs them.
+ * A server that does not answer, a device with no connection, a subscription run out or refused: the line under the facts
+ * says why nothing plays and what to do (see [SubscriptionTrouble]), in the failure red, and is gone once the provider
+ * answers.
  *
- * ## And it gives that line to the subscription's trouble, while there is one
+ * ## The device key
  *
- * A server that does not answer, a device with no connection, a subscription run out or
- * refused: each section's card can say that it could not load, and none of them can say
- * why. This line can, at the width a full sentence needs, in the failure red, and says
- * what to do — see [SubscriptionTrouble]. Nothing moves to make room and nothing is
- * covered: the address and the key a viewer reads out to their provider stay where
- * they are. The header's card keeps its date meanwhile, because a subscription paid for
- * until next year and a server that does not answer are both true at once. The
- * disclaimer is back as soon as the provider answers.
- *
- * ## The device key, which now exists
- *
- * It shipped once without one, because nothing in the build minted a key and a
- * plausible-looking code a user then sends to their provider is worse than no card at
- * all. `DeviceKeyV1` is that value now: derived from the same seed as the address,
- * under its own label so the two cannot be turned into one another, stable across
- * launches and reinstalls, and reproducible by a support tool or a licence server
- * without the device in hand.
- *
- * It is drawn in amber rather than the violet the address uses, because the two are answers to *different* questions a
- * provider asks and a user copying one into a form for the other is the mistake this line exists to prevent.
+ * `DeviceKeyV1`: derived from the same seed as the address, under its own label, stable across launches and reinstalls.
+ * Not drawn until there is one.
  */
 @Composable
 private fun FooterLine(
@@ -1996,81 +1972,154 @@ private fun FooterLine(
         modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(rhythm.foot),
     ) {
+        // **Five facts on the page, with no frame** (the owner's drawing, frame `v5` of home-header-ar.html, 2026-11-24): each
+        // its name, small and quiet, over its value, large and in the ink, the state in its colour. Read from the start: the
+        // MAC address and the device key -- the two a viewer reads out to a reseller or photographs -- then the device's state,
+        // Castivio's licence and the provider's subscription, which left the header for here.
         Row(
             Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
+            verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.spacedBy(frame.chipPad),
         ) {
-            Fact(
-                // **The padlock is open when the licence permits use.**
-                //
-                // It was closed in both states, with only the hue and the word
-                // separating them, and a closed padlock is the one glyph in this
-                // vocabulary that means "you may not". Drawn beside "Activated" it
-                // contradicted the sentence it was illustrating — and it is the part
-                // of the card a viewer reads first, because a shape at a glance beats
-                // a word every time. Open says the device is free to play; closed says
-                // the licence ran out and it is not, which is the only thing this fact
-                // has ever been about.
-                //
-                // Both come from `licenceHolds`, which is `entitlement.allowsUse` —
-                // the same question the header's licence card and the section board
-                // already ask. Nothing new decides it here; the glyph simply stopped
-                // disagreeing with the other two things on this line.
-                if (state.licenceHolds) Icons.Rounded.LockOpen else Icons.Rounded.Lock,
-                stringResource(
-                    R.string.home_device_state,
-                    stringResource(
-                        if (state.licenceHolds) R.string.home_device_activated
-                        else R.string.home_device_locked,
-                    ),
-                ),
-                if (state.licenceHolds) colors.success else colors.danger,
-                frame,
-                Modifier.weight(1f),
-            )
-            Fact(
-                Icons.Rounded.Memory,
-                stringResource(R.string.home_device_mac, ltrIsolate(state.mac)),
-                colors.hueViolet,
-                frame,
-                Modifier.weight(1f),
-            )
-            // Only once there is one. The card is not drawn from a blank, because an
-            // empty third box beside two filled ones reads as a value that failed to
-            // load rather than one that has not arrived yet.
+            Fact(stringResource(R.string.home_label_mac), frame, Modifier.weight(FACT_MAC)) {
+                FactValue(ltrIsolate(state.mac), colors.onBackgroundStrong, frame)
+            }
+            // Only once there is one: an empty value beside filled ones reads as one that failed to load.
             if (state.deviceKey.isNotBlank()) {
-                Fact(
-                    Icons.Rounded.VpnKey,
-                    stringResource(R.string.home_device_key, ltrIsolate(state.deviceKey)),
-                    colors.hueAmber,
+                Fact(stringResource(R.string.home_label_key), frame, Modifier.weight(FACT_KEY)) {
+                    FactValue(ltrIsolate(state.deviceKey), colors.onBackgroundStrong, frame)
+                }
+            }
+            Fact(stringResource(R.string.home_label_state), frame, Modifier.weight(FACT_STATE)) {
+                val hue = if (state.licenceHolds) colors.success else colors.danger
+                StateMark(if (state.licenceHolds) Icons.Rounded.CheckCircle else Icons.Rounded.Lock, hue)
+                FactValue(
+                    stringResource(if (state.licenceHolds) R.string.home_device_activated else R.string.home_device_locked),
+                    hue,
                     frame,
-                    Modifier.weight(1f),
+                )
+            }
+            TermFact(
+                label = stringResource(R.string.home_term_licence),
+                term = licenceTerm(state.entitlement),
+                hue = licenceHue(state),
+                frame = frame,
+                modifier = Modifier.weight(FACT_TERM),
+            )
+            TermFact(
+                label = stringResource(R.string.home_term_provider),
+                term = providerTerm(state.subscription),
+                hue = when (providerTone(state.subscription)) {
+                    ProviderTone.Usable -> colors.success
+                    ProviderTone.Refused -> colors.danger
+                    ProviderTone.Unchecked -> colors.onBackgroundMuted
+                },
+                frame = frame,
+                modifier = Modifier.weight(FACT_TERM),
+            )
+        }
+
+        // What is wrong with the subscription, when something is: the one sentence that tells the viewer why nothing plays.
+        state.trouble?.let { trouble ->
+            Row(
+                Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(frame.chipPad / 2, Alignment.CenterHorizontally),
+            ) {
+                Icon(trouble.icon, contentDescription = null, tint = colors.danger, modifier = Modifier.size(Sizing.iconSm))
+                Text(
+                    stringResource(troubleSentence(trouble)),
+                    style = castivioBodyStyle(frame.fsChip),
+                    color = colors.danger,
+                    textAlign = TextAlign.Center,
+                    maxLines = DISCLAIMER_LINES,
                 )
             }
         }
+    }
+}
 
-        Row(
-            Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(frame.chipPad / 2, Alignment.CenterHorizontally),
-        ) {
-            val trouble = state.trouble
-            Icon(
-                if (trouble == null) Icons.Rounded.Info else trouble.icon,
-                contentDescription = null,
-                tint = if (trouble == null) colors.hueViolet else colors.danger,
-                modifier = Modifier.size(Sizing.iconSm),
-            )
+/**
+ * The licence's colour: the success green while it holds, the amber in its last [LICENCE_SOON_DAYS] days so the viewer
+ * renews before it stops, and the failure red once it does not hold.
+ */
+@Composable
+private fun licenceHue(state: HomeState): Color {
+    val colors = CastivioTheme.colors
+    val days = when (val e = state.entitlement) {
+        is EntitlementState.TrialActive -> e.daysRemaining
+        is EntitlementState.AnnualActive -> e.daysRemaining
+        else -> null
+    }
+    return when {
+        !state.licenceHolds -> colors.danger
+        days != null && days <= LICENCE_SOON_DAYS -> colors.hueAmber
+        else -> colors.success
+    }
+}
+
+/** A term: its mark, its date when it has one, and its word beside it, all in its colour but the date. */
+@Composable
+private fun TermFact(label: String, term: Term, hue: Color, frame: CastivioMetrics, modifier: Modifier = Modifier) {
+    Fact(label, frame, modifier) {
+        StateMark(if (hue == CastivioTheme.colors.danger) Icons.Rounded.ErrorOutline else Icons.Rounded.CheckCircle, hue)
+        val at = term.atMs
+        if (at != null) {
+            FactValue(rememberDate(at), CastivioTheme.colors.onBackgroundStrong, frame)
             Text(
-                stringResource(if (trouble == null) R.string.home_disclaimer else troubleSentence(trouble)),
-                style = castivioBodyStyle(frame.fsChip),
-                color = if (trouble == null) colors.onBackgroundMuted else colors.danger,
-                textAlign = TextAlign.Center,
-                maxLines = DISCLAIMER_LINES,
+                stringResource(term.word),
+                style = castivioChipStyle(frame.fsChip * FACT_LABEL_RATIO),
+                color = hue,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
+        } else {
+            FactValue(stringResource(term.word), hue, frame)
         }
     }
+}
+
+/**
+ * One fact of the footer: its name over its value, on the page itself -- no edge, no fill. The value's row is handed in,
+ * because a state has its mark and its word where the MAC address has its characters only.
+ */
+@Composable
+private fun Fact(
+    label: String,
+    frame: CastivioMetrics,
+    modifier: Modifier = Modifier,
+    value: @Composable RowScope.() -> Unit,
+) {
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(FACT_GAP)) {
+        Text(
+            label,
+            style = castivioChipStyle(frame.fsChip * FACT_LABEL_RATIO),
+            color = CastivioTheme.colors.onBackgroundVariant,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(frame.chipPad / 2),
+            content = value,
+        )
+    }
+}
+
+@Composable
+private fun FactValue(text: String, color: Color, frame: CastivioMetrics) {
+    Text(
+        text,
+        style = castivioTitleStyle(frame.fsLabel * FACT_VALUE_RATIO),
+        color = color,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+    )
+}
+
+@Composable
+private fun StateMark(icon: ImageVector, hue: Color) {
+    Icon(icon, contentDescription = null, tint = hue, modifier = Modifier.size(Sizing.iconSm))
 }
 
 /**
@@ -2084,37 +2133,19 @@ private val SubscriptionTrouble.icon: ImageVector
         SubscriptionTrouble.Expired, SubscriptionTrouble.Refused -> Icons.Rounded.ErrorOutline
     }
 
-/** One value a user copies: a glyph, a label and the value, inside its own edge. */
-@Composable
-private fun Fact(
-    icon: ImageVector,
-    text: String,
-    tint: Color,
-    frame: CastivioMetrics,
-    modifier: Modifier = Modifier,
-) {
-    val colors = CastivioTheme.colors
-    val shape = RoundedCornerShape(frame.radius / 2)
-    Row(
-        modifier
-            .height(frame.chip)
-            .clip(shape)
-            .background(CastivioTheme.colors.homeCardSurface)
-            .border(BorderStroke(1.dp, CastivioTheme.colors.cardSurfaceEdge), shape)
-            .padding(horizontal = frame.chipPad),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(frame.chipPad / 2, Alignment.CenterHorizontally),
-    ) {
-        Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(Sizing.iconSm))
-        Text(
-            text,
-            style = castivioBodyStyle(frame.fsChip),
-            color = colors.onBackgroundMuted,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
-    }
-}
+/** The five facts' shares of the line: the MAC address the widest, the device's state the narrowest. */
+private const val FACT_MAC = 1.3f
+private const val FACT_KEY = 0.9f
+private const val FACT_STATE = 0.8f
+private const val FACT_TERM = 1.2f
+
+/** A fact's name against the frame's chip text, and its value against the label step. */
+private const val FACT_LABEL_RATIO = 0.85f
+private const val FACT_VALUE_RATIO = 0.8f
+private val FACT_GAP = 2.dp
+
+/** The licence turns amber in its last week. */
+private const val LICENCE_SOON_DAYS = 7
 
 // ----------------------------------------------------------------- utilities
 

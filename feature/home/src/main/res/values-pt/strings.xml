@@ -117,6 +117,9 @@
     <string name="home_device_mac">MAC: %1$s</string>
     <string name="home_device_state">Aparelho: %1$s</string>
     <string name="home_device_key">Chave do aparelho: %1$s</string>
+    <string name="home_label_mac">Endereço MAC</string>
+    <string name="home_label_key">Chave do dispositivo</string>
+    <string name="home_label_state">Status do dispositivo</string>
     <string name="home_device_activated">Ativado</string>
     <string name="home_device_locked">Bloqueado</string>
     <string name="home_not_fetched">Ainda não baixado</string>

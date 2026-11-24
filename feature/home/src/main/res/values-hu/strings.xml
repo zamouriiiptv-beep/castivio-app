@@ -115,6 +115,9 @@
     <string name="home_device_mac">MAC: %1$s</string>
     <string name="home_device_state">Eszköz: %1$s</string>
     <string name="home_device_key">Eszközkulcs: %1$s</string>
+    <string name="home_label_mac">MAC-cím</string>
+    <string name="home_label_key">Eszközkulcs</string>
+    <string name="home_label_state">Eszköz állapota</string>
     <string name="home_device_activated">Aktiválva</string>
     <string name="home_device_locked">Zárolva</string>
     <string name="home_not_fetched">Még nincs letöltve</string>

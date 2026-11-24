@@ -115,6 +115,9 @@
     <string name="home_device_mac">MAC: %1$s</string>
     <string name="home_device_state">Устройство: %1$s</string>
     <string name="home_device_key">Ключ на устройството: %1$s</string>
+    <string name="home_label_mac">MAC адрес</string>
+    <string name="home_label_key">Ключ на устройството</string>
+    <string name="home_label_state">Състояние на устройството</string>
     <string name="home_device_activated">Активирано</string>
     <string name="home_device_locked">Заключено</string>
     <string name="home_not_fetched">Още не е изтеглено</string>

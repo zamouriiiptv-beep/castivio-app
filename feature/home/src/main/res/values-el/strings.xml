@@ -115,6 +115,9 @@
     <string name="home_device_mac">MAC: %1$s</string>
     <string name="home_device_state">Συσκευή: %1$s</string>
     <string name="home_device_key">Κλειδί συσκευής: %1$s</string>
+    <string name="home_label_mac">Διεύθυνση MAC</string>
+    <string name="home_label_key">Κλειδί συσκευής</string>
+    <string name="home_label_state">Κατάσταση συσκευής</string>
     <string name="home_device_activated">Ενεργοποιημένη</string>
     <string name="home_device_locked">Κλειδωμένη</string>
     <string name="home_not_fetched">Δεν έχει ληφθεί ακόμη</string>

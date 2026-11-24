@@ -115,6 +115,9 @@
     <string name="home_device_mac">MAC: %1$s</string>
     <string name="home_device_state">Enhet: %1$s</string>
     <string name="home_device_key">Enhetsnyckel: %1$s</string>
+    <string name="home_label_mac">MAC-adress</string>
+    <string name="home_label_key">Enhetsnyckel</string>
+    <string name="home_label_state">Enhetsstatus</string>
     <string name="home_device_activated">Aktiverad</string>
     <string name="home_device_locked">Låst</string>
     <string name="home_not_fetched">Inte hämtat än</string>

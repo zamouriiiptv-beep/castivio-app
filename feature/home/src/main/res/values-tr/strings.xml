@@ -115,6 +115,9 @@
     <string name="home_device_mac">MAC: %1$s</string>
     <string name="home_device_state">Cihaz: %1$s</string>
     <string name="home_device_key">Cihaz anahtarı: %1$s</string>
+    <string name="home_label_mac">MAC adresi</string>
+    <string name="home_label_key">Cihaz anahtarı</string>
+    <string name="home_label_state">Cihaz durumu</string>
     <string name="home_device_activated">Etkinleştirildi</string>
     <string name="home_device_locked">Kilitli</string>
     <string name="home_not_fetched">Henüz indirilmedi</string>
