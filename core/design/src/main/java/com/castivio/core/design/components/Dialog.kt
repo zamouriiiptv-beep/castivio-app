@@ -345,6 +345,8 @@ fun CastivioInfoDialog(
                 text = closeLabel,
                 weight = ButtonWeight.Primary,
                 onClick = onClose,
+                // The short button (owner, 2026-11-25): closing is not the thing to read here.
+                compact = true,
                 modifier = Modifier.focusRequester(close).focusable(),
             )
         }

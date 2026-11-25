@@ -2078,7 +2078,7 @@ private fun AccountRow(label: String, frame: CastivioMetrics, value: @Composable
     ) {
         Text(
             label,
-            style = castivioChipStyle(frame.fsChip),
+            style = castivioChipStyle(frame.fsChip * ACCOUNT_TEXT_SCALE),
             color = CastivioTheme.colors.onBackgroundVariant,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -2120,7 +2120,7 @@ private fun RowScope.TermValue(term: Term, hue: Color, frame: CastivioMetrics) {
         FactValue(rememberDate(at), CastivioTheme.colors.onBackgroundStrong, frame)
         Text(
             stringResource(term.word),
-            style = castivioChipStyle(frame.fsChip * FACT_LABEL_RATIO),
+            style = castivioChipStyle(frame.fsChip * FACT_LABEL_RATIO * ACCOUNT_TEXT_SCALE),
             color = hue,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -2134,7 +2134,7 @@ private fun RowScope.TermValue(term: Term, hue: Color, frame: CastivioMetrics) {
 private fun FactValue(text: String, color: Color, frame: CastivioMetrics) {
     Text(
         text,
-        style = castivioTitleStyle(frame.fsLabel * FACT_VALUE_RATIO),
+        style = castivioTitleStyle(frame.fsLabel * FACT_VALUE_RATIO * ACCOUNT_TEXT_SCALE),
         color = color,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
@@ -2143,7 +2143,7 @@ private fun FactValue(text: String, color: Color, frame: CastivioMetrics) {
 
 @Composable
 private fun StateMark(icon: ImageVector, hue: Color) {
-    Icon(icon, contentDescription = null, tint = hue, modifier = Modifier.size(Sizing.iconSm))
+    Icon(icon, contentDescription = null, tint = hue, modifier = Modifier.size(Sizing.iconMd))
 }
 
 /**
@@ -2160,6 +2160,9 @@ private val SubscriptionTrouble.icon: ImageVector
 
 /** A term's word against the frame's chip text, and a value against the label step. */
 private const val FACT_LABEL_RATIO = 0.85f
+
+/** The account's words, larger than the footer's they came from (owner, 2026-11-25: «الكتابة صغيرة»). */
+private const val ACCOUNT_TEXT_SCALE = 1.3f
 private const val FACT_VALUE_RATIO = 0.8f
 
 /** The licence turns amber in its last week. */
