@@ -78,6 +78,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.focus.FocusRequester
@@ -1091,19 +1092,17 @@ private fun Board(
     typing: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val colors = CastivioTheme.colors
     val shape = RoundedCornerShape(m.panelRadius)
     // Whether this APK may print a failure's figures: debuggable, as for the performance
     // panel, and for the same reason -- a property of the installed package, read once.
     val context = LocalContext.current
     val instrumented = remember(context) { PerformanceLog.isVisibleIn(context) }
 
+    // **No frame round the board** (owner, 2026-11-25, design/mockups/channels-home-look-ar.png): its columns stand on the
+    // application's backdrop as Home's cards do, each in Home's own card, so the two screens read as one application.
     Column(
         modifier
             .fillMaxWidth()
-            .clip(shape)
-            .background(colors.glassFill)
-            .border(1.dp, colors.glassBorderSoft, shape)
             .padding(m.panelPad),
     ) {
         // **A failed fetch does not hide rows that are already on the device.**
@@ -1363,7 +1362,11 @@ private fun Columns(
                     onFavorites = model::openFavorites,
                     onRecent = model::openRecent,
                     hider = hider,
-                    modifier = Modifier.width(m.rail).fillMaxHeight(),
+                    modifier = Modifier
+                        .width(m.rail)
+                        .fillMaxHeight()
+                        .homeCard(m)
+                        .padding(m.panelPad),
                 )
 
                 Spacer(Modifier.width(m.railGap))
@@ -1875,7 +1878,6 @@ private fun ChannelList(
     modifier: Modifier = Modifier,
 ) {
     val colors = CastivioTheme.colors
-    val shape = RoundedCornerShape(m.wellRadius)
     val mode = state.arranging
 
     // The instant the board first has something a viewer can act on. The same boundary
@@ -1899,11 +1901,7 @@ private fun ChannelList(
     // is a *frame* around the list, not a surface under it: the hairline says where the
     // column is and the page shows through. The rail beside it has never had a fill and
     // never needed one.
-    Box(
-        modifier
-            .clip(shape)
-            .border(1.dp, colors.glassBorderSoft, shape),
-    ) {
+    Box(modifier.homeCard(m)) {
         if (rows.itemCount == 0) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 ChannelListEmpty(
@@ -2726,8 +2724,8 @@ internal fun WellPicture(
     Box(
         modifier
             .clip(shape)
-            .background(colors.backgroundElevated)
-            .border(1.dp, colors.glassBorder, shape),
+            .background(colors.homeCardSurface)
+            .border(HOME_CARD_EDGE, colors.cardSurfaceEdge, shape),
     ) {
         // **The plate is the player's when there is a player.**
         //
@@ -2883,7 +2881,8 @@ private fun ChannelFacts(
     Column(
         modifier
             .clip(shape)
-            .border(1.dp, colors.glassBorderSoft, shape)
+            .background(colors.homeCardSurface)
+            .border(HOME_CARD_EDGE, colors.cardSurfaceEdge, shape)
             .padding(horizontal = m.guidePad, vertical = m.guidePad / 2),
         // **One gap, and not a division of the slack.**
         //
@@ -3394,17 +3393,17 @@ private fun ActionButton(
             .clip(shape)
             .background(
                 when {
-                    focused -> colors.secondary
-                    on -> colors.secondaryContainer
-                    else -> colors.glassFill
+                    focused -> SolidColor(colors.secondary)
+                    on -> SolidColor(colors.secondaryContainer)
+                    else -> colors.homeCardSurface
                 },
             )
             .border(
-                1.dp,
+                if (focused || on) 1.dp else HOME_CARD_EDGE,
                 when {
                     focused -> colors.focusRing
                     on -> colors.selectedBorder
-                    else -> colors.glassBorderSoft
+                    else -> colors.cardSurfaceEdge
                 },
                 shape,
             )
@@ -4040,3 +4039,16 @@ internal const val FIELD_OF_ROW = 0.86f
 
 /** The bouquet switch's line on the smoothness panel. */
 private const val SMOOTHNESS_BOUQUET = "Bouquet switch"
+
+/**
+ * A column of the board in Home's own card (owner, 2026-11-25): the same calm indigo fill and the same violet edge as Home's
+ * four sections, so the backdrop shows through as it does there and nobody notices they have left one screen for another.
+ */
+internal fun Modifier.homeCard(m: ChannelsMetrics): Modifier = composed {
+    val colors = CastivioTheme.colors
+    val shape = RoundedCornerShape(m.panelRadius)
+    clip(shape).background(colors.homeCardSurface).border(HOME_CARD_EDGE, colors.cardSurfaceEdge, shape)
+}
+
+/** The edge of Home's cards, which the board's columns now share. */
+internal val HOME_CARD_EDGE = 1.dp
