@@ -9,7 +9,11 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
- * The band's mark is a picture of the television and nothing else.
+ * The band's mark is a picture of the mark and nothing else.
+ *
+ * Since 2026-11-25 the mark is the owner's C with its play button and antennas, cut from its tile; it is taller than it
+ * is wide, so the rule that the picture be wider than tall -- written for the television it replaced -- is gone, and the
+ * band draws it at the band's height, narrower.
  *
  * It read small on a handset because the picture was a portrait canvas with the television in its middle third: drawn
  * as tall as the band, the television was 38% of that height. A child cannot be taller than the band it stands in, so
@@ -126,13 +130,6 @@ class LogoTrimTest {
 
         assertTrue("the television spans $across of the picture's width", across >= FILLS)
         assertTrue("the television spans $down of the picture's height", down >= FILLS)
-    }
-
-    @Test
-    fun `the picture is wider than it is tall, so the mark's width is no more than its height asks`() {
-        val image = alphaOf(logo)
-
-        assertEquals(true, image.width >= image.height)
     }
 
     private companion object {
