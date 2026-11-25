@@ -241,4 +241,8 @@
     <string name="home_continue_none_movies">Ingen film sett ennå</string>
     <string name="home_continue_none_series">Ingen serie sett ennå</string>
     <string name="home_continue_none_radio">Ingen stasjon hørt ennå</string>
+    <string name="home_copy_mac">Kopier MAC-adressen</string>
+    <string name="home_copy_key">Kopier enhetsnøkkelen</string>
+    <string name="home_licence_ends">Utløper</string>
+    <string name="home_subscription_ends">Utløper</string>
 </resources>

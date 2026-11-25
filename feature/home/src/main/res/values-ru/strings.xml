@@ -245,4 +245,8 @@
     <string name="home_continue_none_movies">Вы ещё не смотрели фильмы</string>
     <string name="home_continue_none_series">Вы ещё не смотрели сериалы</string>
     <string name="home_continue_none_radio">Вы ещё не слушали станции</string>
+    <string name="home_copy_mac">Копировать MAC-адрес</string>
+    <string name="home_copy_key">Копировать ключ устройства</string>
+    <string name="home_licence_ends">Истекает</string>
+    <string name="home_subscription_ends">Истекает</string>
 </resources>

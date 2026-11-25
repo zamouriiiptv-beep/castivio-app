@@ -239,4 +239,8 @@
     <string name="home_continue_none_movies">Chưa xem phim nào</string>
     <string name="home_continue_none_series">Chưa xem bộ phim nào</string>
     <string name="home_continue_none_radio">Chưa nghe đài nào</string>
+    <string name="home_copy_mac">Sao chép địa chỉ MAC</string>
+    <string name="home_copy_key">Sao chép khóa thiết bị</string>
+    <string name="home_licence_ends">Hết hạn</string>
+    <string name="home_subscription_ends">Hết hạn</string>
 </resources>

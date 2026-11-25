@@ -329,11 +329,13 @@ fun CastivioInfoDialog(
     closeLabel: String,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
+    /** The panel's width, of its usual share: under 1 for rows that would leave an empty middle. */
+    widthShare: Float = 1f,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val close = remember { FocusRequester() }
     LaunchedEffect(Unit) { runCatching { close.requestFocus() } }
-    DialogPanel(title = title, onScrim = onClose, modifier = modifier) { _ ->
+    DialogPanel(title = title, onScrim = onClose, modifier = modifier, widthShare = widthShare) { _ ->
         Column(
             Modifier
                 .weight(1f, fill = false)
@@ -478,6 +480,8 @@ internal fun DialogPanel(
      * handset the share is 373 -- under the 400 floor and under what they need side by side.
      */
     minPanel: Dp = 0.dp,
+    /** The panel's width, of what it would be: 1 for every dialog but the account's, whose rows are short. */
+    widthShare: Float = 1f,
     /**
      * @param tight whether the surface left over is short enough that the panel has to
      *   drop something to fit on it. It is the measured height, not a question about the
@@ -532,7 +536,7 @@ internal fun DialogPanel(
 
             Column(
                 Modifier
-                    .widthIn(max = maxOf(m.width, minPanel))
+                    .widthIn(max = maxOf(m.width, minPanel) * widthShare)
                     // Never taller than most of the screen. On the 360dp frame that
                     // is 288dp, which is the number that makes the notice scroll
                     // rather than push its own close button off the bottom.

@@ -83,6 +83,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -107,6 +108,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.castivio.core.common.format.CastivioDates
 import com.castivio.core.design.components.CastivioClock
 import com.castivio.core.design.components.CastivioInfoDialog
+import com.castivio.core.design.components.CopyButton
 import com.castivio.core.design.components.EmptyState
 import com.castivio.core.design.components.InteractiveGlassCard
 import com.castivio.core.design.components.castivioBodyStyle
@@ -127,6 +129,7 @@ import com.castivio.domain.Channel
 import com.castivio.domain.MediaKind
 import com.castivio.domain.Recorded
 import com.castivio.domain.entitlement.EntitlementState
+import kotlinx.coroutines.delay
 
 /**
  * Home: the dashboard, composed to the frame it is handed rather than to a scroll.
@@ -2029,17 +2032,52 @@ private fun FooterLine(
 internal fun AccountDialog(state: HomeState, frame: CastivioMetrics, onClose: () -> Unit) {
     val colors = CastivioTheme.colors
     BackHandler(onBack = onClose)
+    // Copying is for a phone (owner, 2026-11-25): the address and the key are sent to the provider from it. A television
+    // has nothing to paste them into, so there they are only read out.
+    val canCopy = !CastivioTheme.device.isTv
+    val clipboard = LocalClipboardManager.current
+    var copied by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(copied) {
+        if (copied != null) {
+            delay(COPIED_FOR_MS)
+            copied = null
+        }
+    }
     CastivioInfoDialog(
         title = stringResource(R.string.home_account),
         closeLabel = stringResource(R.string.home_close),
         onClose = onClose,
+        // Narrower (owner, 2026-11-25): the rows are short, and the full share left an empty middle.
+        widthShare = ACCOUNT_WIDTH_SHARE,
     ) {
         AccountRow(stringResource(R.string.home_label_mac), frame) {
             FactValue(ltrIsolate(state.mac), colors.onBackgroundStrong, frame)
+            if (canCopy && state.mac.isNotBlank()) {
+                CopyButton(
+                    size = Sizing.minTarget(false),
+                    label = stringResource(R.string.home_copy_mac),
+                    isCopied = copied == COPIED_MAC,
+                    onClick = {
+                        clipboard.setText(AnnotatedString(state.mac))
+                        copied = COPIED_MAC
+                    },
+                )
+            }
         }
         if (state.deviceKey.isNotBlank()) {
             AccountRow(stringResource(R.string.home_label_key), frame) {
                 FactValue(ltrIsolate(state.deviceKey), colors.onBackgroundStrong, frame)
+                if (canCopy) {
+                    CopyButton(
+                        size = Sizing.minTarget(false),
+                        label = stringResource(R.string.home_copy_key),
+                        isCopied = copied == COPIED_KEY,
+                        onClick = {
+                            clipboard.setText(AnnotatedString(state.deviceKey))
+                            copied = COPIED_KEY
+                        },
+                    )
+                }
             }
         }
         AccountRow(stringResource(R.string.home_label_state), frame) {
@@ -2052,7 +2090,7 @@ internal fun AccountDialog(state: HomeState, frame: CastivioMetrics, onClose: ()
             )
         }
         AccountRow(stringResource(R.string.home_term_licence), frame) {
-            TermValue(licenceTerm(state.entitlement), licenceHue(state), frame)
+            TermValue(licenceTerm(state.entitlement), licenceHue(state), frame, stringResource(R.string.home_licence_ends))
         }
         AccountRow(stringResource(R.string.home_term_provider), frame) {
             TermValue(
@@ -2063,6 +2101,7 @@ internal fun AccountDialog(state: HomeState, frame: CastivioMetrics, onClose: ()
                     ProviderTone.Unchecked -> colors.onBackgroundMuted
                 },
                 frame,
+                stringResource(R.string.home_subscription_ends),
             )
         }
     }
@@ -2111,12 +2150,20 @@ private fun licenceHue(state: HomeState): Color {
     }
 }
 
-/** A term's value: its mark, its date when it has one, and its word beside it, all in its colour but the date. */
+/** A term's value: its mark, "ends on" and its date when it has one, and its word beside it, all in its colour but the date. */
 @Composable
-private fun RowScope.TermValue(term: Term, hue: Color, frame: CastivioMetrics) {
+private fun RowScope.TermValue(term: Term, hue: Color, frame: CastivioMetrics, ends: String) {
     StateMark(if (hue == CastivioTheme.colors.danger) Icons.Rounded.ErrorOutline else Icons.Rounded.CheckCircle, hue)
     val at = term.atMs
     if (at != null) {
+        // "Ends on" before the date (owner, 2026-11-25), so the date is read as the end and not as a start.
+        Text(
+            ends,
+            style = castivioChipStyle(frame.fsChip * FACT_LABEL_RATIO * ACCOUNT_TEXT_SCALE),
+            color = CastivioTheme.colors.onBackgroundVariant,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
         FactValue(rememberDate(at), CastivioTheme.colors.onBackgroundStrong, frame)
         Text(
             stringResource(term.word),
@@ -2163,6 +2210,14 @@ private const val FACT_LABEL_RATIO = 0.85f
 
 /** The account's words, larger than the footer's they came from (owner, 2026-11-25: «الكتابة صغيرة»). */
 private const val ACCOUNT_TEXT_SCALE = 1.3f
+
+/** The account panel's width, of a dialog's usual share. */
+private const val ACCOUNT_WIDTH_SHARE = 0.9f
+
+/** How long a copy button shows its tick. */
+private const val COPIED_FOR_MS = 2_000L
+private const val COPIED_MAC = "mac"
+private const val COPIED_KEY = "key"
 private const val FACT_VALUE_RATIO = 0.8f
 
 /** The licence turns amber in its last week. */

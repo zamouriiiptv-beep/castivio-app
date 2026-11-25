@@ -241,4 +241,8 @@
     <string name="home_continue_none_movies">Nog geen film bekeken</string>
     <string name="home_continue_none_series">Nog geen serie bekeken</string>
     <string name="home_continue_none_radio">Nog geen zender beluisterd</string>
+    <string name="home_copy_mac">MAC-adres kopiëren</string>
+    <string name="home_copy_key">Apparaatsleutel kopiëren</string>
+    <string name="home_licence_ends">Verloopt op</string>
+    <string name="home_subscription_ends">Verloopt op</string>
 </resources>

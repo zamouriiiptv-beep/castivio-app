@@ -239,4 +239,8 @@
     <string name="home_continue_none_movies">Belum ada film yang ditonton</string>
     <string name="home_continue_none_series">Belum ada serial yang ditonton</string>
     <string name="home_continue_none_radio">Belum ada stasiun yang didengar</string>
+    <string name="home_copy_mac">Salin alamat MAC</string>
+    <string name="home_copy_key">Salin kunci perangkat</string>
+    <string name="home_licence_ends">Berakhir pada</string>
+    <string name="home_subscription_ends">Berakhir pada</string>
 </resources>

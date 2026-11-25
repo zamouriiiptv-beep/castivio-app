@@ -245,4 +245,8 @@
     <string name="home_continue_none_movies">Nie obejrzano jeszcze filmu</string>
     <string name="home_continue_none_series">Nie obejrzano jeszcze serialu</string>
     <string name="home_continue_none_radio">Nie słuchano jeszcze stacji</string>
+    <string name="home_copy_mac">Kopiuj adres MAC</string>
+    <string name="home_copy_key">Kopiuj klucz urządzenia</string>
+    <string name="home_licence_ends">Wygasa</string>
+    <string name="home_subscription_ends">Wygasa</string>
 </resources>

@@ -241,4 +241,8 @@
     <string name="home_continue_none_movies">Ende nuk keni parë asnjë film</string>
     <string name="home_continue_none_series">Ende nuk keni parë asnjë serial</string>
     <string name="home_continue_none_radio">Ende nuk keni dëgjuar asnjë stacion</string>
+    <string name="home_copy_mac">Kopjo adresën MAC</string>
+    <string name="home_copy_key">Kopjo çelësin e pajisjes</string>
+    <string name="home_licence_ends">Mbaron më</string>
+    <string name="home_subscription_ends">Mbaron më</string>
 </resources>

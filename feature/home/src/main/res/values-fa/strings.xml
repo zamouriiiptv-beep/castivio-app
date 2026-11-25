@@ -241,4 +241,8 @@
     <string name="home_continue_none_movies">هنوز فیلمی تماشا نکرده‌اید</string>
     <string name="home_continue_none_series">هنوز سریالی تماشا نکرده‌اید</string>
     <string name="home_continue_none_radio">هنوز ایستگاهی گوش نداده‌اید</string>
+    <string name="home_copy_mac">کپی نشانی MAC</string>
+    <string name="home_copy_key">کپی کلید دستگاه</string>
+    <string name="home_licence_ends">پایان در</string>
+    <string name="home_subscription_ends">پایان در</string>
 </resources>

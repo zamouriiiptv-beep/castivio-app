@@ -241,4 +241,8 @@
     <string name="home_continue_none_movies">Et ole vielä katsonut elokuvaa</string>
     <string name="home_continue_none_series">Et ole vielä katsonut sarjaa</string>
     <string name="home_continue_none_radio">Et ole vielä kuunnellut asemaa</string>
+    <string name="home_copy_mac">Kopioi MAC-osoite</string>
+    <string name="home_copy_key">Kopioi laiteavain</string>
+    <string name="home_licence_ends">Päättyy</string>
+    <string name="home_subscription_ends">Päättyy</string>
 </resources>

@@ -239,4 +239,8 @@
     <string name="home_continue_none_movies">尚未观看电影</string>
     <string name="home_continue_none_series">尚未观看剧集</string>
     <string name="home_continue_none_radio">尚未收听电台</string>
+    <string name="home_copy_mac">复制 MAC 地址</string>
+    <string name="home_copy_key">复制设备密钥</string>
+    <string name="home_licence_ends">到期日</string>
+    <string name="home_subscription_ends">到期日</string>
 </resources>

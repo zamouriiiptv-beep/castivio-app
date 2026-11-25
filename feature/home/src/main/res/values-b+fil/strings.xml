@@ -241,4 +241,8 @@
     <string name="home_continue_none_movies">Wala pang napanood na pelikula</string>
     <string name="home_continue_none_series">Wala pang napanood na serye</string>
     <string name="home_continue_none_radio">Wala pang napakinggang istasyon</string>
+    <string name="home_copy_mac">Kopyahin ang MAC address</string>
+    <string name="home_copy_key">Kopyahin ang device key</string>
+    <string name="home_licence_ends">Matatapos sa</string>
+    <string name="home_subscription_ends">Matatapos sa</string>
 </resources>

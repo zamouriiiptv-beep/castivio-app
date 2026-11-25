@@ -241,4 +241,8 @@
     <string name="home_continue_none_movies">Още не сте гледали филм</string>
     <string name="home_continue_none_series">Още не сте гледали сериал</string>
     <string name="home_continue_none_radio">Още не сте слушали станция</string>
+    <string name="home_copy_mac">Копиране на MAC адреса</string>
+    <string name="home_copy_key">Копиране на ключа на устройството</string>
+    <string name="home_licence_ends">Изтича на</string>
+    <string name="home_subscription_ends">Изтича на</string>
 </resources>

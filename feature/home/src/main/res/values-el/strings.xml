@@ -241,4 +241,8 @@
     <string name="home_continue_none_movies">Δεν έχετε δει ταινία ακόμη</string>
     <string name="home_continue_none_series">Δεν έχετε δει σειρά ακόμη</string>
     <string name="home_continue_none_radio">Δεν έχετε ακούσει σταθμό ακόμη</string>
+    <string name="home_copy_mac">Αντιγραφή διεύθυνσης MAC</string>
+    <string name="home_copy_key">Αντιγραφή κλειδιού συσκευής</string>
+    <string name="home_licence_ends">Λήγει στις</string>
+    <string name="home_subscription_ends">Λήγει στις</string>
 </resources>
