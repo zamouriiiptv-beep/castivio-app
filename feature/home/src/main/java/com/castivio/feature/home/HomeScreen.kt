@@ -309,8 +309,6 @@ fun HomeScreen(
         val frame = rememberMetrics(maxWidth, maxHeight)
         val plan = Plan.of(frame)
         val rhythm = Rhythm.of(frame)
-        // Read here, in the box's own scope: the column below does not answer for the box's size.
-        val labelled = CastivioTheme.device.isTv || maxHeight >= LABELLED_HEADER_MIN_HEIGHT
 
         Column(Modifier.fillMaxSize()) {
             // The header is a band across the whole width (`HomeHeader`): the logo, the page's seven buttons with their
@@ -318,7 +316,8 @@ fun HomeScreen(
             HomeHeader(
                 state = state,
                 frame = frame,
-                labelled = labelled,
+                // Every button carries its word, a handset too (owner, 2026-11-25): a glyph alone was not read.
+                labelled = true,
                 onRefresh = model::refresh,
                 onChoosePlaylist = model::choosePlaylist,
                 onAddPlaylist = onAddPlaylist,
@@ -803,7 +802,8 @@ private fun Section.ink(): Color {
     return when (tally) {
         Tally.Unfetched -> colors.primary
         Tally.Empty -> colors.onBackgroundMuted
-        Tally.Counted -> hue
+        // White, as in the owner's drawing (2026-11-25): the card's colour is its picture now, not its figure.
+        Tally.Counted -> colors.onBackgroundStrong
     }
 }
 
@@ -895,7 +895,7 @@ private fun HeroCard(
         restBorder = if (arrived) colors.success.copy(alpha = ARRIVED_EDGE_ALPHA) else colors.cardSurfaceEdge,
     ) {
         Box(Modifier.fillMaxSize()) {
-        SectionArt(section.art, ArtPlacement.Whole)
+        SectionArt(section.art)
         when (face) {
             HeroFace.Plain -> PlainFace(section, frame)
             HeroFace.NotLoaded -> NotLoadedFace(
@@ -922,57 +922,18 @@ private fun HeroCard(
 }
 
 /**
- * The live card as it was, and as it stays whenever it has nothing else to say: the glyph and its lines, the name, the count --
- * or the load, its bar and its failure -- see [HeroLoad].
+ * The live card whenever it has nothing else to say: over its picture, the name and the count -- or the load, its bar and
+ * its failure -- see [HeroLoad].
  */
 @Composable
 private fun PlainFace(section: Section, frame: CastivioMetrics) {
     val colors = CastivioTheme.colors
-    BoxWithConstraints(
-        Modifier
-            .fillMaxSize()
-            .drawBehind { drawHeroLines(azure = colors.hueAzure, violet = colors.hueViolet) },
-    ) {
-        // **Filled with a gradient, not a tint, and placed dead centre.** It hung
-        // from the top edge in a flat wash of the section's hue at a tenth of its
-        // ink, which read as an icon somebody forgot in a corner rather than a
-        // mark the panel was built around. Centred, a little larger and carrying
-        // the azure-to-violet ramp the backdrop and the wordmark already use, it
-        // reads as part of the identity instead of a shape added to it.
-        //
-        // `Icon` paints a vector in one colour, so the gradient is applied after
-        // the fact: the glyph is drawn into its own layer and `SrcIn` replaces
-        // every opaque pixel of it with the brush, which is why the layer is
-        // forced offscreen — without that the blend would reach the card behind.
-        // The alpha rides on the same layer so it multiplies the finished ramp
-        // once rather than each colour separately.
-        val ramp = Brush.linearGradient(
-            listOf(colors.discGlyph(section.hue), colors.hueViolet),
-        )
-        val glyph = maxHeight * HERO_GLYPH_SHARE
-        Icon(
-            imageVector = section.icon,
-            contentDescription = null,
-            tint = colors.onBackgroundStrong,
-            modifier = Modifier
-                // Raised, so that the panel's name under it does not touch it: its centre is at HERO_GLYPH_CENTRE of the
-                // panel's height and not the middle.
-                .align(Alignment.TopCenter)
-                .padding(top = maxHeight * HERO_GLYPH_CENTRE - glyph / 2)
-                .size(glyph)
-                .graphicsLayer {
-                    alpha = HERO_GLYPH_ALPHA
-                    compositingStrategy = CompositingStrategy.Offscreen
-                }
-                .drawWithContent {
-                    drawContent()
-                    drawRect(ramp, blendMode = BlendMode.SrcIn)
-                },
-        )
-
+    // The section's picture is behind the card now (see [SectionArt]): no glyph and no lines over it, only the words.
+    Box(Modifier.fillMaxSize()) {
         Column(
             Modifier.fillMaxSize().padding(frame.chipPad),
             verticalArrangement = Arrangement.Bottom,
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 text = stringResource(section.name),
@@ -1089,7 +1050,7 @@ private fun SectionLine(
     ) {
         // The picture is behind the words while the card offers nothing to carry on from: a thumbnail of what was watched
         // takes the line's end then, and two pictures in one line would be one too many.
-        if (offer == null || upright) SectionArt(section.art, if (upright) ArtPlacement.Whole else ArtPlacement.End)
+        if (offer == null || upright) SectionArt(section.art, mirrored = !upright)
         if (upright) {
             UprightFace(section, frame, offer, face)
         } else BoxWithConstraints(Modifier.fillMaxSize()) {
@@ -1100,16 +1061,6 @@ private fun SectionLine(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(frame.chipPad),
             ) {
-                // The glyph in the section's hue, with no plate under it: the card is the one rectangle, and the colour of the line
-                // is its glyph and its figure.
-                Box(Modifier.size(Sizing.iconMd + frame.chipPad), contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = section.icon,
-                        contentDescription = null,
-                        tint = colors.discGlyph(section.hue),
-                        modifier = Modifier.size(Sizing.iconMd),
-                    )
-                }
                 Column(Modifier.weight(1f)) {
                     if (offer != null) {
                         TileResumeBody(section, offer, frame)
@@ -1126,15 +1077,15 @@ private fun SectionLine(
                 }
                 // The line's empty end is what both new faces use.
                 if (face == HeroFace.NotLoaded) TileLoadPill(frame)
-                if (offer != null) TileThumb(offer, height = lineHeight) else if (face != HeroFace.NotLoaded) PlayMark(frame)
+                if (offer != null) TileThumb(offer, height = lineHeight)
             }
         }
     }
 }
 
 /**
- * The radio's narrow card: its glyph on a disc, its name, and under it what its load says -- or, once something was played,
- * the station last played. Centred, as the owner drew it.
+ * The radio's narrow card: over its picture, at its foot, its name and under it what its load says -- or, once something
+ * was played, the station last played. Centred, as the owner drew it.
  */
 @Composable
 private fun UprightFace(section: Section, frame: CastivioMetrics, offer: SectionResume?, face: HeroFace) {
@@ -1142,17 +1093,8 @@ private fun UprightFace(section: Section, frame: CastivioMetrics, offer: Section
     Column(
         Modifier.fillMaxSize().padding(frame.chipPad),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(frame.chipPad / 2, Alignment.CenterVertically),
+        verticalArrangement = Arrangement.spacedBy(frame.chipPad / 2, Alignment.Bottom),
     ) {
-        Box(
-            Modifier
-                .size(Sizing.iconMd * UPRIGHT_DISC)
-                .clip(CircleShape)
-                .background(colors.discFill(section.hue)),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(section.icon, contentDescription = null, tint = colors.discGlyph(section.hue), modifier = Modifier.size(Sizing.iconMd))
-        }
         Text(
             text = stringResource(section.name),
             style = castivioTitleStyle(frame.fsLabel),
@@ -1177,70 +1119,26 @@ private fun UprightFace(section: Section, frame: CastivioMetrics, offer: Section
     }
 }
 
-/** Where a card's picture sits: across the whole card (live, radio) or at its end, fading into the card (films, series). */
-private enum class ArtPlacement { Whole, End }
-
 /**
- * A section's picture, under its words. Across the whole card it is darkened toward the foot, where the name and the figure
- * are; at a line's end it fills [LINE_ART_SHARE] of the width and fades out toward the start, where the words are, opaque at
- * its own edge so it leaves no line on the card.
- * The fade follows the reading direction, so the words never sit on the bright part in either language.
+ * A section's picture, as the card's background (owner, 2026-11-25): across the whole card, at [ART_ALPHA] over the card's own
+ * dark ground, so it colours the card without competing with its words. The films' and the series' pictures have their
+ * objects on one side and an empty dark side for the words, drawn for Arabic, where the words are on the right; in a language
+ * read left to right the picture is [mirrored] so the words stay on its empty side. There is no text in the pictures, so the
+ * mirror is not seen.
  */
 @Composable
-private fun SectionArt(art: Int, placement: ArtPlacement) {
-    val ground = CastivioTheme.colors.background
-    val start = LocalLayoutDirection.current == LayoutDirection.Ltr
-    Box(Modifier.fillMaxSize()) {
-        Image(
-            painter = painterResource(art),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = when (placement) {
-                ArtPlacement.Whole -> Modifier.fillMaxSize()
-                ArtPlacement.End -> Modifier.fillMaxHeight().fillMaxWidth(LINE_ART_SHARE).align(Alignment.CenterEnd)
-            },
-        )
-        when (placement) {
-            ArtPlacement.Whole -> Box(
-                Modifier
-                    .fillMaxSize()
-                    .background(
-                        Brush.verticalGradient(
-                            0f to ground.copy(alpha = ART_DIM),
-                            ART_FADE_FROM to ground.copy(alpha = ART_DIM),
-                            1f to ground.copy(alpha = ART_FOOT),
-                        ),
-                    ),
-            )
-            // Over the picture only, opaque at its edge toward the words so the picture has no edge of its own there.
-            ArtPlacement.End -> {
-                val stops = listOf(ground, ground.copy(alpha = ART_FOOT), ground.copy(alpha = ART_DIM))
-                Box(
-                    Modifier
-                        .fillMaxHeight()
-                        .fillMaxWidth(LINE_ART_SHARE)
-                        .align(Alignment.CenterEnd)
-                        .background(Brush.horizontalGradient(if (start) stops else stops.reversed())),
-                )
-            }
-        }
-    }
+private fun SectionArt(art: Int, mirrored: Boolean = false) {
+    val flip = mirrored && LocalLayoutDirection.current == LayoutDirection.Ltr
+    Image(
+        painter = painterResource(art),
+        contentDescription = null,
+        contentScale = ContentScale.Crop,
+        alpha = ART_ALPHA,
+        modifier = Modifier
+            .fillMaxSize()
+            .graphicsLayer { if (flip) scaleX = -1f },
+    )
 }
-
-/** The round play mark at the end of a line, as in the owner's picture: drawn, not a control -- the whole card is pressed. */
-@Composable
-private fun PlayMark(frame: CastivioMetrics) {
-    val colors = CastivioTheme.colors
-    Box(
-        Modifier
-            .size(Sizing.iconMd + frame.chipPad)
-            .border(BorderStroke(PLAY_MARK_EDGE, colors.onBackgroundVariant), CircleShape),
-        contentAlignment = Alignment.Center,
-    ) {
-        Icon(Icons.Rounded.PlayArrow, contentDescription = null, tint = colors.onBackgroundStrong, modifier = Modifier.size(Sizing.iconSm))
-    }
-}
-
 /**
  * The three lines of a card with something to carry on from: its name with its count -- which is not lost for the sake of the
  * offer -- then what was watched last, then how far in it the viewer was, in the aqua the live programme's bar is drawn in.
@@ -1493,53 +1391,6 @@ private fun loadSeconds(load: CardLoad.Arrived): String? {
     val instrumented = remember(context) { PerformanceLog.isVisibleIn(context) }
     val seconds = load.seconds ?: return null
     return if (instrumented) stringResource(R.string.home_load_seconds, seconds.toInt()) else null
-}
-
-/**
- * The lines that fill the live channels' panel, drawn behind its glyph and its words: the frame of the glyph echoed
- * outward three times, each thinner in ink than the last, and [HERO_RIBBONS] across the lower half, fading at both ends.
- * Thin lines and no light -- the owner did not want a glow -- in the azure and the violet the glyph is drawn in.
- */
-internal fun DrawScope.drawHeroLines(azure: Color, violet: Color) {
-    val centre = Offset(size.width / 2f, size.height * HERO_GLYPH_CENTRE)
-    val body = size.height * HERO_GLYPH_SHARE * HERO_BODY_OF_GLYPH
-    val edge = Brush.linearGradient(
-        colors = listOf(azure, violet),
-        start = Offset(0f, 0f),
-        end = Offset(size.width, size.height),
-    )
-    val echoStroke = Stroke(width = HERO_LINE_DP.dp.toPx())
-    for ((scale, alpha) in HERO_ECHOES) {
-        val width = body * scale
-        val height = width * HERO_FRAME_RATIO
-        drawRoundRect(
-            brush = edge,
-            topLeft = Offset(centre.x - width / 2f, centre.y - height / 2f),
-            size = Size(width, height),
-            cornerRadius = CornerRadius(width * HERO_ECHO_RADIUS),
-            alpha = alpha,
-            style = echoStroke,
-        )
-    }
-    val ribbonStroke = Stroke(width = HERO_RIBBON_DP.dp.toPx())
-    for (r in HERO_RIBBONS) {
-        val path = Path().apply {
-            moveTo(r[0] * size.width, r[1] * size.height)
-            cubicTo(r[2] * size.width, r[3] * size.height, r[4] * size.width, r[5] * size.height, r[6] * size.width, r[7] * size.height)
-            cubicTo(r[8] * size.width, r[9] * size.height, r[10] * size.width, r[11] * size.height, r[12] * size.width, r[13] * size.height)
-        }
-        drawPath(
-            path = path,
-            brush = Brush.horizontalGradient(
-                0f to violet.copy(alpha = 0f),
-                HERO_RIBBON_PEAK to azure.copy(alpha = r[14]),
-                1f to violet.copy(alpha = 0f),
-                startX = 0f,
-                endX = size.width,
-            ),
-            style = ribbonStroke,
-        )
-    }
 }
 
 /** The success green on the glass, for the moments a card says it has just loaded. */
@@ -2355,15 +2206,10 @@ private const val STACK_SHARE = 0.40f
 private const val HERO_SHARE = 0.47f
 private const val RADIO_SHARE = 0.15f
 
-/** A line's picture, of its width; the picture's dimming at rest; where the foot's darkening starts, and how dark it ends. */
-private const val LINE_ART_SHARE = 0.62f
-private const val ART_DIM = 0.25f
-private const val ART_FADE_FROM = 0.35f
-private const val ART_FOOT = 0.88f
+/** The section pictures' opacity over the card's ground: the owner's choice to try, 2026-11-25. */
+private const val ART_ALPHA = 0.5f
 
-/** The radio's glyph disc, against the glyph. */
-private const val UPRIGHT_DISC = 1.9f
-private val PLAY_MARK_EDGE = 1.5.dp
+
 
 /**
  * The watermark: how much of the hero panel's height its glyph takes, and how far it

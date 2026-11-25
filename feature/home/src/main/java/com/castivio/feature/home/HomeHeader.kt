@@ -74,11 +74,10 @@ import com.castivio.core.design.theme.Motion
  * words inside each button are short enough that their own direction does not matter to the order. A screen reader is
  * given each button's word as its name.
  *
- * ## The words go where there is no room for them
+ * ## Every button carries its word
  *
- * On a television and a tablet ([labelled]) every button carries its word; on a handset held sideways (833x385dp) seven
- * words do not fit beside the lockup and the clock, so the buttons are their glyphs and the word is what a screen reader
- * says. The licence and the subscription dates that sat here are in the footer now (`FooterLine`).
+ * On every device (owner, 2026-11-25): on a handset the glyphs alone were not read. [labelled] stays a parameter so a
+ * frame too narrow for seven words can still ask for glyphs; a screen reader is given each word as the button's name.
  *
  * ## What each button does
  *
@@ -296,9 +295,6 @@ private fun HeaderAction(
         }
     }
 }
-
-/** From this height a handset or a tablet has room for the buttons' words; a television always has. */
-internal val LABELLED_HEADER_MIN_HEIGHT: Dp = 480.dp
 
 /** The wordmark beside the mark, against the frame's title size: the drawing's 22 against 30. */
 private const val LOCKUP_WORD_RATIO = 0.75f

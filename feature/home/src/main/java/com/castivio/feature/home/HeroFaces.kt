@@ -85,9 +85,8 @@ internal fun NotLoadedFace(
 ) {
     val colors = CastivioTheme.colors
     BoxWithConstraints(
-        modifier
-            .fillMaxSize()
-            .drawBehind { drawHeroLines(azure = colors.hueAzure, violet = colors.hueViolet) },
+        // No lines over the section's picture (owner, 2026-11-25): the picture is the card's ornament now.
+        modifier.fillMaxSize(),
     ) {
         val glyph = maxHeight * NOT_LOADED_GLYPH_SHARE
         Column(Modifier.fillMaxSize().padding(frame.chipPad)) {
@@ -155,9 +154,8 @@ internal fun ContinueFace(
 ) {
     val colors = CastivioTheme.colors
     BoxWithConstraints(
-        modifier
-            .fillMaxSize()
-            .drawBehind { drawHeroLines(azure = colors.hueAzure, violet = colors.hueViolet) },
+        // No lines over the section's picture (owner, 2026-11-25): the picture is the card's ornament now.
+        modifier.fillMaxSize(),
     ) {
         val logo = maxHeight * CONTINUE_LOGO_SHARE
         val plateHeight = maxHeight * CONTINUE_PLATE_SHARE
