@@ -239,8 +239,6 @@
     <string name="home_continue_none_movies">まだ映画を視聴していません</string>
     <string name="home_continue_none_series">まだシリーズを視聴していません</string>
     <string name="home_continue_none_radio">まだ局を聴いていません</string>
-    <string name="home_copy_mac">MAC アドレスをコピー</string>
-    <string name="home_copy_key">デバイスキーをコピー</string>
     <string name="home_licence_ends">終了日</string>
     <string name="home_subscription_ends">終了日</string>
 </resources>

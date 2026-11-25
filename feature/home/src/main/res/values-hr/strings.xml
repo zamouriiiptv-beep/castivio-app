@@ -243,8 +243,6 @@
     <string name="home_continue_none_movies">Još niste gledali film</string>
     <string name="home_continue_none_series">Još niste gledali seriju</string>
     <string name="home_continue_none_radio">Još niste slušali postaju</string>
-    <string name="home_copy_mac">Kopiraj MAC adresu</string>
-    <string name="home_copy_key">Kopiraj ključ uređaja</string>
     <string name="home_licence_ends">Istječe</string>
     <string name="home_subscription_ends">Istječe</string>
 </resources>

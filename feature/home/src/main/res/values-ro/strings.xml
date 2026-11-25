@@ -243,8 +243,6 @@
     <string name="home_continue_none_movies">Niciun film vizionat încă</string>
     <string name="home_continue_none_series">Niciun serial vizionat încă</string>
     <string name="home_continue_none_radio">Niciun post ascultat încă</string>
-    <string name="home_copy_mac">Copiază adresa MAC</string>
-    <string name="home_copy_key">Copiază cheia dispozitivului</string>
     <string name="home_licence_ends">Expiră pe</string>
     <string name="home_subscription_ends">Expiră pe</string>
 </resources>

@@ -450,8 +450,6 @@
     <string name="home_load_hero_button">Load the channels</string>
     <string name="home_resume_number">Channel %1$s</string>
     <string name="home_load_tile_button">Load</string>
-    <string name="home_copy_mac">Copy MAC address</string>
-    <string name="home_copy_key">Copy device key</string>
     <string name="home_licence_ends">Ends on</string>
     <string name="home_subscription_ends">Ends on</string>
 </resources>

@@ -239,8 +239,6 @@
     <string name="home_continue_none_movies">Belum ada filem ditonton</string>
     <string name="home_continue_none_series">Belum ada siri ditonton</string>
     <string name="home_continue_none_radio">Belum ada stesen didengar</string>
-    <string name="home_copy_mac">Salin alamat MAC</string>
-    <string name="home_copy_key">Salin kunci peranti</string>
     <string name="home_licence_ends">Tamat pada</string>
     <string name="home_subscription_ends">Tamat pada</string>
 </resources>

@@ -243,8 +243,6 @@
     <string name="home_continue_none_movies">Aucun film regardé</string>
     <string name="home_continue_none_series">Aucune série regardée</string>
     <string name="home_continue_none_radio">Aucune station écoutée</string>
-    <string name="home_copy_mac">Copier l’adresse MAC</string>
-    <string name="home_copy_key">Copier la clé d’appareil</string>
     <string name="home_licence_ends">Expire le</string>
     <string name="home_subscription_ends">Expire le</string>
 </resources>

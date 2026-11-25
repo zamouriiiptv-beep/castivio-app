@@ -241,8 +241,6 @@
     <string name="home_continue_none_movies">এখনও কোনো সিনেমা দেখা হয়নি</string>
     <string name="home_continue_none_series">এখনও কোনো সিরিজ দেখা হয়নি</string>
     <string name="home_continue_none_radio">এখনও কোনো স্টেশন শোনা হয়নি</string>
-    <string name="home_copy_mac">MAC ঠিকানা কপি করুন</string>
-    <string name="home_copy_key">ডিভাইস কী কপি করুন</string>
     <string name="home_licence_ends">শেষ হবে</string>
     <string name="home_subscription_ends">শেষ হবে</string>
 </resources>

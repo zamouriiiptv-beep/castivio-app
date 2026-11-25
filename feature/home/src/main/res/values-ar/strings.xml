@@ -341,8 +341,6 @@
     <string name="home_load_hero_button">تحميل القنوات</string>
     <string name="home_resume_number">القناة %1$s</string>
     <string name="home_load_tile_button">تحميل</string>
-    <string name="home_copy_mac">نسخ عنوان MAC</string>
-    <string name="home_copy_key">نسخ مفتاح الجهاز</string>
     <string name="home_licence_ends">تنتهي في</string>
     <string name="home_subscription_ends">ينتهي في</string>
 </resources>

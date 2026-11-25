@@ -245,8 +245,6 @@
     <string name="home_continue_none_movies">Zatím žádný sledovaný film</string>
     <string name="home_continue_none_series">Zatím žádný sledovaný seriál</string>
     <string name="home_continue_none_radio">Zatím žádná poslouchaná stanice</string>
-    <string name="home_copy_mac">Kopírovat MAC adresu</string>
-    <string name="home_copy_key">Kopírovat klíč zařízení</string>
     <string name="home_licence_ends">Končí</string>
     <string name="home_subscription_ends">Končí</string>
 </resources>

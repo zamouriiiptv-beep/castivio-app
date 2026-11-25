@@ -241,8 +241,6 @@
     <string name="home_continue_none_movies">Noch kein Film angesehen</string>
     <string name="home_continue_none_series">Noch keine Serie angesehen</string>
     <string name="home_continue_none_radio">Noch kein Radiosender gehört</string>
-    <string name="home_copy_mac">MAC-Adresse kopieren</string>
-    <string name="home_copy_key">Geräteschlüssel kopieren</string>
     <string name="home_licence_ends">Endet am</string>
     <string name="home_subscription_ends">Endet am</string>
 </resources>

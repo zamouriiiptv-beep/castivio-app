@@ -241,8 +241,6 @@
     <string name="home_continue_none_movies">Henüz film izlenmedi</string>
     <string name="home_continue_none_series">Henüz dizi izlenmedi</string>
     <string name="home_continue_none_radio">Henüz istasyon dinlenmedi</string>
-    <string name="home_copy_mac">MAC adresini kopyala</string>
-    <string name="home_copy_key">Cihaz anahtarını kopyala</string>
     <string name="home_licence_ends">Bitiş:</string>
     <string name="home_subscription_ends">Bitiş:</string>
 </resources>

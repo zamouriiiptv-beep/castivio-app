@@ -239,8 +239,6 @@
     <string name="home_continue_none_movies">ยังไม่ได้ดูภาพยนตร์ใด</string>
     <string name="home_continue_none_series">ยังไม่ได้ดูซีรีส์ใด</string>
     <string name="home_continue_none_radio">ยังไม่ได้ฟังสถานีใด</string>
-    <string name="home_copy_mac">คัดลอกที่อยู่ MAC</string>
-    <string name="home_copy_key">คัดลอกคีย์อุปกรณ์</string>
     <string name="home_licence_ends">สิ้นสุด</string>
     <string name="home_subscription_ends">สิ้นสุด</string>
 </resources>
