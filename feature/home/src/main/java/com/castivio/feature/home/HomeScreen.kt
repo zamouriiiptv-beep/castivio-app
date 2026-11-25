@@ -2052,7 +2052,7 @@ internal fun AccountDialog(state: HomeState, frame: CastivioMetrics, onClose: ()
             FactValue(ltrIsolate(state.mac), colors.onBackgroundStrong, frame)
             if (canCopy && state.mac.isNotBlank()) {
                 CopyButton(
-                    size = Sizing.minTarget(false),
+                    size = COPY_SIZE,
                     label = stringResource(R.string.home_copy_mac),
                     isCopied = copied == COPIED_MAC,
                     onClick = {
@@ -2067,7 +2067,7 @@ internal fun AccountDialog(state: HomeState, frame: CastivioMetrics, onClose: ()
                 FactValue(ltrIsolate(state.deviceKey), colors.onBackgroundStrong, frame)
                 if (canCopy) {
                     CopyButton(
-                        size = Sizing.minTarget(false),
+                        size = COPY_SIZE,
                         label = stringResource(R.string.home_copy_key),
                         isCopied = copied == COPIED_KEY,
                         onClick = {
@@ -2207,10 +2207,13 @@ private val SubscriptionTrouble.icon: ImageVector
 private const val FACT_LABEL_RATIO = 0.85f
 
 /** The account's words, larger than the footer's they came from (owner, 2026-11-25: «الكتابة صغيرة»). */
-private const val ACCOUNT_TEXT_SCALE = 1.3f
+private const val ACCOUNT_TEXT_SCALE = 1.15f
 
 /** The account panel's width, of a dialog's usual share. */
 private const val ACCOUNT_WIDTH_SHARE = 0.9f
+
+/** The copy buttons beside the address and the key: small, so the five rows fit without scrolling (owner, 2026-11-25). */
+private val COPY_SIZE = 32.dp
 
 /** How long a copy button shows its tick. */
 private const val COPIED_FOR_MS = 2_000L
