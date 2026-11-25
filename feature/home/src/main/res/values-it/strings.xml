@@ -238,4 +238,8 @@
     <string name="settings_pin_detail">La password che blocca e sblocca i canali. È 0000 finché non la cambi.</string>
     <string name="channels_live_badge">IN DIRETTA</string>
 
+    <string name="home_continue_none_live">Nessun canale guardato</string>
+    <string name="home_continue_none_movies">Nessun film guardato</string>
+    <string name="home_continue_none_series">Nessuna serie guardata</string>
+    <string name="home_continue_none_radio">Nessuna stazione ascoltata</string>
 </resources>

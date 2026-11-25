@@ -234,4 +234,8 @@
     <string name="settings_pin_detail">채널을 잠그고 해제하는 비밀번호입니다. 변경하기 전까지는 0000입니다.</string>
     <string name="channels_live_badge">LIVE</string>
 
+    <string name="home_continue_none_live">아직 시청한 채널이 없습니다</string>
+    <string name="home_continue_none_movies">아직 시청한 영화가 없습니다</string>
+    <string name="home_continue_none_series">아직 시청한 시리즈가 없습니다</string>
+    <string name="home_continue_none_radio">아직 들은 방송국이 없습니다</string>
 </resources>

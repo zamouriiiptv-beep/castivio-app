@@ -234,4 +234,8 @@
     <string name="settings_pin_detail">Kata laluan yang mengunci dan membuka kunci saluran. Ia 0000 sehingga anda menukarnya.</string>
     <string name="channels_live_badge">LANGSUNG</string>
 
+    <string name="home_continue_none_live">Belum ada saluran ditonton</string>
+    <string name="home_continue_none_movies">Belum ada filem ditonton</string>
+    <string name="home_continue_none_series">Belum ada siri ditonton</string>
+    <string name="home_continue_none_radio">Belum ada stesen didengar</string>
 </resources>

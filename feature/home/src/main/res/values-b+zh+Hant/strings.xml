@@ -234,4 +234,8 @@
     <string name="settings_pin_detail">用於鎖定和解鎖頻道的密碼。變更之前為 0000。</string>
     <string name="channels_live_badge">直播</string>
 
+    <string name="home_continue_none_live">尚未觀看頻道</string>
+    <string name="home_continue_none_movies">尚未觀看電影</string>
+    <string name="home_continue_none_series">尚未觀看影集</string>
+    <string name="home_continue_none_radio">尚未收聽電台</string>
 </resources>

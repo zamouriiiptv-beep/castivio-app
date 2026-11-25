@@ -240,4 +240,8 @@
     <string name="settings_pin_detail">Heslo, ktoré kanály zamyká a odomyká. Kým ho nezmeníte, je to 0000.</string>
     <string name="channels_live_badge">NAŽIVO</string>
 
+    <string name="home_continue_none_live">Zatiaľ žiadny sledovaný kanál</string>
+    <string name="home_continue_none_movies">Zatiaľ žiadny sledovaný film</string>
+    <string name="home_continue_none_series">Zatiaľ žiadny sledovaný seriál</string>
+    <string name="home_continue_none_radio">Zatiaľ žiadna počúvaná stanica</string>
 </resources>

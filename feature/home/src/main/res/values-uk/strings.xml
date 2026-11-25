@@ -240,4 +240,8 @@
     <string name="settings_pin_detail">Пароль, який блокує й розблоковує канали. Доки ви його не зміните, це 0000.</string>
     <string name="channels_live_badge">НАЖИВО</string>
 
+    <string name="home_continue_none_live">Ви ще не дивилися канали</string>
+    <string name="home_continue_none_movies">Ви ще не дивилися фільми</string>
+    <string name="home_continue_none_series">Ви ще не дивилися серіали</string>
+    <string name="home_continue_none_radio">Ви ще не слухали станції</string>
 </resources>

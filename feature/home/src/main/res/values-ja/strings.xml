@@ -234,4 +234,8 @@
     <string name="settings_pin_detail">チャンネルのロックと解除に使うパスワードです。変更するまでは 0000 です。</string>
     <string name="channels_live_badge">ライブ</string>
 
+    <string name="home_continue_none_live">まだチャンネルを視聴していません</string>
+    <string name="home_continue_none_movies">まだ映画を視聴していません</string>
+    <string name="home_continue_none_series">まだシリーズを視聴していません</string>
+    <string name="home_continue_none_radio">まだ局を聴いていません</string>
 </resources>

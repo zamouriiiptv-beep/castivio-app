@@ -374,22 +374,23 @@ fun HomeScreen(
                             modifier = Modifier.fillMaxWidth().weight(1f),
                         )
                         // Carrying on is this row's alone (owner, 2026-11-25): the cards above always open their section.
-                        if (hasContinue(state.resume, state.resumes)) {
-                            ContinueRow(
-                                resume = state.resume,
-                                resumes = state.resumes,
-                                frame = frame,
-                                onResume = { channel -> if (model.press(CatalogSection.Live)) onResume(channel) },
-                                onResumeSection = { offer ->
-                                    val section = CatalogSection.entries.first { it.kind == offer.kind }
-                                    if (model.press(section)) onResumeSection(offer)
-                                },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(frame.chip * CONTINUE_OF_CHIP)
-                                    .padding(bottom = rhythm.group),
-                            )
-                        }
+                        // Always there (owner, 2026-11-25): a section with nothing watched yet keeps its slot, empty.
+                        ContinueRow(
+                            resume = state.resume,
+                            resumes = state.resumes,
+                            frame = frame,
+                            unfetched = unfetchedKinds(state),
+                            onResume = { channel -> if (model.press(CatalogSection.Live)) onResume(channel) },
+                            onResumeSection = { offer ->
+                                val section = CatalogSection.entries.first { it.kind == offer.kind }
+                                if (model.press(section)) onResumeSection(offer)
+                            },
+                            onOpenSection = { section -> if (model.press(section)) onSeeSection(section) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(frame.chip * CONTINUE_OF_CHIP)
+                                .padding(bottom = rhythm.group),
+                        )
                         FooterLine(state, frame, rhythm)
                     }
                 }

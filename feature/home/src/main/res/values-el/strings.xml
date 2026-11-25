@@ -236,4 +236,8 @@
     <string name="settings_pin_detail">Ο κωδικός που κλειδώνει και ξεκλειδώνει τα κανάλια. Είναι 0000 μέχρι να τον αλλάξετε.</string>
     <string name="channels_live_badge">ΖΩΝΤΑΝΑ</string>
 
+    <string name="home_continue_none_live">Δεν έχετε δει κανάλι ακόμη</string>
+    <string name="home_continue_none_movies">Δεν έχετε δει ταινία ακόμη</string>
+    <string name="home_continue_none_series">Δεν έχετε δει σειρά ακόμη</string>
+    <string name="home_continue_none_radio">Δεν έχετε ακούσει σταθμό ακόμη</string>
 </resources>

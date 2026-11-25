@@ -240,4 +240,8 @@
     <string name="settings_pin_detail">Пароль, который блокирует и разблокирует каналы. Пока вы его не измените, это 0000.</string>
     <string name="channels_live_badge">ЭФИР</string>
 
+    <string name="home_continue_none_live">Вы ещё не смотрели каналы</string>
+    <string name="home_continue_none_movies">Вы ещё не смотрели фильмы</string>
+    <string name="home_continue_none_series">Вы ещё не смотрели сериалы</string>
+    <string name="home_continue_none_radio">Вы ещё не слушали станции</string>
 </resources>

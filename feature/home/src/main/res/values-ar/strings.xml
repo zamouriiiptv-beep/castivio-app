@@ -331,6 +331,10 @@
 
     <!-- بطاقة البث المباشر: وجهاها الآخران (design/mockups/home-resume-ar.png وhome-resume-idle-ar.png). -->
     <string name="home_resume_label">تابع المشاهدة</string>
+    <string name="home_continue_none_live">لم تشاهد قناة بعد</string>
+    <string name="home_continue_none_movies">لم تشاهد فيلمًا بعد</string>
+    <string name="home_continue_none_series">لم تشاهد مسلسلًا بعد</string>
+    <string name="home_continue_none_radio">لم تستمع لمحطة بعد</string>
     <string name="home_resume_go">تابع</string>
     <string name="home_load_hero_title">حمّل قنوات اشتراكك</string>
     <string name="home_load_hero_detail">تُجلب من خادم الاشتراك وتبقى على جهازك</string>

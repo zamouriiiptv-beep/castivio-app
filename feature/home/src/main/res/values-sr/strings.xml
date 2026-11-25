@@ -238,4 +238,8 @@
     <string name="settings_pin_detail">Лозинка која закључава и откључава канале. Док је не промените, то је 0000.</string>
     <string name="channels_live_badge">УЖИВО</string>
 
+    <string name="home_continue_none_live">Још нисте гледали канал</string>
+    <string name="home_continue_none_movies">Још нисте гледали филм</string>
+    <string name="home_continue_none_series">Још нисте гледали серију</string>
+    <string name="home_continue_none_radio">Још нисте слушали станицу</string>
 </resources>

@@ -440,6 +440,10 @@
 
     <!-- The live card's other faces (design/mockups/home-resume-ar.png, home-resume-idle-ar.png). -->
     <string name="home_resume_label">Continue watching</string>
+    <string name="home_continue_none_live">No channel watched yet</string>
+    <string name="home_continue_none_movies">No film watched yet</string>
+    <string name="home_continue_none_series">No series watched yet</string>
+    <string name="home_continue_none_radio">No station played yet</string>
     <string name="home_resume_go">Continue</string>
     <string name="home_load_hero_title">Load your channels</string>
     <string name="home_load_hero_detail">Fetched from your provider and kept on this device</string>

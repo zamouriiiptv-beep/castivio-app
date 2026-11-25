@@ -236,4 +236,8 @@
     <string name="settings_pin_detail">Fjalëkalimi që kyç dhe hap kanalet. Është 0000 derisa ta ndryshosh.</string>
     <string name="channels_live_badge">DREJTPËRDREJT</string>
 
+    <string name="home_continue_none_live">Ende nuk keni parë asnjë kanal</string>
+    <string name="home_continue_none_movies">Ende nuk keni parë asnjë film</string>
+    <string name="home_continue_none_series">Ende nuk keni parë asnjë serial</string>
+    <string name="home_continue_none_radio">Ende nuk keni dëgjuar asnjë stacion</string>
 </resources>

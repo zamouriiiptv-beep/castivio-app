@@ -236,4 +236,8 @@
     <string name="settings_pin_detail">Passordet som låser og låser opp kanaler. Det er 0000 til du endrer det.</string>
     <string name="channels_live_badge">DIREKTE</string>
 
+    <string name="home_continue_none_live">Ingen kanal sett ennå</string>
+    <string name="home_continue_none_movies">Ingen film sett ennå</string>
+    <string name="home_continue_none_series">Ingen serie sett ennå</string>
+    <string name="home_continue_none_radio">Ingen stasjon hørt ennå</string>
 </resources>

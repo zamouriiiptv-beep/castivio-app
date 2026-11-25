@@ -234,4 +234,8 @@
     <string name="settings_pin_detail">Kata sandi yang mengunci dan membuka kunci saluran. Nilainya 0000 sampai Anda menggantinya.</string>
     <string name="channels_live_badge">LANGSUNG</string>
 
+    <string name="home_continue_none_live">Belum ada saluran yang ditonton</string>
+    <string name="home_continue_none_movies">Belum ada film yang ditonton</string>
+    <string name="home_continue_none_series">Belum ada serial yang ditonton</string>
+    <string name="home_continue_none_radio">Belum ada stasiun yang didengar</string>
 </resources>

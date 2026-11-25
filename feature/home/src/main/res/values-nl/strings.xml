@@ -236,4 +236,8 @@
     <string name="settings_pin_detail">Het wachtwoord dat zenders vergrendelt en ontgrendelt. Het is 0000 tot je het wijzigt.</string>
     <string name="channels_live_badge">LIVE</string>
 
+    <string name="home_continue_none_live">Nog geen zender bekeken</string>
+    <string name="home_continue_none_movies">Nog geen film bekeken</string>
+    <string name="home_continue_none_series">Nog geen serie bekeken</string>
+    <string name="home_continue_none_radio">Nog geen zender beluisterd</string>
 </resources>

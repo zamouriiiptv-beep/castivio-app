@@ -234,4 +234,8 @@
     <string name="settings_pin_detail">用于锁定和解锁频道的密码。更改之前为 0000。</string>
     <string name="channels_live_badge">直播</string>
 
+    <string name="home_continue_none_live">尚未观看频道</string>
+    <string name="home_continue_none_movies">尚未观看电影</string>
+    <string name="home_continue_none_series">尚未观看剧集</string>
+    <string name="home_continue_none_radio">尚未收听电台</string>
 </resources>

@@ -234,4 +234,8 @@
     <string name="settings_pin_detail">Mật khẩu dùng để khóa và mở khóa kênh. Mặc định là 0000 cho đến khi bạn đổi.</string>
     <string name="channels_live_badge">TRỰC TIẾP</string>
 
+    <string name="home_continue_none_live">Chưa xem kênh nào</string>
+    <string name="home_continue_none_movies">Chưa xem phim nào</string>
+    <string name="home_continue_none_series">Chưa xem bộ phim nào</string>
+    <string name="home_continue_none_radio">Chưa nghe đài nào</string>
 </resources>

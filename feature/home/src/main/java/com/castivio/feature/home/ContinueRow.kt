@@ -1,6 +1,8 @@
 package com.castivio.feature.home
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,7 +18,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
@@ -34,27 +39,32 @@ import com.castivio.domain.Channel
 import com.castivio.domain.MediaKind
 
 /**
- * "Continue watching": a row of small cards under the four sections (owner, 2026-11-25), one for each section something was
- * watched in -- the channel last on, the film, the show and the station -- and none for a section nothing was watched in.
+ * "Continue watching": a row of small cards under the four sections (owner, 2026-11-25), one slot for each section in the
+ * board's order -- live, films, series, radio -- holding the channel last on, the film, the show and the station.
  * The four large cards above it always open their section; carrying on is this row's alone.
  *
- * Each card is its picture (the channel's or the station's logo, the film's or the show's poster), its name, a line under it
+ * A filled card is its picture (the channel's or the station's logo, the film's or the show's poster), its name, a line under it
  * -- what is on the channel now, or the episode -- and, where there is one, the aqua bar of how far in it the viewer was.
  * A press does what the large cards' resume faces did: the shell opens the section with that item started inside it.
  *
- * Drawn only when there is at least one card; with nothing watched yet the board takes its room.
+ * The row is always there (owner, 2026-11-25, design/mockups/home-continue-empty-ar.png): a slot with nothing watched in it
+ * yet is its section's own picture at the large cards' transparency, its name, and "nothing watched yet" -- or "not
+ * downloaded yet" for a section not on the device -- and a press on it opens the section, as the large card does.
  */
 @Composable
 internal fun ContinueRow(
     resume: Resume?,
     resumes: Map<MediaKind, SectionResume>,
     frame: CastivioMetrics,
+    /** The sections not on the device yet, whose empty slots say so. */
+    unfetched: Set<MediaKind>,
     onResume: (Channel) -> Unit,
     onResumeSection: (SectionResume) -> Unit,
+    /** A press on an empty slot: its section, as the large card opens it. */
+    onOpenSection: (CatalogSection) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val colors = CastivioTheme.colors
-    val sections = listOf(MediaKind.MOVIE, MediaKind.SERIES, MediaKind.RADIO).mapNotNull { resumes[it] }
     Column(modifier, verticalArrangement = Arrangement.spacedBy(frame.chipPad / 2)) {
         Text(
             stringResource(R.string.home_resume_label),
@@ -68,7 +78,8 @@ internal fun ContinueRow(
             val slot = (maxWidth - gap * (SLOTS - 1)) / SLOTS
             val height = maxHeight
             Row(horizontalArrangement = Arrangement.spacedBy(gap)) {
-                resume?.let { live ->
+                val live = resume
+                if (live != null) {
                     val programme = live.programme
                     ContinueCard(
                         width = slot,
@@ -86,8 +97,19 @@ internal fun ContinueRow(
                             seed = live.channel.title,
                         )
                     }
+                } else {
+                    EmptySlot(MediaKind.LIVE, MediaKind.LIVE in unfetched, slot, height, frame) {
+                        onOpenSection(CatalogSection.Live)
+                    }
                 }
-                for (offer in sections) {
+                for (kind in listOf(MediaKind.MOVIE, MediaKind.SERIES, MediaKind.RADIO)) {
+                    val offer = resumes[kind]
+                    if (offer == null) {
+                        EmptySlot(kind, kind in unfetched, slot, height, frame) {
+                            onOpenSection(CatalogSection.entries.first { it.kind == kind })
+                        }
+                        continue
+                    }
                     ContinueCard(
                         width = slot,
                         height = height,
@@ -117,9 +139,20 @@ internal fun ContinueRow(
     }
 }
 
-/** True when the row has a card to draw. */
-internal fun hasContinue(resume: Resume?, resumes: Map<MediaKind, SectionResume>): Boolean =
-    resume != null || listOf(MediaKind.MOVIE, MediaKind.SERIES, MediaKind.RADIO).any { resumes[it] != null }
+/**
+ * The sections not on the device: no rows and never fetched -- the large cards' own "not downloaded yet" rule, so a slot and
+ * the card above it never disagree. Rows on the device count as fetched whatever the marks say.
+ */
+internal fun unfetchedKinds(state: HomeState): Set<MediaKind> = buildSet {
+    for ((kind, count) in listOf(
+        MediaKind.LIVE to state.liveCount,
+        MediaKind.MOVIE to state.movieCount,
+        MediaKind.SERIES to state.seriesCount,
+        MediaKind.RADIO to state.radioCount,
+    )) {
+        if (count <= 0 && state.sections[kind] == null) add(kind)
+    }
+}
 
 private fun sectionName(kind: MediaKind): Int = when (kind) {
     MediaKind.MOVIE -> R.string.browse_movies
@@ -182,6 +215,89 @@ private fun ContinueCard(
         }
     }
 }
+
+/**
+ * A slot with nothing watched in it yet: its section's picture across the card at the large cards' transparency, with its
+ * objects on the side away from the words, and the section's name over "nothing watched yet" (or "not downloaded yet").
+ *
+ * Unlike a filled card this one follows the interface's direction: its words are the application's own, not a provider's
+ * name, so in Arabic they stand on the right with the picture on the left, as on the large cards, and the other way round in
+ * a language read from the left -- where the picture, drawn for Arabic, is mirrored. There is no text in the pictures.
+ */
+@Composable
+private fun EmptySlot(
+    kind: MediaKind,
+    unfetched: Boolean,
+    width: Dp,
+    height: Dp,
+    frame: CastivioMetrics,
+    onClick: () -> Unit,
+) {
+    val colors = CastivioTheme.colors
+    val pad = frame.chipPad / 2
+    val flip = LocalLayoutDirection.current == LayoutDirection.Ltr
+    InteractiveGlassCard(
+        onClick = onClick,
+        modifier = Modifier.size(width = width, height = height),
+        shape = RoundedCornerShape(frame.radius / 2),
+        fill = colors.homeCardSurface,
+        restBorder = colors.cardSurfaceEdge,
+    ) {
+        Box(Modifier.fillMaxSize()) {
+            // The picture is placed from the left whatever the language -- the objects are on its left -- and turned over as a
+            // whole where the words are on the left.
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                Image(
+                    painter = painterResource(sectionArt(kind)),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    alignment = Alignment.CenterStart,
+                    alpha = EMPTY_ART_ALPHA,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .graphicsLayer { if (flip) scaleX = -1f },
+                )
+            }
+            Column(
+                Modifier.fillMaxSize().padding(horizontal = pad * 2, vertical = pad),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.Start,
+            ) {
+                Text(
+                    stringResource(sectionName(kind)),
+                    style = castivioChipStyle(frame.fsChip),
+                    color = colors.onBackgroundStrong,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    stringResource(if (unfetched) R.string.home_not_fetched else nothingYet(kind)),
+                    style = castivioBodyStyle(frame.fsChip * LINE_OF_CHIP),
+                    color = colors.onBackgroundVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+        }
+    }
+}
+
+private fun sectionArt(kind: MediaKind): Int = when (kind) {
+    MediaKind.MOVIE -> R.drawable.home_art_movies
+    MediaKind.SERIES -> R.drawable.home_art_series
+    MediaKind.RADIO -> R.drawable.home_art_radio
+    else -> R.drawable.home_art_live
+}
+
+private fun nothingYet(kind: MediaKind): Int = when (kind) {
+    MediaKind.MOVIE -> R.string.home_continue_none_movies
+    MediaKind.SERIES -> R.string.home_continue_none_series
+    MediaKind.RADIO -> R.string.home_continue_none_radio
+    else -> R.string.home_continue_none_live
+}
+
+/** An empty slot's picture: the large cards' own transparency (HomeScreen's ART_ALPHA), at the owner's word. */
+private const val EMPTY_ART_ALPHA = 0.4f
 
 /** The row always lays out four slots. */
 private const val SLOTS = 4

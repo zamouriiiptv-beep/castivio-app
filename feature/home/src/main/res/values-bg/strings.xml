@@ -236,4 +236,8 @@
     <string name="settings_pin_detail">Паролата, която заключва и отключва каналите. Тя е 0000, докато не я смените.</string>
     <string name="channels_live_badge">НА ЖИВО</string>
 
+    <string name="home_continue_none_live">Още не сте гледали канал</string>
+    <string name="home_continue_none_movies">Още не сте гледали филм</string>
+    <string name="home_continue_none_series">Още не сте гледали сериал</string>
+    <string name="home_continue_none_radio">Още не сте слушали станция</string>
 </resources>

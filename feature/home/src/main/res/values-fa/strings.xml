@@ -236,4 +236,8 @@
     <string name="settings_pin_detail">رمزی که کانال‌ها را قفل و باز می‌کند. تا زمانی که آن را تغییر ندهید 0000 است.</string>
     <string name="channels_live_badge">زنده</string>
 
+    <string name="home_continue_none_live">هنوز کانالی تماشا نکرده‌اید</string>
+    <string name="home_continue_none_movies">هنوز فیلمی تماشا نکرده‌اید</string>
+    <string name="home_continue_none_series">هنوز سریالی تماشا نکرده‌اید</string>
+    <string name="home_continue_none_radio">هنوز ایستگاهی گوش نداده‌اید</string>
 </resources>

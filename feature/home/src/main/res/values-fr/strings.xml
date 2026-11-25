@@ -238,4 +238,8 @@
     <string name="settings_pin_detail">Le mot de passe qui verrouille et déverrouille les chaînes. C’est 0000 tant que vous ne le changez pas.</string>
     <string name="channels_live_badge">EN DIRECT</string>
 
+    <string name="home_continue_none_live">Aucune chaîne regardée</string>
+    <string name="home_continue_none_movies">Aucun film regardé</string>
+    <string name="home_continue_none_series">Aucune série regardée</string>
+    <string name="home_continue_none_radio">Aucune station écoutée</string>
 </resources>

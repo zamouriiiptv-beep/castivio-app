@@ -236,4 +236,8 @@
     <string name="settings_pin_detail">Lösenordet som låser och låser upp kanaler. Det är 0000 tills du ändrar det.</string>
     <string name="channels_live_badge">LIVE</string>
 
+    <string name="home_continue_none_live">Ingen kanal sedd ännu</string>
+    <string name="home_continue_none_movies">Ingen film sedd ännu</string>
+    <string name="home_continue_none_series">Ingen serie sedd ännu</string>
+    <string name="home_continue_none_radio">Ingen station lyssnad på ännu</string>
 </resources>
