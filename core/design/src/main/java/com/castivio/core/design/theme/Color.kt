@@ -632,10 +632,6 @@ class CastivioColors(
     val brandBrush: Brush
         get() = Brush.linearGradient(listOf(Palette.Violet40, Palette.Azure40))
 
-    /** The line under Home's header: the brand's violet running into azure, as in the owner's drawing. */
-    val headerRuleBrush: Brush
-        get() = Brush.horizontalGradient(listOf(Palette.Violet50, Palette.Violet40, Palette.Azure40, Palette.Azure60))
-
     /** A header button under the remote: the brand ramp, carried, so the glyph and its word stay white on it. */
     val headerActionFocusBrush: Brush
         get() = Brush.verticalGradient(

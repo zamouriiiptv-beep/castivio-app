@@ -40,10 +40,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -69,7 +66,7 @@ import com.castivio.core.design.theme.Motion
  * Home's header, as the owner drew it (design/mockups/home-header-ar.html, frame `v4`, approved 2026-11-24): one band across
  * the whole width with the lockup at one end, the clock and the date at the other, and between them the page's seven
  * buttons -- refresh, switch playlist, catch-up, settings, language, the appearance and exit -- each a glyph with its word
- * under it, standing on the application's own backdrop, with a line from violet to azure under them.
+ * under it, standing on the application's own backdrop.
  *
  * ## The band keeps its order in every language
  *
@@ -105,17 +102,11 @@ internal fun HomeHeader(
     onExit: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val colors = CastivioTheme.colors
     val themeSwitch = LocalThemeSwitch.current
-    val ruleBrush = colors.headerRuleBrush
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
         Row(
-            // No band of its own (owner, 2026-11-25): the buttons stand on the application's own backdrop, with the line under them.
+            // No band and no line of their own (owner, 2026-11-25): the buttons stand on the application's own backdrop.
             modifier
-                .drawBehind {
-                    val rule = HEADER_RULE.toPx()
-                    drawRect(ruleBrush, topLeft = Offset(0f, size.height - rule), size = Size(size.width, rule))
-                }
                 .padding(horizontal = frame.edge),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(frame.chipPad),
@@ -311,9 +302,6 @@ internal val LABELLED_HEADER_MIN_HEIGHT: Dp = 480.dp
 
 /** The wordmark beside the mark, against the frame's title size: the drawing's 22 against 30. */
 private const val LOCKUP_WORD_RATIO = 0.75f
-
-/** The line under the band. */
-private val HEADER_RULE = 2.dp
 
 /** The upright rules' height, of the band's. */
 private const val HEADER_RULE_HEIGHT = 0.46f
