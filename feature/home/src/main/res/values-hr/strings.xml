@@ -238,6 +238,7 @@
     <string name="settings_pin_detail">Lozinka koja zaključava i otključava kanale. Dok je ne promijenite, to je 0000.</string>
     <string name="channels_live_badge">UŽIVO</string>
 
+    <string name="home_resume_label">Nastavi gledati</string>
     <string name="home_continue_none_live">Još niste gledali kanal</string>
     <string name="home_continue_none_movies">Još niste gledali film</string>
     <string name="home_continue_none_series">Još niste gledali seriju</string>

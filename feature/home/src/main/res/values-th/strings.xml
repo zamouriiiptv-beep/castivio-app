@@ -234,6 +234,7 @@
     <string name="settings_pin_detail">รหัสผ่านที่ใช้ล็อกและปลดล็อกช่อง คือ 0000 จนกว่าคุณจะเปลี่ยน</string>
     <string name="channels_live_badge">สด</string>
 
+    <string name="home_resume_label">ดูต่อ</string>
     <string name="home_continue_none_live">ยังไม่ได้ดูช่องใด</string>
     <string name="home_continue_none_movies">ยังไม่ได้ดูภาพยนตร์ใด</string>
     <string name="home_continue_none_series">ยังไม่ได้ดูซีรีส์ใด</string>

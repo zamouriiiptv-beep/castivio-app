@@ -238,6 +238,7 @@
     <string name="settings_pin_detail">Parola care blochează și deblochează canalele. Este 0000 până o schimbi.</string>
     <string name="channels_live_badge">LIVE</string>
 
+    <string name="home_resume_label">Continuă vizionarea</string>
     <string name="home_continue_none_live">Niciun canal vizionat încă</string>
     <string name="home_continue_none_movies">Niciun film vizionat încă</string>
     <string name="home_continue_none_series">Niciun serial vizionat încă</string>

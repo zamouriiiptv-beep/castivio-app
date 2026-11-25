@@ -236,6 +236,7 @@
     <string name="settings_pin_detail">Salasana, joka lukitsee ja avaa kanavat. Se on 0000, kunnes vaihdat sen.</string>
     <string name="channels_live_badge">SUORA</string>
 
+    <string name="home_resume_label">Jatka katsomista</string>
     <string name="home_continue_none_live">Et ole vielä katsonut kanavaa</string>
     <string name="home_continue_none_movies">Et ole vielä katsonut elokuvaa</string>
     <string name="home_continue_none_series">Et ole vielä katsonut sarjaa</string>

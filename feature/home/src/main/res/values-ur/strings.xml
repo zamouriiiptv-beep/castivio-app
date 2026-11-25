@@ -236,6 +236,7 @@
     <string name="settings_pin_detail">چینلز کو مقفل اور غیر مقفل کرنے والا پاس ورڈ۔ آپ کے بدلنے تک یہ 0000 ہے۔</string>
     <string name="channels_live_badge">لائیو</string>
 
+    <string name="home_resume_label">دیکھنا جاری رکھیں</string>
     <string name="home_continue_none_live">ابھی تک کوئی چینل نہیں دیکھا</string>
     <string name="home_continue_none_movies">ابھی تک کوئی فلم نہیں دیکھی</string>
     <string name="home_continue_none_series">ابھی تک کوئی سیریز نہیں دیکھی</string>

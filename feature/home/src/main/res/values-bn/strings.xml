@@ -236,6 +236,7 @@
     <string name="settings_pin_detail">যে পাসওয়ার্ড চ্যানেল লক ও আনলক করে। আপনি না বদলানো পর্যন্ত এটি 0000।</string>
     <string name="channels_live_badge">লাইভ</string>
 
+    <string name="home_resume_label">দেখা চালিয়ে যান</string>
     <string name="home_continue_none_live">এখনও কোনো চ্যানেল দেখা হয়নি</string>
     <string name="home_continue_none_movies">এখনও কোনো সিনেমা দেখা হয়নি</string>
     <string name="home_continue_none_series">এখনও কোনো সিরিজ দেখা হয়নি</string>

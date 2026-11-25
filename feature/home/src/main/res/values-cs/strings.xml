@@ -240,6 +240,7 @@
     <string name="settings_pin_detail">Heslo, které kanály zamyká a odemyká. Dokud ho nezměníte, je to 0000.</string>
     <string name="channels_live_badge">ŽIVĚ</string>
 
+    <string name="home_resume_label">Pokračovat ve sledování</string>
     <string name="home_continue_none_live">Zatím žádný sledovaný kanál</string>
     <string name="home_continue_none_movies">Zatím žádný sledovaný film</string>
     <string name="home_continue_none_series">Zatím žádný sledovaný seriál</string>

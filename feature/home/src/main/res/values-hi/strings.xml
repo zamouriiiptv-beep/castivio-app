@@ -236,6 +236,7 @@
     <string name="settings_pin_detail">चैनल लॉक और अनलॉक करने वाला पासवर्ड। बदलने तक यह 0000 रहता है।</string>
     <string name="channels_live_badge">लाइव</string>
 
+    <string name="home_resume_label">देखना जारी रखें</string>
     <string name="home_continue_none_live">अभी तक कोई चैनल नहीं देखा</string>
     <string name="home_continue_none_movies">अभी तक कोई फ़िल्म नहीं देखी</string>
     <string name="home_continue_none_series">अभी तक कोई सीरीज़ नहीं देखी</string>

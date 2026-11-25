@@ -238,6 +238,7 @@
     <string name="settings_pin_detail">A senha que bloqueia e desbloqueia canais. É 0000 até você alterá-la.</string>
     <string name="channels_live_badge">AO VIVO</string>
 
+    <string name="home_resume_label">Continuar assistindo</string>
     <string name="home_continue_none_live">Nenhum canal assistido ainda</string>
     <string name="home_continue_none_movies">Nenhum filme assistido ainda</string>
     <string name="home_continue_none_series">Nenhuma série assistida ainda</string>

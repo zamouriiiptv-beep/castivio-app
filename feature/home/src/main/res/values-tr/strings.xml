@@ -236,6 +236,7 @@
     <string name="settings_pin_detail">Kanalları kilitleyen ve kilidini açan parola. Değiştirene kadar 0000’dır.</string>
     <string name="channels_live_badge">CANLI</string>
 
+    <string name="home_resume_label">İzlemeye devam et</string>
     <string name="home_continue_none_live">Henüz kanal izlenmedi</string>
     <string name="home_continue_none_movies">Henüz film izlenmedi</string>
     <string name="home_continue_none_series">Henüz dizi izlenmedi</string>

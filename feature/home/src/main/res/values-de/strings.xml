@@ -236,6 +236,7 @@
     <string name="settings_pin_detail">Das Passwort, das Sender sperrt und entsperrt. Es lautet 0000, bis du es änderst.</string>
     <string name="channels_live_badge">LIVE</string>
 
+    <string name="home_resume_label">Weiterschauen</string>
     <string name="home_continue_none_live">Noch kein Sender angesehen</string>
     <string name="home_continue_none_movies">Noch kein Film angesehen</string>
     <string name="home_continue_none_series">Noch keine Serie angesehen</string>

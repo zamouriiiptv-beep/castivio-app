@@ -240,6 +240,7 @@
     <string name="settings_pin_detail">Hasło, które blokuje i odblokowuje kanały. Do czasu zmiany to 0000.</string>
     <string name="channels_live_badge">NA ŻYWO</string>
 
+    <string name="home_resume_label">Oglądaj dalej</string>
     <string name="home_continue_none_live">Nie obejrzano jeszcze kanału</string>
     <string name="home_continue_none_movies">Nie obejrzano jeszcze filmu</string>
     <string name="home_continue_none_series">Nie obejrzano jeszcze serialu</string>

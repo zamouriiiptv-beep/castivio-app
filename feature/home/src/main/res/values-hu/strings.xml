@@ -236,6 +236,7 @@
     <string name="settings_pin_detail">A jelszó, amely zárolja és feloldja a csatornákat. Amíg nem módosítod, 0000.</string>
     <string name="channels_live_badge">ÉLŐ</string>
 
+    <string name="home_resume_label">Folytatás</string>
     <string name="home_continue_none_live">Még nem nézett csatornát</string>
     <string name="home_continue_none_movies">Még nem nézett filmet</string>
     <string name="home_continue_none_series">Még nem nézett sorozatot</string>

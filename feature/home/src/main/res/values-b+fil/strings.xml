@@ -236,6 +236,7 @@
     <string name="settings_pin_detail">Ang password na nagla-lock at nag-a-unlock ng mga channel. 0000 ito hangga\'t hindi mo binabago.</string>
     <string name="channels_live_badge">LIVE</string>
 
+    <string name="home_resume_label">Ituloy ang panonood</string>
     <string name="home_continue_none_live">Wala pang napanood na channel</string>
     <string name="home_continue_none_movies">Wala pang napanood na pelikula</string>
     <string name="home_continue_none_series">Wala pang napanood na serye</string>

@@ -236,6 +236,7 @@
     <string name="settings_pin_detail">Adgangskoden, der låser kanaler og låser dem op. Den er 0000, indtil du ændrer den.</string>
     <string name="channels_live_badge">LIVE</string>
 
+    <string name="home_resume_label">Fortsæt med at se</string>
     <string name="home_continue_none_live">Ingen kanal set endnu</string>
     <string name="home_continue_none_movies">Ingen film set endnu</string>
     <string name="home_continue_none_series">Ingen serie set endnu</string>

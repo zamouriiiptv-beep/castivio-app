@@ -238,6 +238,7 @@
     <string name="settings_pin_detail">A palavra-passe que bloqueia e desbloqueia canais. É 0000 até a alterar.</string>
     <string name="channels_live_badge">EM DIRETO</string>
 
+    <string name="home_resume_label">Continuar a ver</string>
     <string name="home_continue_none_live">Ainda não viu nenhum canal</string>
     <string name="home_continue_none_movies">Ainda não viu nenhum filme</string>
     <string name="home_continue_none_series">Ainda não viu nenhuma série</string>
