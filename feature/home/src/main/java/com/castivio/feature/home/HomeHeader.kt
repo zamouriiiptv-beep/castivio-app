@@ -302,12 +302,12 @@ private const val LOCKUP_WORD_RATIO = 0.75f
 /** The upright rules' height, of the band's. */
 private const val HEADER_RULE_HEIGHT = 0.46f
 
-/** A button's glyph, of the touch target: 24dp of a television's 48. */
-private const val GLYPH_OF_TARGET = 0.5f
+/** A button's glyph, of the touch target: 20dp of a television's 48 -- a little smaller at the owner's word, 2026-11-25. */
+private const val GLYPH_OF_TARGET = 0.42f
 
-/** A button's word, of the frame's chip text: the drawing's 10.5 against 13. */
-private const val LABEL_OF_CHIP = 0.85f
+/** A button's word, of the frame's chip text: a little under the drawing's 10.5 against 13, with the glyph. */
+private const val LABEL_OF_CHIP = 0.78f
 
 private val ACTION_PAD_V = 4.dp
-private val ACTION_GAP = 3.dp
+private val ACTION_GAP = 2.dp
 private val BUSY_RING = 2.dp
