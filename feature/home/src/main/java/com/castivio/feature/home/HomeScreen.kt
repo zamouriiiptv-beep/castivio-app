@@ -1046,9 +1046,13 @@ private fun SectionLine(
         fill = if (arrived) arrivedFill() else CastivioTheme.colors.homeCardSurface,
         restBorder = if (arrived) colors.success.copy(alpha = ARRIVED_EDGE_ALPHA) else colors.cardSurfaceEdge,
     ) {
-        // The picture is behind the words while the card offers nothing to carry on from: a thumbnail of what was watched
-        // takes the line's end then, and two pictures in one line would be one too many.
-        if (offer == null || upright) SectionArt(section.art, mirrored = !upright)
+        // The picture is behind the words always (owner, 2026-11-25); while the card carries the poster of what was watched
+        // last it steps back to [ART_ALPHA_BEHIND_POSTER], so the poster is the one picture that stands out.
+        SectionArt(
+            section.art,
+            mirrored = !upright,
+            alpha = if (offer != null && !upright) ART_ALPHA_BEHIND_POSTER else ART_ALPHA,
+        )
         if (upright) {
             UprightFace(section, frame, offer, face)
         } else BoxWithConstraints(Modifier.fillMaxSize()) {
@@ -1125,13 +1129,13 @@ private fun UprightFace(section: Section, frame: CastivioMetrics, offer: Section
  * mirror is not seen.
  */
 @Composable
-private fun SectionArt(art: Int, mirrored: Boolean = false) {
+private fun SectionArt(art: Int, mirrored: Boolean = false, alpha: Float = ART_ALPHA) {
     val flip = mirrored && LocalLayoutDirection.current == LayoutDirection.Ltr
     Image(
         painter = painterResource(art),
         contentDescription = null,
         contentScale = ContentScale.Crop,
-        alpha = ART_ALPHA,
+        alpha = alpha,
         modifier = Modifier
             .fillMaxSize()
             .graphicsLayer { if (flip) scaleX = -1f },
@@ -2206,6 +2210,9 @@ private const val RADIO_SHARE = 0.15f
 
 /** The section pictures' opacity over the card's ground: 0.5 tried, then lighter at the owner's word, 2026-11-25. */
 private const val ART_ALPHA = 0.4f
+
+/** The same picture behind a poster of what was watched last: lighter, so the two do not crowd (owner, 2026-11-25). */
+private const val ART_ALPHA_BEHIND_POSTER = 0.3f
 
 
 
