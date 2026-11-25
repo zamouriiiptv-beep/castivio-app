@@ -120,6 +120,8 @@
     <string name="home_label_mac">Adresse MAC</string>
     <string name="home_label_key">Clé de l’appareil</string>
     <string name="home_label_state">État de l’appareil</string>
+    <string name="home_account">Compte</string>
+    <string name="home_close">Fermer</string>
     <string name="home_device_activated">Activé</string>
     <string name="home_device_locked">Verrouillé</string>
     <string name="home_not_fetched">Pas encore téléchargé</string>

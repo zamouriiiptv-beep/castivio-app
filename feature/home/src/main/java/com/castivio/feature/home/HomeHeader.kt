@@ -24,6 +24,7 @@ import androidx.compose.material.icons.rounded.DarkMode
 import androidx.compose.material.icons.rounded.ErrorOutline
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.LightMode
+import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.material.icons.rounded.Settings
@@ -65,7 +66,7 @@ import com.castivio.core.design.theme.Motion
 /**
  * Home's header, as the owner drew it (design/mockups/home-header-ar.html, frame `v4`, approved 2026-11-24): one band across
  * the whole width with the lockup at one end, the clock and the date at the other, and between them the page's seven
- * buttons -- refresh, switch playlist, catch-up, settings, language, the appearance and exit -- each a glyph with its word
+ * buttons -- refresh, switch playlist, catch-up, account, settings, language, the appearance and exit -- each a glyph with its word
  * under it, standing on the application's own backdrop.
  *
  * ## The band keeps its order in every language
@@ -96,6 +97,8 @@ internal fun HomeHeader(
     onAddPlaylist: () -> Unit,
     onManageSources: () -> Unit,
     onCatchUp: () -> Unit,
+    /** Opens the device's account: its address, key, state, licence and subscription. */
+    onAccount: () -> Unit,
     onSettings: () -> Unit,
     onLanguage: () -> Unit,
     onExit: () -> Unit,
@@ -140,6 +143,7 @@ internal fun HomeHeader(
                     )
                 }
                 HeaderAction(Icons.Rounded.Schedule, stringResource(R.string.catchup_title), labelled, frame, onCatchUp)
+                HeaderAction(Icons.Rounded.Person, stringResource(R.string.home_account), labelled, frame, onAccount)
                 HeaderAction(Icons.Rounded.Settings, stringResource(R.string.home_settings), labelled, frame, onSettings)
                 HeaderAction(Icons.Rounded.Language, stringResource(R.string.home_language), labelled, frame, onLanguage)
                 if (themeSwitch != null) {

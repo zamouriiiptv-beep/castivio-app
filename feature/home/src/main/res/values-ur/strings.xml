@@ -118,6 +118,8 @@
     <string name="home_label_mac">MAC ایڈریس</string>
     <string name="home_label_key">ڈیوائس کی</string>
     <string name="home_label_state">ڈیوائس کی حالت</string>
+    <string name="home_account">اکاؤنٹ</string>
+    <string name="home_close">بند کریں</string>
     <string name="home_device_activated">فعال</string>
     <string name="home_device_locked">مقفل</string>
     <string name="home_not_fetched">ابھی ڈاؤن لوڈ نہیں ہوا</string>

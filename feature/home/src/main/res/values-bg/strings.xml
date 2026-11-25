@@ -118,6 +118,8 @@
     <string name="home_label_mac">MAC адрес</string>
     <string name="home_label_key">Ключ на устройството</string>
     <string name="home_label_state">Състояние на устройството</string>
+    <string name="home_account">Акаунт</string>
+    <string name="home_close">Затваряне</string>
     <string name="home_device_activated">Активирано</string>
     <string name="home_device_locked">Заключено</string>
     <string name="home_not_fetched">Още не е изтеглено</string>

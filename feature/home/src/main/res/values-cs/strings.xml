@@ -122,6 +122,8 @@
     <string name="home_label_mac">Adresa MAC</string>
     <string name="home_label_key">Klíč zařízení</string>
     <string name="home_label_state">Stav zařízení</string>
+    <string name="home_account">Účet</string>
+    <string name="home_close">Zavřít</string>
     <string name="home_device_activated">Aktivováno</string>
     <string name="home_device_locked">Uzamčeno</string>
     <string name="home_not_fetched">Zatím nestaženo</string>

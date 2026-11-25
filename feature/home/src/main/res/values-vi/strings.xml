@@ -116,6 +116,8 @@
     <string name="home_label_mac">Địa chỉ MAC</string>
     <string name="home_label_key">Khóa thiết bị</string>
     <string name="home_label_state">Trạng thái thiết bị</string>
+    <string name="home_account">Tài khoản</string>
+    <string name="home_close">Đóng</string>
     <string name="home_device_activated">Đã kích hoạt</string>
     <string name="home_device_locked">Đã khóa</string>
     <string name="home_not_fetched">Chưa tải xuống</string>

@@ -116,6 +116,8 @@
     <string name="home_label_mac">MAC 位址</string>
     <string name="home_label_key">裝置金鑰</string>
     <string name="home_label_state">裝置狀態</string>
+    <string name="home_account">帳戶</string>
+    <string name="home_close">關閉</string>
     <string name="home_device_activated">已啟用</string>
     <string name="home_device_locked">已鎖定</string>
     <string name="home_not_fetched">尚未下載</string>

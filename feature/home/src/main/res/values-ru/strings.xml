@@ -122,6 +122,8 @@
     <string name="home_label_mac">MAC-адрес</string>
     <string name="home_label_key">Ключ устройства</string>
     <string name="home_label_state">Состояние устройства</string>
+    <string name="home_account">Аккаунт</string>
+    <string name="home_close">Закрыть</string>
     <string name="home_device_activated">Активировано</string>
     <string name="home_device_locked">Заблокировано</string>
     <string name="home_not_fetched">Ещё не загружено</string>

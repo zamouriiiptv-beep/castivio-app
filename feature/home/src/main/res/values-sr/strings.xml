@@ -120,6 +120,8 @@
     <string name="home_label_mac">MAC адреса</string>
     <string name="home_label_key">Кључ уређаја</string>
     <string name="home_label_state">Стање уређаја</string>
+    <string name="home_account">Налог</string>
+    <string name="home_close">Затвори</string>
     <string name="home_device_activated">Активиран</string>
     <string name="home_device_locked">Закључан</string>
     <string name="home_not_fetched">Још није преузето</string>

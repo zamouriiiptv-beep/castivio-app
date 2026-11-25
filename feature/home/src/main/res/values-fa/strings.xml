@@ -118,6 +118,8 @@
     <string name="home_label_mac">آدرس MAC</string>
     <string name="home_label_key">کلید دستگاه</string>
     <string name="home_label_state">وضعیت دستگاه</string>
+    <string name="home_account">حساب</string>
+    <string name="home_close">بستن</string>
     <string name="home_device_activated">فعال‌شده</string>
     <string name="home_device_locked">قفل</string>
     <string name="home_not_fetched">هنوز دانلود نشده</string>

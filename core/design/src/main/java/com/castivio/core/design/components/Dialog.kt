@@ -319,6 +319,39 @@ fun CastivioNoticeDialog(
 }
 
 /**
+ * A panel of facts the user reads and closes -- the device's account on Home: rows of a name and its value, and one
+ * close button that takes focus. The scrim, the panel, the corner and the focus rule are [CastivioDialog]'s, through
+ * [DialogPanel]; the rows are the caller's, as [content].
+ */
+@Composable
+fun CastivioInfoDialog(
+    title: String,
+    closeLabel: String,
+    onClose: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    val close = remember { FocusRequester() }
+    LaunchedEffect(Unit) { runCatching { close.requestFocus() } }
+    DialogPanel(title = title, onScrim = onClose, modifier = modifier) { _ ->
+        Column(
+            Modifier
+                .weight(1f, fill = false)
+                .verticalScroll(rememberScrollState()),
+            content = content,
+        )
+        Row(Modifier.padding(top = Spacing.sm)) {
+            CastivioButton(
+                text = closeLabel,
+                weight = ButtonWeight.Primary,
+                onClick = onClose,
+                modifier = Modifier.focusRequester(close).focusable(),
+            )
+        }
+    }
+}
+
+/**
  * One answer in a [CastivioChoiceDialog]: what it says, and what it adds at the end of its row.
  *
  * [detail] is for a fact about the answer that is in force -- the time a sleep timer has left -- and is

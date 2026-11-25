@@ -116,6 +116,8 @@
     <string name="home_label_mac">Alamat MAC</string>
     <string name="home_label_key">Kunci perangkat</string>
     <string name="home_label_state">Status perangkat</string>
+    <string name="home_account">Akun</string>
+    <string name="home_close">Tutup</string>
     <string name="home_device_activated">Diaktifkan</string>
     <string name="home_device_locked">Terkunci</string>
     <string name="home_not_fetched">Belum diunduh</string>

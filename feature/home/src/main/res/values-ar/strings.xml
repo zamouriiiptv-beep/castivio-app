@@ -160,6 +160,8 @@
     <string name="home_label_mac">عنوان MAC</string>
     <string name="home_label_key">مفتاح الجهاز</string>
     <string name="home_label_state">حالة الجهاز</string>
+    <string name="home_account">الحساب</string>
+    <string name="home_close">إغلاق</string>
     <string name="home_device_activated">مُفعَّل</string>
     <string name="home_device_locked">مقفل</string>
 

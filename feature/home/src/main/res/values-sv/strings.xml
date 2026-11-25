@@ -118,6 +118,8 @@
     <string name="home_label_mac">MAC-adress</string>
     <string name="home_label_key">Enhetsnyckel</string>
     <string name="home_label_state">Enhetsstatus</string>
+    <string name="home_account">Konto</string>
+    <string name="home_close">Stäng</string>
     <string name="home_device_activated">Aktiverad</string>
     <string name="home_device_locked">Låst</string>
     <string name="home_not_fetched">Inte hämtat än</string>

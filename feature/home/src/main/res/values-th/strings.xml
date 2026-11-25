@@ -116,6 +116,8 @@
     <string name="home_label_mac">ที่อยู่ MAC</string>
     <string name="home_label_key">คีย์อุปกรณ์</string>
     <string name="home_label_state">สถานะอุปกรณ์</string>
+    <string name="home_account">บัญชี</string>
+    <string name="home_close">ปิด</string>
     <string name="home_device_activated">เปิดใช้งานแล้ว</string>
     <string name="home_device_locked">ล็อกอยู่</string>
     <string name="home_not_fetched">ยังไม่ได้ดาวน์โหลด</string>

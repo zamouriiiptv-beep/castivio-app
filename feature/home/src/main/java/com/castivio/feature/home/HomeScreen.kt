@@ -1,6 +1,7 @@
 package com.castivio.feature.home
 
 import android.view.View
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -33,7 +34,6 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
@@ -41,6 +41,7 @@ import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.CloudOff
 import androidx.compose.material.icons.rounded.ErrorOutline
+import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.LiveTv
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Movie
@@ -71,21 +72,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.CompositingStrategy
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -115,6 +106,7 @@ import androidx.lifecycle.compose.LifecycleStartEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.castivio.core.common.format.CastivioDates
 import com.castivio.core.design.components.CastivioClock
+import com.castivio.core.design.components.CastivioInfoDialog
 import com.castivio.core.design.components.EmptyState
 import com.castivio.core.design.components.InteractiveGlassCard
 import com.castivio.core.design.components.castivioBodyStyle
@@ -299,6 +291,8 @@ fun HomeScreen(
         val frame = rememberMetrics(maxWidth - radioExtra, maxHeight)
         val plan = Plan.of(frame)
         val rhythm = Rhythm.of(frame)
+        // The device's account, opened from the header (owner, 2026-11-25); its facts were the footer's.
+        var showAccount by rememberSaveable { mutableStateOf(false) }
 
         Column(Modifier.fillMaxSize()) {
             // The header is a band across the whole width (`HomeHeader`): the logo, the page's seven buttons with their
@@ -313,6 +307,7 @@ fun HomeScreen(
                 onAddPlaylist = onAddPlaylist,
                 onManageSources = onManageSources,
                 onCatchUp = onCatchUp,
+                onAccount = { showAccount = true },
                 onSettings = onSettings,
                 onLanguage = onLanguage,
                 onExit = onExit,
@@ -384,6 +379,8 @@ fun HomeScreen(
                 }
             }
         }
+
+        if (showAccount) AccountDialog(state, frame) { showAccount = false }
 
         // Temporary, for development: where the press on a section has got to -- see `LoadStrip`. Nothing in a build that
         // is not debuggable. Over the foot of the stage and not in the column: the board keeps every dp it has, and what
@@ -1969,74 +1966,99 @@ private fun FooterLine(
     modifier: Modifier = Modifier,
 ) {
     val colors = CastivioTheme.colors
-    Column(
+    // The device's facts moved to the header's Account window (owner, 2026-11-25); the line keeps the disclaimer, and
+    // gives its place to the subscription's trouble while there is one.
+    val trouble = state.trouble
+    Row(
         modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(rhythm.foot),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(frame.chipPad / 2, Alignment.CenterHorizontally),
     ) {
-        // **Five facts on the page, with no frame** (the owner's drawing, frame `v5` of home-header-ar.html, 2026-11-24): each
-        // its name, small and quiet, over its value, large and in the ink, the state in its colour. Read from the start: the
-        // MAC address and the device key -- the two a viewer reads out to a reseller or photographs -- then the device's state,
-        // Castivio's licence and the provider's subscription, which left the header for here.
-        Row(
-            Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.Bottom,
-            horizontalArrangement = Arrangement.spacedBy(frame.chipPad),
-        ) {
-            Fact(stringResource(R.string.home_label_mac), frame, Modifier.weight(FACT_MAC)) {
-                FactValue(ltrIsolate(state.mac), colors.onBackgroundStrong, frame)
+        Icon(
+            if (trouble == null) Icons.Rounded.Info else trouble.icon,
+            contentDescription = null,
+            tint = if (trouble == null) colors.hueViolet else colors.danger,
+            modifier = Modifier.size(Sizing.iconSm),
+        )
+        Text(
+            stringResource(if (trouble == null) R.string.home_disclaimer else troubleSentence(trouble)),
+            style = castivioBodyStyle(frame.fsChip),
+            color = if (trouble == null) colors.onBackgroundMuted else colors.danger,
+            textAlign = TextAlign.Center,
+            maxLines = DISCLAIMER_LINES,
+        )
+    }
+}
+
+/**
+ * The device's account, as the header's Account button opens it (owner, 2026-11-25): the MAC address, the device key,
+ * the device's state, Castivio's licence and the provider's subscription, each its name and its value, the states in
+ * their colours. These were the footer's; the footer carries the disclaimer now.
+ */
+@Composable
+internal fun AccountDialog(state: HomeState, frame: CastivioMetrics, onClose: () -> Unit) {
+    val colors = CastivioTheme.colors
+    BackHandler(onBack = onClose)
+    CastivioInfoDialog(
+        title = stringResource(R.string.home_account),
+        closeLabel = stringResource(R.string.home_close),
+        onClose = onClose,
+    ) {
+        AccountRow(stringResource(R.string.home_label_mac), frame) {
+            FactValue(ltrIsolate(state.mac), colors.onBackgroundStrong, frame)
+        }
+        if (state.deviceKey.isNotBlank()) {
+            AccountRow(stringResource(R.string.home_label_key), frame) {
+                FactValue(ltrIsolate(state.deviceKey), colors.onBackgroundStrong, frame)
             }
-            // Only once there is one: an empty value beside filled ones reads as one that failed to load.
-            if (state.deviceKey.isNotBlank()) {
-                Fact(stringResource(R.string.home_label_key), frame, Modifier.weight(FACT_KEY)) {
-                    FactValue(ltrIsolate(state.deviceKey), colors.onBackgroundStrong, frame)
-                }
-            }
-            Fact(stringResource(R.string.home_label_state), frame, Modifier.weight(FACT_STATE)) {
-                val hue = if (state.licenceHolds) colors.success else colors.danger
-                StateMark(if (state.licenceHolds) Icons.Rounded.CheckCircle else Icons.Rounded.Lock, hue)
-                FactValue(
-                    stringResource(if (state.licenceHolds) R.string.home_device_activated else R.string.home_device_locked),
-                    hue,
-                    frame,
-                )
-            }
-            TermFact(
-                label = stringResource(R.string.home_term_licence),
-                term = licenceTerm(state.entitlement),
-                hue = licenceHue(state),
-                frame = frame,
-                modifier = Modifier.weight(FACT_TERM),
+        }
+        AccountRow(stringResource(R.string.home_label_state), frame) {
+            val hue = if (state.licenceHolds) colors.success else colors.danger
+            StateMark(if (state.licenceHolds) Icons.Rounded.CheckCircle else Icons.Rounded.Lock, hue)
+            FactValue(
+                stringResource(if (state.licenceHolds) R.string.home_device_activated else R.string.home_device_locked),
+                hue,
+                frame,
             )
-            TermFact(
-                label = stringResource(R.string.home_term_provider),
-                term = providerTerm(state.subscription),
-                hue = when (providerTone(state.subscription)) {
+        }
+        AccountRow(stringResource(R.string.home_term_licence), frame) {
+            TermValue(licenceTerm(state.entitlement), licenceHue(state), frame)
+        }
+        AccountRow(stringResource(R.string.home_term_provider), frame) {
+            TermValue(
+                providerTerm(state.subscription),
+                when (providerTone(state.subscription)) {
                     ProviderTone.Usable -> colors.success
                     ProviderTone.Refused -> colors.danger
                     ProviderTone.Unchecked -> colors.onBackgroundMuted
                 },
-                frame = frame,
-                modifier = Modifier.weight(FACT_TERM),
+                frame,
             )
         }
+    }
+}
 
-        // What is wrong with the subscription, when something is: the one sentence that tells the viewer why nothing plays.
-        state.trouble?.let { trouble ->
-            Row(
-                Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(frame.chipPad / 2, Alignment.CenterHorizontally),
-            ) {
-                Icon(trouble.icon, contentDescription = null, tint = colors.danger, modifier = Modifier.size(Sizing.iconSm))
-                Text(
-                    stringResource(troubleSentence(trouble)),
-                    style = castivioBodyStyle(frame.fsChip),
-                    color = colors.danger,
-                    textAlign = TextAlign.Center,
-                    maxLines = DISCLAIMER_LINES,
-                )
-            }
-        }
+/** One row of the account: its name at the start, its value at the end. */
+@Composable
+private fun AccountRow(label: String, frame: CastivioMetrics, value: @Composable RowScope.() -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().padding(vertical = frame.chipPad / 2),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(frame.chipPad),
+    ) {
+        Text(
+            label,
+            style = castivioChipStyle(frame.fsChip),
+            color = CastivioTheme.colors.onBackgroundVariant,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f),
+        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(frame.chipPad / 2),
+            content = value,
+        )
     }
 }
 
@@ -2059,51 +2081,22 @@ private fun licenceHue(state: HomeState): Color {
     }
 }
 
-/** A term: its mark, its date when it has one, and its word beside it, all in its colour but the date. */
+/** A term's value: its mark, its date when it has one, and its word beside it, all in its colour but the date. */
 @Composable
-private fun TermFact(label: String, term: Term, hue: Color, frame: CastivioMetrics, modifier: Modifier = Modifier) {
-    Fact(label, frame, modifier) {
-        StateMark(if (hue == CastivioTheme.colors.danger) Icons.Rounded.ErrorOutline else Icons.Rounded.CheckCircle, hue)
-        val at = term.atMs
-        if (at != null) {
-            FactValue(rememberDate(at), CastivioTheme.colors.onBackgroundStrong, frame)
-            Text(
-                stringResource(term.word),
-                style = castivioChipStyle(frame.fsChip * FACT_LABEL_RATIO),
-                color = hue,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-        } else {
-            FactValue(stringResource(term.word), hue, frame)
-        }
-    }
-}
-
-/**
- * One fact of the footer: its name over its value, on the page itself -- no edge, no fill. The value's row is handed in,
- * because a state has its mark and its word where the MAC address has its characters only.
- */
-@Composable
-private fun Fact(
-    label: String,
-    frame: CastivioMetrics,
-    modifier: Modifier = Modifier,
-    value: @Composable RowScope.() -> Unit,
-) {
-    Column(modifier, verticalArrangement = Arrangement.spacedBy(FACT_GAP)) {
+private fun RowScope.TermValue(term: Term, hue: Color, frame: CastivioMetrics) {
+    StateMark(if (hue == CastivioTheme.colors.danger) Icons.Rounded.ErrorOutline else Icons.Rounded.CheckCircle, hue)
+    val at = term.atMs
+    if (at != null) {
+        FactValue(rememberDate(at), CastivioTheme.colors.onBackgroundStrong, frame)
         Text(
-            label,
+            stringResource(term.word),
             style = castivioChipStyle(frame.fsChip * FACT_LABEL_RATIO),
-            color = CastivioTheme.colors.onBackgroundVariant,
+            color = hue,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(frame.chipPad / 2),
-            content = value,
-        )
+    } else {
+        FactValue(stringResource(term.word), hue, frame)
     }
 }
 
@@ -2134,16 +2127,10 @@ private val SubscriptionTrouble.icon: ImageVector
         SubscriptionTrouble.Expired, SubscriptionTrouble.Refused -> Icons.Rounded.ErrorOutline
     }
 
-/** The five facts' shares of the line: the MAC address the widest, the device's state the narrowest. */
-private const val FACT_MAC = 1.3f
-private const val FACT_KEY = 0.9f
-private const val FACT_STATE = 0.8f
-private const val FACT_TERM = 1.2f
 
-/** A fact's name against the frame's chip text, and its value against the label step. */
+/** A term's word against the frame's chip text, and a value against the label step. */
 private const val FACT_LABEL_RATIO = 0.85f
 private const val FACT_VALUE_RATIO = 0.8f
-private val FACT_GAP = 2.dp
 
 /** The licence turns amber in its last week. */
 private const val LICENCE_SOON_DAYS = 7

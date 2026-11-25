@@ -118,6 +118,8 @@
     <string name="home_label_mac">MAC-adres</string>
     <string name="home_label_key">Apparaatsleutel</string>
     <string name="home_label_state">Apparaatstatus</string>
+    <string name="home_account">Account</string>
+    <string name="home_close">Sluiten</string>
     <string name="home_device_activated">Geactiveerd</string>
     <string name="home_device_locked">Vergrendeld</string>
     <string name="home_not_fetched">Nog niet gedownload</string>

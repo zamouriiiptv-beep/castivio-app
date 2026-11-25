@@ -202,6 +202,8 @@
     <string name="home_label_mac">MAC address</string>
     <string name="home_label_key">Device key</string>
     <string name="home_label_state">Device status</string>
+    <string name="home_account">Account</string>
+    <string name="home_close">Close</string>
     <string name="home_device_activated">Activated</string>
     <string name="home_device_locked">Locked</string>
 

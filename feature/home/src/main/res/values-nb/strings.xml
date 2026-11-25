@@ -118,6 +118,8 @@
     <string name="home_label_mac">MAC-adresse</string>
     <string name="home_label_key">Enhetsnøkkel</string>
     <string name="home_label_state">Enhetsstatus</string>
+    <string name="home_account">Konto</string>
+    <string name="home_close">Lukk</string>
     <string name="home_device_activated">Aktivert</string>
     <string name="home_device_locked">Låst</string>
     <string name="home_not_fetched">Ikke lastet ned ennå</string>

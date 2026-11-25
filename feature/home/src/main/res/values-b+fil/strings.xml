@@ -118,6 +118,8 @@
     <string name="home_label_mac">MAC address</string>
     <string name="home_label_key">Key ng device</string>
     <string name="home_label_state">Status ng device</string>
+    <string name="home_account">Account</string>
+    <string name="home_close">Isara</string>
     <string name="home_device_activated">Naka-activate</string>
     <string name="home_device_locked">Naka-lock</string>
     <string name="home_not_fetched">Hindi pa na-download</string>

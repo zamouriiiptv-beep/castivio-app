@@ -120,6 +120,8 @@
     <string name="home_label_mac">Adresă MAC</string>
     <string name="home_label_key">Cheia dispozitivului</string>
     <string name="home_label_state">Starea dispozitivului</string>
+    <string name="home_account">Cont</string>
+    <string name="home_close">Închide</string>
     <string name="home_device_activated">Activat</string>
     <string name="home_device_locked">Blocat</string>
     <string name="home_not_fetched">Încă nedescărcat</string>

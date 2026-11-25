@@ -118,6 +118,8 @@
     <string name="home_label_mac">Adresa MAC</string>
     <string name="home_label_key">Çelësi i pajisjes</string>
     <string name="home_label_state">Gjendja e pajisjes</string>
+    <string name="home_account">Llogaria</string>
+    <string name="home_close">Mbyll</string>
     <string name="home_device_activated">E aktivizuar</string>
     <string name="home_device_locked">E kyçur</string>
     <string name="home_not_fetched">Ende e pashkarkuar</string>
