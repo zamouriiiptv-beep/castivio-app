@@ -275,27 +275,17 @@ fun HomeScreen(
     // measured the display would size itself to room it does not have and draw its
     // trailing column underneath the navigation.
     //
-    // **The horizontal inset is symmetrised rather than applied as given**, which is
-    // the one thing this differs from `safeDrawingPadding()` in. Held sideways, the
-    // system's furniture is on the *sides*: a camera cutout on one edge and the
-    // navigation bar on the other, and they are not the same width. Insetting each
-    // edge by its own obstruction keeps the board out of both and leaves it visibly
-    // off-centre — which is what the board did on a device, sitting a few dp nearer
-    // one edge than the other with no reason a viewer could see. Taking the larger of
-    // the two and spending it on both edges costs that difference in width and buys a
-    // block that is centred on the *screen*, which is the thing being looked at.
-    //
-    // Start and end rather than left and right: the two are compared, never placed,
-    // and the maximum of the pair is the same number whichever way the text runs. The
-    // result is symmetric by construction, so this screen lays out identically in
-    // both directions — which is what invariant 9 is protecting and why reading a
-    // physical inset here does not breach it.
+    // **Each side keeps its own inset** (owner, 2026-11-25). It used to be symmetrised -- the larger of the two spent on both
+    // edges, to keep the block centred -- which left, beside a camera cutout on one side, an empty band of the cutout's width
+    // on the other. Now each edge is inset by its own obstruction, and the width that band held goes to the radio's narrow
+    // card ([SectionBoard]'s `radioExtra`); the metrics are still read as if the inset were symmetric, so every other card,
+    // the header's buttons and the footer's facts keep the size they had. Start and end rather than left and right, so
+    // turning the device over moves the margin with the cutout.
     val safeArea = WindowInsets.safeDrawing.asPaddingValues()
     val reading = LocalLayoutDirection.current
-    val gutter = maxOf(
-        safeArea.calculateStartPadding(reading),
-        safeArea.calculateEndPadding(reading),
-    )
+    val startInset = safeArea.calculateStartPadding(reading)
+    val endInset = safeArea.calculateEndPadding(reading)
+    val radioExtra = maxOf(startInset, endInset) * 2 - (startInset + endInset)
 
     BoxWithConstraints(
         modifier
@@ -304,9 +294,9 @@ fun HomeScreen(
                 top = safeArea.calculateTopPadding(),
                 bottom = safeArea.calculateBottomPadding(),
             )
-            .padding(horizontal = gutter),
+            .padding(start = startInset, end = endInset),
     ) {
-        val frame = rememberMetrics(maxWidth, maxHeight)
+        val frame = rememberMetrics(maxWidth - radioExtra, maxHeight)
         val plan = Plan.of(frame)
         val rhythm = Rhythm.of(frame)
 
@@ -375,6 +365,7 @@ fun HomeScreen(
                             frame = frame,
                             rhythm = rhythm,
                             boardFocus = boardFocus,
+                        radioExtra = radioExtra,
                             // The holder decides: a section on the device opens, one that is not
                             // is asked for and loads on its own card while the viewer stays here.
                             onSeeSection = { section -> if (model.press(section)) onSeeSection(section) },
@@ -673,6 +664,8 @@ private fun SectionBoard(
     onResume: (Channel) -> Unit,
     onResumeSection: (SectionResume) -> Unit,
     modifier: Modifier = Modifier,
+    /** Width the screen gained on the side without a cutout, given whole to the radio's card. */
+    radioExtra: Dp = 0.dp,
 ) {
     val colors = CastivioTheme.colors
     val live = Section(
@@ -709,7 +702,11 @@ private fun SectionBoard(
     // The owner's second picture (2026-11-24): live at the start, large; films over series in the middle; the radio a narrow
     // column at the end. The pictures inside the cards are the owner's to send; until then each card is its glyph and words.
     val (lines, radio) = rest.partition { it.section != CatalogSection.Radio }
-    Row(modifier, horizontalArrangement = Arrangement.spacedBy(frame.bandTop)) {
+    BoxWithConstraints(modifier) {
+    // The three shares are of the board as it would be with a symmetric inset; the radio takes its share and the extra.
+    val shared = maxWidth - radioExtra - frame.bandTop * 2
+    val radioWidth = shared * (RADIO_SHARE / (HERO_SHARE + STACK_SHARE + RADIO_SHARE)) + radioExtra
+    Row(Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(frame.bandTop)) {
         HeroCard(
             section = live,
             frame = frame,
@@ -743,9 +740,10 @@ private fun SectionBoard(
                 onClick = { onSeeSection(section.section) },
                 onResume = onResumeSection,
                 upright = true,
-                modifier = Modifier.weight(RADIO_SHARE).fillMaxHeight(),
+                modifier = Modifier.width(radioWidth).fillMaxHeight(),
             )
         }
+    }
     }
 }
 
