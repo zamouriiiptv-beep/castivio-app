@@ -41,7 +41,6 @@ import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.CloudOff
 import androidx.compose.material.icons.rounded.ErrorOutline
-import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.LiveTv
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Movie
@@ -374,6 +373,23 @@ fun HomeScreen(
                             },
                             modifier = Modifier.fillMaxWidth().weight(1f),
                         )
+                        // Carrying on is this row's alone (owner, 2026-11-25): the cards above always open their section.
+                        if (hasContinue(state.resume, state.resumes)) {
+                            ContinueRow(
+                                resume = state.resume,
+                                resumes = state.resumes,
+                                frame = frame,
+                                onResume = { channel -> if (model.press(CatalogSection.Live)) onResume(channel) },
+                                onResumeSection = { offer ->
+                                    val section = CatalogSection.entries.first { it.kind == offer.kind }
+                                    if (model.press(section)) onResumeSection(offer)
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(frame.chip * CONTINUE_OF_CHIP)
+                                    .padding(bottom = rhythm.group),
+                            )
+                        }
                         FooterLine(state, frame, rhythm)
                     }
                 }
@@ -707,7 +723,8 @@ private fun SectionBoard(
         HeroCard(
             section = live,
             frame = frame,
-            resume = state.resume,
+            // The large cards always open their section; carrying on is the row under them.
+            resume = null,
             onClick = { onSeeSection(live.section) },
             onResume = onResume,
             modifier = Modifier.weight(HERO_SHARE).fillMaxHeight().focusRequester(boardFocus),
@@ -721,7 +738,7 @@ private fun SectionBoard(
                 SectionLine(
                     section = section,
                     frame = frame,
-                    resume = state.resumes[section.section.kind],
+                    resume = null,
                     onClick = { onSeeSection(section.section) },
                     onResume = onResumeSection,
                     modifier = Modifier.fillMaxWidth().weight(1f),
@@ -733,7 +750,7 @@ private fun SectionBoard(
             SectionLine(
                 section = section,
                 frame = frame,
-                resume = state.resumes[section.section.kind],
+                resume = null,
                 onClick = { onSeeSection(section.section) },
                 onResume = onResumeSection,
                 upright = true,
@@ -1966,24 +1983,19 @@ private fun FooterLine(
     modifier: Modifier = Modifier,
 ) {
     val colors = CastivioTheme.colors
-    // The device's facts moved to the header's Account window (owner, 2026-11-25); the line keeps the disclaimer, and
-    // gives its place to the subscription's trouble while there is one.
-    val trouble = state.trouble
+    // Nothing at rest (owner, 2026-11-25: the disclaimer is the terms' business, in Settings); the subscription's trouble,
+    // while there is one, says why nothing plays.
+    val trouble = state.trouble ?: return
     Row(
         modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(frame.chipPad / 2, Alignment.CenterHorizontally),
     ) {
-        Icon(
-            if (trouble == null) Icons.Rounded.Info else trouble.icon,
-            contentDescription = null,
-            tint = if (trouble == null) colors.hueViolet else colors.danger,
-            modifier = Modifier.size(Sizing.iconSm),
-        )
+        Icon(trouble.icon, contentDescription = null, tint = colors.danger, modifier = Modifier.size(Sizing.iconSm))
         Text(
-            stringResource(if (trouble == null) R.string.home_disclaimer else troubleSentence(trouble)),
+            stringResource(troubleSentence(trouble)),
             style = castivioBodyStyle(frame.fsChip),
-            color = if (trouble == null) colors.onBackgroundMuted else colors.danger,
+            color = colors.danger,
             textAlign = TextAlign.Center,
             maxLines = DISCLAIMER_LINES,
         )
@@ -2294,6 +2306,9 @@ private const val ARRIVED_FILL_BOTTOM = 0.04f
  * targets; the second exists so a longer translation wraps rather than gets cut.
  */
 private const val DISCLAIMER_LINES = 2
+
+/** The continue row's height, the label over its cards, against the frame's chip. */
+private const val CONTINUE_OF_CHIP = 2.3f
 
 
 
