@@ -69,7 +69,7 @@ import com.castivio.core.design.theme.Motion
  * Home's header, as the owner drew it (design/mockups/home-header-ar.html, frame `v4`, approved 2026-11-24): one band across
  * the whole width with the lockup at one end, the clock and the date at the other, and between them the page's seven
  * buttons -- refresh, switch playlist, catch-up, settings, language, the appearance and exit -- each a glyph with its word
- * under it. A violet light behind the mark, and a line from violet to azure under the band.
+ * under it, standing on the application's own backdrop, with a line from violet to azure under them.
  *
  * ## The band keeps its order in every language
  *
@@ -110,8 +110,8 @@ internal fun HomeHeader(
     val ruleBrush = colors.headerRuleBrush
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
         Row(
+            // No band of its own (owner, 2026-11-25): the buttons stand on the application's own backdrop, with the line under them.
             modifier
-                .background(colors.headerBandBrush)
                 .drawBehind {
                     val rule = HEADER_RULE.toPx()
                     drawRect(ruleBrush, topLeft = Offset(0f, size.height - rule), size = Size(size.width, rule))

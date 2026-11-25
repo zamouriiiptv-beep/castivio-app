@@ -326,11 +326,6 @@ private val CTA_STOPS = arrayOf(
  */
 private const val CTA_QUIET = 0.42f
 
-/** [CastivioColors.headerBandBrush]: how much violet light the band starts with, where it is gone, and the band's own weight. */
-private const val HEADER_BAND_GLOW = 0.55f
-private const val HEADER_BAND_GLOW_END = 0.24f
-private const val HEADER_BAND_FILL = 0.92f
-
 /** [CastivioColors.headerActionFocusBrush]: the focused button's fill, top and foot. */
 private const val HEADER_ACTION_TOP = 0.70f
 private const val HEADER_ACTION_FOOT = 0.60f
@@ -636,17 +631,6 @@ class CastivioColors(
     /** Brand mark / badge fill: violet into azure. */
     val brandBrush: Brush
         get() = Brush.linearGradient(listOf(Palette.Violet40, Palette.Azure40))
-
-    /**
-     * Home's header band: a violet light behind the mark at the band's left end, fading into a deeper carry of the page.
-     * Left to right in both directions, as the band itself is: the header keeps its order in every language.
-     */
-    val headerBandBrush: Brush
-        get() = Brush.horizontalGradient(
-            0f to Palette.Violet40.copy(alpha = HEADER_BAND_GLOW),
-            HEADER_BAND_GLOW_END to Palette.Deep.copy(alpha = HEADER_BAND_FILL),
-            1f to Palette.Void.copy(alpha = HEADER_BAND_FILL),
-        )
 
     /** The line under Home's header: the brand's violet running into azure, as in the owner's drawing. */
     val headerRuleBrush: Brush
