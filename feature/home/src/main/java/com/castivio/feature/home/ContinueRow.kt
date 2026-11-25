@@ -1,7 +1,6 @@
 package com.castivio.feature.home
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,12 +13,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import com.castivio.core.design.components.InteractiveGlassCard
 import com.castivio.core.design.components.PosterFrame
 import com.castivio.core.design.components.ProviderArtwork
@@ -146,7 +149,9 @@ private fun ContinueCard(
         fill = colors.homeCardSurface,
         restBorder = colors.cardSurfaceEdge,
     ) {
-        Box(Modifier.fillMaxSize()) {
+        // Left to right in every language (owner, 2026-11-25): the picture at the left and the name from the left, as in
+        // English -- the names are the provider's, mostly Latin, and read from the left in an Arabic interface too.
+        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
             Row(
                 Modifier.fillMaxSize().padding(horizontal = pad, vertical = pad),
                 verticalAlignment = Alignment.CenterVertically,
@@ -156,14 +161,14 @@ private fun ContinueCard(
                 Column(Modifier.weight(1f)) {
                     Text(
                         title,
-                        style = castivioChipStyle(frame.fsChip).copy(textDirection = TextDirection.Content),
+                        style = castivioChipStyle(frame.fsChip).copy(textDirection = TextDirection.Content, textAlign = TextAlign.Left),
                         color = colors.onBackgroundStrong,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
                     Text(
                         line,
-                        style = castivioBodyStyle(frame.fsChip * LINE_OF_CHIP).copy(textDirection = TextDirection.Content),
+                        style = castivioBodyStyle(frame.fsChip * LINE_OF_CHIP).copy(textDirection = TextDirection.Content, textAlign = TextAlign.Left),
                         color = colors.onBackgroundMuted,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
