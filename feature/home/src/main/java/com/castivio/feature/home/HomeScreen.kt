@@ -932,8 +932,6 @@ private fun HeroCard(
                 name = stringResource(section.name),
                 sentence = section.sentence(),
                 sentenceInk = section.ink(),
-                icon = section.icon,
-                hue = section.hue,
                 frame = frame,
             )
             // Continue is only ever chosen with something to continue from -- see [heroFace] -- so there is always an offer here.

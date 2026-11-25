@@ -24,15 +24,8 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.graphics.BlendMode
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.CompositingStrategy
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
@@ -65,22 +58,19 @@ import com.castivio.core.design.theme.Sizing
  */
 
 /**
- * A subscription whose live channels have never been downloaded: the glyph, what to do, and the button that does it.
+ * A subscription whose live channels have never been downloaded: what to do, and the button that does it, over the stadium.
  *
  * The card's own press is the button's: pressed, the section is asked for and loads on this card, which becomes its loading
  * face. The button is the card's drawing of that press and not a second control, so a remote has one stop on the card.
  *
- * **The card's own ornament is behind it.** The frame of the glyph echoed outward and the ribbons across the lower half are what
- * filled the live card before it had anything to say -- the same lines, from [drawHeroLines], centred where [HERO_GLYPH_CENTRE]
- * puts the glyph -- so a card with a glyph, two lines and a button is not left with a field of nothing round them.
+ * **The section's picture is its ornament** (owner, 2026-11-25): no glyph and no lines over it; the words stand where they stood
+ * under the glyph, and the stadium fills the room above them.
  */
 @Composable
 internal fun NotLoadedFace(
     name: String,
     sentence: String,
     sentenceInk: Color,
-    icon: ImageVector,
-    hue: Color,
     frame: CastivioMetrics,
     modifier: Modifier = Modifier,
 ) {
@@ -97,13 +87,12 @@ internal fun NotLoadedFace(
                 frame = frame,
             )
         }
-        // Centred on the ornament's centre, as the watermark of the plain card is: the lines echo this glyph's frame.
+        // No glyph (owner, 2026-11-25): the stadium says "live" and the other cards have none. The words stay where they
+        // stood under it, so the picture fills the room it left.
         Column(
-            Modifier.fillMaxWidth().padding(top = maxHeight * HERO_GLYPH_CENTRE - glyph / 2),
+            Modifier.fillMaxWidth().padding(top = maxHeight * HERO_GLYPH_CENTRE + glyph / 2),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            // Faint, near the section's picture behind it (owner, 2026-11-25): kept, but part of the picture, not over it.
-            Box(Modifier.alpha(NOT_LOADED_GLYPH_ALPHA)) { GradientGlyph(icon = icon, hue = hue, size = glyph) }
             Text(
                 text = stringResource(R.string.home_load_hero_title),
                 style = castivioTitleStyle(frame.fsLabel),
@@ -361,34 +350,7 @@ internal fun ProgrammeBar(fraction: Float, modifier: Modifier = Modifier) {
     }
 }
 
-/**
- * The section's glyph, drawn in the azure-to-violet ramp the live card's watermark and the wordmark share.
- *
- * `Icon` paints a vector in one colour, so the ramp is applied after the fact on its own layer -- see `HeroCard`, which does the
- * same at the size of the whole panel.
- */
-@Composable
-private fun GradientGlyph(icon: ImageVector, hue: Color, size: Dp) {
-    val colors = CastivioTheme.colors
-    val ramp = Brush.linearGradient(listOf(colors.discGlyph(hue), colors.hueViolet))
-    Icon(
-        imageVector = icon,
-        contentDescription = null,
-        tint = colors.onBackgroundStrong,
-        modifier = Modifier
-            .size(size)
-            .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
-            .drawWithContent {
-                drawContent()
-                drawRect(ramp, blendMode = BlendMode.SrcIn)
-            },
-    )
-}
-
-/**
- * The glyph of the invitation: half the card's height, so that the frame of it the ornament echoes -- drawn for a glyph at
- * [HERO_GLYPH_CENTRE] -- stands round it as it stood round the watermark, and so that it keeps its proportion on every surface.
- */
+/** The room the live card's glyph had, which its words are still placed under. */
 private const val NOT_LOADED_GLYPH_SHARE = 0.44f
 
 /** The resumed channel's logo and the earlier channels' plates, as shares of the card's height. */
@@ -402,6 +364,3 @@ private const val PLATE_ASPECT = 2.1f
 private val PLATE_INSET = 3.dp
 
 private val PROGRAMME_BAR = 4.dp
-
-/** The not-loaded live card's glyph: a little clearer than the pictures' 40% (owner, 2026-11-25), and 12% smaller. */
-private const val NOT_LOADED_GLYPH_ALPHA = 0.55f
