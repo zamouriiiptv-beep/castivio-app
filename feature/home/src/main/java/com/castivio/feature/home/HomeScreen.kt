@@ -2206,8 +2206,8 @@ private const val STACK_SHARE = 0.40f
 private const val HERO_SHARE = 0.47f
 private const val RADIO_SHARE = 0.15f
 
-/** The section pictures' opacity over the card's ground: the owner's choice to try, 2026-11-25. */
-private const val ART_ALPHA = 0.5f
+/** The section pictures' opacity over the card's ground: 0.5 tried, then lighter at the owner's word, 2026-11-25. */
+private const val ART_ALPHA = 0.4f
 
 
 
