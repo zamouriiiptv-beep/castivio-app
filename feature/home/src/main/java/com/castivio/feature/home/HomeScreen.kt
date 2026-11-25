@@ -379,7 +379,6 @@ fun HomeScreen(
                             resume = state.resume,
                             resumes = state.resumes,
                             frame = frame,
-                            unfetched = unfetchedKinds(state),
                             onResume = { channel -> if (model.press(CatalogSection.Live)) onResume(channel) },
                             onResumeSection = { offer ->
                                 val section = CatalogSection.entries.first { it.kind == offer.kind }

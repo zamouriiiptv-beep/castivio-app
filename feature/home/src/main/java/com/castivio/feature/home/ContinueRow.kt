@@ -48,16 +48,14 @@ import com.castivio.domain.MediaKind
  * A press does what the large cards' resume faces did: the shell opens the section with that item started inside it.
  *
  * The row is always there (owner, 2026-11-25, design/mockups/home-continue-empty-ar.png): a slot with nothing watched in it
- * yet is its section's own picture at the large cards' transparency, its name, and "nothing watched yet" -- or "not
- * downloaded yet" for a section not on the device -- and a press on it opens the section, as the large card does.
+ * yet is its section's own picture at the large cards' transparency, its name, and "nothing watched yet" -- whether or not
+ * the section is on the device, which the large card above says -- and a press on it opens the section, as the large card does.
  */
 @Composable
 internal fun ContinueRow(
     resume: Resume?,
     resumes: Map<MediaKind, SectionResume>,
     frame: CastivioMetrics,
-    /** The sections not on the device yet, whose empty slots say so. */
-    unfetched: Set<MediaKind>,
     onResume: (Channel) -> Unit,
     onResumeSection: (SectionResume) -> Unit,
     /** A press on an empty slot: its section, as the large card opens it. */
@@ -98,14 +96,14 @@ internal fun ContinueRow(
                         )
                     }
                 } else {
-                    EmptySlot(MediaKind.LIVE, MediaKind.LIVE in unfetched, slot, height, frame) {
+                    EmptySlot(MediaKind.LIVE, slot, height, frame) {
                         onOpenSection(CatalogSection.Live)
                     }
                 }
                 for (kind in listOf(MediaKind.MOVIE, MediaKind.SERIES, MediaKind.RADIO)) {
                     val offer = resumes[kind]
                     if (offer == null) {
-                        EmptySlot(kind, kind in unfetched, slot, height, frame) {
+                        EmptySlot(kind, slot, height, frame) {
                             onOpenSection(CatalogSection.entries.first { it.kind == kind })
                         }
                         continue
@@ -136,21 +134,6 @@ internal fun ContinueRow(
                 }
             }
         }
-    }
-}
-
-/**
- * The sections not on the device: no rows and never fetched -- the large cards' own "not downloaded yet" rule, so a slot and
- * the card above it never disagree. Rows on the device count as fetched whatever the marks say.
- */
-internal fun unfetchedKinds(state: HomeState): Set<MediaKind> = buildSet {
-    for ((kind, count) in listOf(
-        MediaKind.LIVE to state.liveCount,
-        MediaKind.MOVIE to state.movieCount,
-        MediaKind.SERIES to state.seriesCount,
-        MediaKind.RADIO to state.radioCount,
-    )) {
-        if (count <= 0 && state.sections[kind] == null) add(kind)
     }
 }
 
@@ -218,7 +201,7 @@ private fun ContinueCard(
 
 /**
  * A slot with nothing watched in it yet: its section's picture across the card at the large cards' transparency, with its
- * objects on the side away from the words, and the section's name over "nothing watched yet" (or "not downloaded yet").
+ * objects on the side away from the words, and the section's name over "nothing watched yet".
  *
  * Unlike a filled card this one follows the interface's direction: its words are the application's own, not a provider's
  * name, so in Arabic they stand on the right with the picture on the left, as on the large cards, and the other way round in
@@ -227,7 +210,6 @@ private fun ContinueCard(
 @Composable
 private fun EmptySlot(
     kind: MediaKind,
-    unfetched: Boolean,
     width: Dp,
     height: Dp,
     frame: CastivioMetrics,
@@ -271,7 +253,7 @@ private fun EmptySlot(
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
-                    stringResource(if (unfetched) R.string.home_not_fetched else nothingYet(kind)),
+                    stringResource(nothingYet(kind)),
                     style = castivioBodyStyle(frame.fsChip * LINE_OF_CHIP),
                     color = colors.onBackgroundVariant,
                     maxLines = 1,
