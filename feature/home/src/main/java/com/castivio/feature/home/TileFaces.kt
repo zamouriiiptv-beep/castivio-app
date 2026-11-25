@@ -61,8 +61,8 @@ internal fun TileThumb(resume: SectionResume, height: Dp, modifier: Modifier = M
 /** The pill's height as a share of the pill a chip is: a little under, so that it sits in a 66dp line with air above and below. */
 private const val TILE_PILL_OF_CHIP = 0.85f
 
-/** A poster is this share of the line's height, a logo a little less: the square needs less to read as large. */
-private const val TILE_POSTER_OF_LINE = 0.68f
+/** A poster is this share of the line's height (0.68 until the owner asked it a little taller, 2026-11-25), a logo less: the square needs less to read as large. */
+private const val TILE_POSTER_OF_LINE = 0.82f
 private const val TILE_LOGO_OF_LINE = 0.6f
 
 /** A poster's width over its height. */
