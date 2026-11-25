@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.ui.Alignment
 import com.castivio.core.design.components.CastivioBackChip
 import com.castivio.core.design.components.CastivioClock
-import com.castivio.core.design.components.CastivioThemeSwitchChip
 import com.castivio.core.design.components.CastivioHeader
 import com.castivio.core.design.components.CastivioHeaderTitle
 import com.castivio.core.design.components.CastivioLockup
@@ -177,14 +176,6 @@ internal fun ChooserHeader(
                         fsTime = m.fsTitle,
                         fsDate = m.fsBadge,
                         modifier = Modifier.testTag(ActivationTags.HEADER_CLOCK),
-                    )
-                    CastivioThemeSwitchChip(
-                        chip = m.back,
-                        touchTarget = m.frame.touchTarget,
-                        fontSize = m.fsBack,
-                        toLighter = stringResource(R.string.action_theme_lighter),
-                        toDarker = stringResource(R.string.action_theme_darker),
-                        modifier = Modifier.testTag(ActivationTags.HEADER_THEME),
                     )
                     CompositionLocalProvider(LocalLayoutDirection provides reading) {
                         CastivioBackChip(

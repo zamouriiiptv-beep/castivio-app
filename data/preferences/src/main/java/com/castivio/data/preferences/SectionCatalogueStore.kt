@@ -27,7 +27,7 @@ import javax.inject.Singleton
  * migration blind and hoping the JSON matches is the one change guaranteed to break
  * the build in a way nobody can check locally.
  *
- * So it lives beside [ThemeStore] and [LanguageStore], and for one of the same
+ * So it lives beside [LanguageStore], and for one of the same
  * reasons: it is a handful of longs, read on the path to a screen, with no
  * relational meaning of its own. **This is a deliberate debt, not a design.** When a
  * migration is affordable it moves, and the interface it implements is in `:domain`

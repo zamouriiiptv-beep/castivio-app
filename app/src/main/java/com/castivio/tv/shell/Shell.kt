@@ -256,8 +256,6 @@ private sealed interface Overlay {
 fun ShellScreen(
     motionLevel: MotionLevel,
     onMotionLevel: (MotionLevel) -> Unit,
-    dark: Boolean,
-    onDark: (Boolean) -> Unit,
     /**
      * Ask to leave Castivio.
      *

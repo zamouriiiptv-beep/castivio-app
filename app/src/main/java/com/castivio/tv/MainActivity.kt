@@ -28,9 +28,6 @@ import androidx.core.view.WindowInsetsControllerCompat
 import com.castivio.core.design.components.CastivioIntro
 import com.castivio.core.design.input.KeyRelay
 import com.castivio.core.design.input.LocalKeyRelay
-import com.castivio.core.design.theme.CastivioThemeSwitch
-import com.castivio.core.design.theme.LocalThemeSwitch
-import com.castivio.data.preferences.ThemeStore
 import com.castivio.core.design.theme.CastivioTheme
 import com.castivio.core.platform.AndroidDeviceCapabilities
 import com.castivio.tv.gate.SplashGate
@@ -108,17 +105,6 @@ class MainActivity : ComponentActivity() {
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus) applyBarStyle()
     }
-
-    /**
-     * Where the dark-or-light choice lives between launches.
-     *
-     * Read synchronously, once, before the first composition -- see [ThemeStore] for
-     * why that is the requirement rather than a convenience. Injected rather than
-     * constructed so the single instance is the same one the rest of the process would
-     * see, exactly as the language store is.
-     */
-    @Inject
-    lateinit var themeStore: ThemeStore
 
     /**
      * The language is applied to the `Context` the activity is built on, before it
@@ -208,27 +194,6 @@ class MainActivity : ComponentActivity() {
             // it live in Settings, which is exactly what this build is here to validate.
             var motionLevel by remember { mutableStateOf(performance.suggestedMotion) }
 
-            // The stored choice is the starting value, and the state is what the tree
-            // reads. Writing to the store on change rather than reading from it on every
-            // frame keeps the switch free of I/O: one boolean written on a press, and
-            // nothing on the composition's path touches the disc at all.
-            var dark by remember { mutableStateOf(themeStore.isDark()) }
-
-            // One object for the whole tree, so a header anywhere can offer the
-            // choice without six screens carrying a boolean that has nothing to do
-            // with what any of them is for. `remember` with no key: the object is
-            // stable and reads the state, so a press is one recomposition rather
-            // than a new switch handed to every header.
-            val switch = remember {
-                object : CastivioThemeSwitch {
-                    override val isDark: Boolean get() = dark
-                    override fun toggle() {
-                        dark = !dark
-                        themeStore.setDark(dark)
-                    }
-                }
-            }
-
             // The language, applied to the composition rather than by recreating
             // the activity.
             //
@@ -260,13 +225,11 @@ class MainActivity : ComponentActivity() {
                     } else {
                         LayoutDirection.Ltr
                     },
-                LocalThemeSwitch provides switch,
                 LocalKeyRelay provides keyRelay,
             ) {
                 CastivioTheme(
                     performance = performance,
                     motionLevel = motionLevel,
-                    dark = dark,
                 ) {
                     // Whether the mark has already played. `rememberSaveable`,
                     // so a rotation or a night-mode change does not replay it:
@@ -286,11 +249,6 @@ class MainActivity : ComponentActivity() {
                                     ShellScreen(
                                         motionLevel = motionLevel,
                                         onMotionLevel = { motionLevel = it },
-                                        dark = dark,
-                                        onDark = {
-                                            dark = it
-                                            themeStore.setDark(it)
-                                        },
                                         onExit = askToExit,
                                     )
                                 },

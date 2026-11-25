@@ -93,28 +93,14 @@ fun CastivioTheme(
      * against it with [resolveMotionLevel] and passes the result here.
      */
     motionLevel: MotionLevel = performance.suggestedMotion,
-    /**
-     * Which of the two grounds to stand on: the void when true, the slate when false.
-     *
-     * The name still says `dark` after the second ground stopped being a light one,
-     * and that is deliberate rather than left over. Both grounds are dark now; what
-     * this asks is whether to stand on *the* dark — the near-black void every drawing
-     * in this project was made against — or on the lifted indigo beside it. Renaming
-     * it would rename the stored preference and the switch and the two strings for a
-     * question whose true half is still true.
-     *
-     * Default true, and that default is load-bearing rather than a preference: a
-     * caller that says nothing gets exactly what shipped. `:app` reads the user's
-     * stored choice and passes it; nothing else does.
-     */
-    dark: Boolean = true,
     content: @Composable () -> Unit,
 ) {
     // Remembered on the flag, so a switch is one allocation and everything below it
     // recomposes off a new `staticCompositionLocalOf` value. No I/O, no resource load,
     // no view model, no navigation: the two palettes are two `CastivioColors` objects
     // and swapping them is the whole of what changing theme costs.
-    val colors = remember(dark) { if (dark) castivioDarkColors() else castivioSlateColors() }
+    // One appearance (owner, 2026-11-25): the second ground and its switch are gone.
+    val colors = remember { castivioDarkColors() }
     val device = rememberDeviceClass()
 
     // `darkColorScheme` on both grounds, and not because one branch was tidier.

@@ -191,9 +191,6 @@ internal object ActivationTags {
      */
     const val HEADER_MARK = "chooser.mark"
 
-    /** The dark/light control, which every header in the flow carries. */
-    const val HEADER_THEME = "chooser.theme"
-
     /** The time and the day beside it, the same pair Home's header carries. */
     const val HEADER_CLOCK = "chooser.clock"
 

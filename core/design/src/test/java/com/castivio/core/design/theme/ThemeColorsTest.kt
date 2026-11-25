@@ -9,8 +9,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
- * The two grounds: that the void is still what shipped, and that the slate beside it is
- * a ground of its own rather than a rearrangement of it.
+ * The one ground: that the void is still what shipped (the slate beside it was removed with the appearance switch,
+ * 2026-11-25).
  *
  * ## Why the first half is a list of literals
  *
@@ -38,7 +38,6 @@ import org.junit.Test
 class ThemeColorsTest {
 
     private val dark = castivioDarkColors()
-    private val slate = castivioSlateColors()
 
     /* ------------------------------------------------------ dark, unchanged */
 
@@ -82,59 +81,6 @@ class ThemeColorsTest {
         assertEquals(Palette.Void, dark.rowEdgeFade)
     }
 
-    /* ---------------------------------------------------------------- slate */
-
-    /**
-     * Both grounds are dark, and the slate is the lifted one.
-     *
-     * The pair of bounds is the whole shape of the decision. Below 0.05 relative
-     * luminance says the slate is still a dark ground — the assertion the old light
-     * theme could not have passed, and the one that stops this drifting back toward a
-     * page brighter than its own content. Above the void says it is a *second* ground
-     * and not a repaint of the first.
-     *
-     * The backdrop's own stops are included: a second ground whose page gradient is
-     * still the first one's is a second ground in name only, and that is exactly what
-     * a partial port produces.
-     */
-    @Test
-    fun `both grounds are dark, and the slate is the lifted one`() {
-        assertTrue("the void is not dark", dark.background.luminance() < 0.01f)
-        assertTrue("the slate is not dark", slate.background.luminance() < 0.05f)
-        assertTrue(
-            "the slate is not lifted off the void",
-            slate.background.luminance() > dark.background.luminance(),
-        )
-        for (stop in dark.backdropStops) {
-            assertTrue("a void backdrop stop is not dark: $stop", stop.luminance() < 0.02f)
-        }
-        for (stop in slate.backdropStops) {
-            assertTrue("a slate backdrop stop is not dark: $stop", stop.luminance() < 0.05f)
-            assertTrue(
-                "a slate backdrop stop is not lifted off the void: $stop",
-                stop.luminance() > dark.background.luminance(),
-            )
-        }
-    }
-
-    /**
-     * Each ground's ramp, at the values it was approved at.
-     *
-     * Two stops rather than three on both: `linearGradient` interpolates, so a middle
-     * stop earns its line only by bending the ramp, and neither of these bends.
-     */
-    @Test
-    fun `each ground draws its own two-stop ramp`() {
-        assertEquals(
-            listOf(Palette.BackdropVoid, Palette.BackdropVoidLift),
-            dark.backdropStops,
-        )
-        assertEquals(
-            listOf(Palette.BackdropSlate, Palette.BackdropSlateLift),
-            slate.backdropStops,
-        )
-    }
-
     /**
      * **The ground is drawn from constants nothing else uses.**
      *
@@ -152,7 +98,7 @@ class ThemeColorsTest {
      */
     @Test
     fun `no backdrop stop doubles as a surface`() {
-        for ((name, colors) in listOf("void" to dark, "slate" to slate)) {
+        for ((name, colors) in listOf("void" to dark)) {
             val surfaces = mapOf(
                 "background" to colors.background,
                 "backgroundElevated" to colors.backgroundElevated,
@@ -171,29 +117,6 @@ class ThemeColorsTest {
         }
     }
 
-    /**
-     * A card is an object on this ground, which is the finding it was built from.
-     *
-     * Measured in L* rather than in a contrast ratio, because this is a question about
-     * two dark surfaces and WCAG's ratio is dominated by its own +0.05 floor down
-     * there: the void's card and the slate's differ by a factor of two perceptually and
-     * by 0.08 in that ratio, which is a number that cannot fail.
-     *
-     * The reference players are the target and the reason for the figure. Hot Player
-     * lifts its card 8.43 L* off its page and TiviMate 9.81; the void lifts its own
-     * 4.18, and that gap is what read as hollow beside them. Eight is the floor rather
-     * than the aim — the shipped value is 8.47.
-     */
-    @Test
-    fun `a card stands off the slate as far as it does in the reference players`() {
-        val page = lstar(slate.background)
-        val card = lstar(slate.backgroundElevated)
-        assertTrue(
-            "the slate's card lifts ${"%.2f".format(card - page)} L*, under the 8 the " +
-                "reference players clear",
-            card - page >= 8f,
-        )
-    }
 
     /**
      * Text is readable on both grounds and on a card on each, at the threshold the
@@ -206,7 +129,7 @@ class ThemeColorsTest {
      */
     @Test
     fun `the four inks clear AA on both grounds, page and card`() {
-        for ((name, colors) in listOf("void" to dark, "slate" to slate)) {
+        for ((name, colors) in listOf("void" to dark)) {
             for ((surface, ground) in listOf(
                 "page" to colors.background,
                 "card" to colors.backgroundElevated,
@@ -244,7 +167,7 @@ class ThemeColorsTest {
      */
     @Test
     fun `a focused row's number reads on its white plate on both grounds`() {
-        for (colors in listOf(dark, slate)) {
+        for (colors in listOf(dark)) {
             val ratio = contrast(colors.onSecondary, colors.onSelectedPlate)
             assertTrue("the number on the white plate is $ratio:1", ratio >= 4.5f)
             assertTrue("and it is still a violet, not a grey", colors.onSelectedPlate.blue > colors.onSelectedPlate.green)
@@ -254,106 +177,17 @@ class ThemeColorsTest {
     /** And the ordinary numbers are the ground's own white on a dark plate, with room to spare. */
     @Test
     fun `an ordinary row's number reads on its glass plate`() {
-        for (colors in listOf(dark, slate)) {
+        for (colors in listOf(dark)) {
             val plate = colors.glassFill.compositeOver(colors.background)
             val ratio = contrast(colors.onBackground, plate)
             assertTrue("the number on the glass plate is $ratio:1", ratio >= 7f)
         }
     }
 
-    @Test
-    fun `the accents are the same on both`() {
-        assertEquals(dark.accent, slate.accent)
-        assertEquals(dark.live, slate.live)
-        assertEquals(dark.success, slate.success)
-        assertEquals(dark.warning, slate.warning)
-        assertEquals(dark.danger, slate.danger)
-        assertEquals(dark.logoTints, slate.logoTints)
-        assertEquals(dark.primary, slate.primary)
-        assertEquals(dark.secondary, slate.secondary)
-    }
 
-    /**
-     * The four card hues are the same *entries*, not two sets that happen to agree.
-     *
-     * A duplicated value is one edit away from being two opinions about what colour the
-     * M3U card is, and this is the assertion that keeps the answer single.
-     */
-    @Test
-    fun `the four card hues are shared, not copied`() {
-        assertEquals(Palette.Azure50, dark.hueAzure)
-        assertEquals(Palette.Violet50, dark.hueViolet)
-        assertEquals(Palette.Success, dark.hueGreen)
-        assertEquals(Palette.Amber, dark.hueAmber)
 
-        assertEquals(dark.hueAzure, slate.hueAzure)
-        assertEquals(dark.hueViolet, slate.hueViolet)
-        assertEquals(dark.hueGreen, slate.hueGreen)
-        assertEquals(dark.hueAmber, slate.hueAmber)
 
-        assertEquals(0.34f, dark.discTop, 0f)
-        assertEquals(0.08f, dark.discFoot, 0f)
-        assertEquals(0.46f, dark.discEdge, 0f)
-        assertEquals(0.30f, dark.backdropGlowWarm, 0f)
-        assertEquals(0.26f, dark.backdropGlowCool, 0f)
-    }
 
-    /**
-     * A glyph is legible on its own disc, on the lifted ground.
-     *
-     * This is the failure a lifted page produces and a near-black one does not: the
-     * disc is a tint of the hue over the page, so raising the page raises the disc, and
-     * at the void's own 34% the azure glyph measures 2.92:1 and the violet 2.59:1
-     * against a disc drawn on this ground. 3:1 rather than 4.5 because these are glyphs
-     * and not words, which is the threshold WCAG sets for a graphical object.
-     *
-     * Composited by hand, over the *card*, because that is where a disc is actually
-     * drawn — a ratio taken against the page would be measuring a picture nobody sees.
-     */
-    @Test
-    fun `a glyph reads on its own disc on the slate`() {
-        for ((name, hue) in listOf(
-            "azure" to slate.hueAzure,
-            "violet" to slate.hueViolet,
-            "green" to slate.hueGreen,
-            "amber" to slate.hueAmber,
-        )) {
-            val disc = over(hue, slate.discTop, slate.backgroundElevated)
-            val ratio = contrast(slate.discGlyph(hue), disc)
-            assertTrue(
-                "slate/$name: the glyph is ${"%.2f".format(ratio)}:1 on its disc, under 3",
-                ratio >= 3f,
-            )
-        }
-    }
-
-    /**
-     * The aurora is softer on the lifted ground than on the void.
-     *
-     * The same two glows in the same two corners at the same radii on both, so strength
-     * is the only thing that separates a bloom on near-black from a wash on a page five
-     * L* higher — and it is the number a partial port leaves alone.
-     */
-    @Test
-    fun `the slate lays its glows on more softly than the void`() {
-        assertTrue(
-            "the slate's warm glow ${slate.backdropGlowWarm} is not softer than the " +
-                "void's ${dark.backdropGlowWarm}",
-            slate.backdropGlowWarm < dark.backdropGlowWarm,
-        )
-        assertTrue(
-            "the slate's cool glow ${slate.backdropGlowCool} is not softer than the " +
-                "void's ${dark.backdropGlowCool}",
-            slate.backdropGlowCool < dark.backdropGlowCool,
-        )
-    }
-
-    /** The flag both palettes carry, since the two derived recipes read it. */
-    @Test
-    fun `each palette knows which one it is`() {
-        assertTrue(slate.isSlate)
-        assertTrue(!dark.isSlate)
-    }
 
     /* ----------------------------------------------------------------- scrim */
 
@@ -372,7 +206,7 @@ class ThemeColorsTest {
      */
     @Test
     fun `the scrim dims the screen rather than replacing it`() {
-        listOf("dark" to dark.scrim, "slate" to slate.scrim).forEach { (name, scrim) ->
+        listOf("dark" to dark.scrim).forEach { (name, scrim) ->
             assertTrue(
                 "$name's scrim is ${scrim.alpha} opaque, which is a wall rather than a dim",
                 scrim.alpha <= 0.55f,
@@ -384,22 +218,6 @@ class ThemeColorsTest {
         }
     }
 
-    /**
-     * And it carries no hue.
-     *
-     * A dim with a colour in it is a second opinion about the ground underneath, and
-     * this file already has one of those per theme. It is also what keeps the two
-     * grounds able to share the value at all.
-     */
-    @Test
-    fun `the scrim is black on both grounds, and the same black`() {
-        listOf("dark" to dark.scrim, "slate" to slate.scrim).forEach { (name, scrim) ->
-            assertEquals("$name's scrim has red in it", 0f, scrim.red, 0.001f)
-            assertEquals("$name's scrim has green in it", 0f, scrim.green, 0.001f)
-            assertEquals("$name's scrim has blue in it", 0f, scrim.blue, 0.001f)
-        }
-        assertEquals(dark.scrim, slate.scrim)
-    }
 
     /* ------------------------------------------------------------ the card */
 
@@ -409,19 +227,13 @@ class ThemeColorsTest {
      */
     @Test
     fun `a card is the indigo of the two hues on both grounds`() {
-        for ((name, ground) in listOf("dark" to dark, "slate" to slate)) {
+        for ((name, ground) in listOf("dark" to dark)) {
             val mix = lerp(ground.hueAzure, ground.hueViolet, 0.6f)
             assertEquals("$name's indigo", mix, ground.cardIndigo)
             assertEquals("$name's card edge is the indigo", mix.copy(alpha = 0.5f), ground.cardSurfaceEdge)
         }
     }
 
-    /** One recipe for both grounds -- a flag a screen could read to draw two cards is the thing the file exists to prevent. */
-    @Test
-    fun `the card is drawn the same on both grounds`() {
-        assertEquals(dark.cardIndigo, slate.cardIndigo)
-        assertEquals(dark.cardSurfaceEdge, slate.cardSurfaceEdge)
-    }
 
     /**
      * Home's card is the same indigo as every other card, at a lighter weight -- not a second hue -- and it stays lit at its head
@@ -429,7 +241,7 @@ class ThemeColorsTest {
      */
     @Test
     fun `Home's card is the card's indigo at a calmer weight on both grounds`() {
-        for ((name, ground) in listOf("dark" to dark, "slate" to slate)) {
+        for ((name, ground) in listOf("dark" to dark)) {
             val indigo = ground.cardIndigo
             for (fill in listOf(ground.homeCardLit, ground.homeCardFoot)) {
                 assertEquals("$name's Home card keeps the indigo's red", indigo.red, fill.red, 0.001f)
@@ -441,8 +253,7 @@ class ThemeColorsTest {
             assertEquals("$name's Home card at its foot", indigo.copy(alpha = 0.02f), ground.homeCardFoot)
             assertTrue("$name's Home card is lit at its head", ground.homeCardLit.alpha > ground.homeCardFoot.alpha)
         }
-        assertEquals(dark.homeCardLit, slate.homeCardLit)
-        assertEquals(dark.homeCardFoot, slate.homeCardFoot)
+
     }
 
     /** Calmer means a thinner film of the same indigo, not a different recipe: the card's fill is never heavier than the shared card's. */
@@ -459,7 +270,7 @@ class ThemeColorsTest {
      */
     @Test
     fun `a card is an object on either ground`() {
-        for ((name, ground) in listOf("dark" to dark, "slate" to slate)) {
+        for ((name, ground) in listOf("dark" to dark)) {
             val page = ground.background
             val lit = over(ground.cardIndigo, 0.26f, page)
             val foot = over(ground.cardIndigo, 0.06f, page)
@@ -476,7 +287,7 @@ class ThemeColorsTest {
      */
     @Test
     fun `the surface ladder under the controls did not move`() {
-        for (ground in listOf(dark, slate)) {
+        for (ground in listOf(dark)) {
             assertEquals(ground.glassFill, ground.surfaceGlass)
             assertEquals(ground.glassFillStrong, ground.surfaceRaised)
             assertEquals(Palette.WellInk, ground.surfaceWell)

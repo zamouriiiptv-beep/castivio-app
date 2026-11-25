@@ -20,13 +20,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
-import androidx.compose.material.icons.rounded.DarkMode
-import androidx.compose.material.icons.rounded.LightMode
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -36,7 +33,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.unit.dp
 import com.castivio.core.design.theme.CastivioTheme
-import com.castivio.core.design.theme.LocalThemeSwitch
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.layout.Layout
@@ -489,124 +485,6 @@ fun CastivioBackChip(
             )
         }
     }
-}
-
-/**
- * Dark or light, as one control in the header of every screen.
- *
- * ## Why it is here and not in Settings alone
- *
- * It was in Settings, and it stays there — this does not replace it. A preference
- * a user sets once belongs in Settings; a *view* a user flips depending on the
- * room they are in belongs where they are looking. Both are true of this one, so
- * it is in both places, reading and writing the same state.
- *
- * ## Icon-only, and that is arithmetic rather than taste
- *
- * The header is three columns whose two side columns are `1fr`, so every dp the
- * chips take is a dp the title's column loses — and the Arabic television header
- * is already the case where the chips outrun the title, 262 against 205. Round,
- * this costs its own height: 44dp on a television down to 34 on the shortest
- * phone. Labelled it would cost 90 to 120 depending on the language, which is
- * the difference between a title that does not move and a title that steps down
- * a size in two languages while the mark drifts off the row's centre.
- *
- * Measured on four frames in two languages, with and against: the title's width
- * and its size are identical in all eight, nothing clips, and the mark does not
- * move. What narrows is the air between the lockup and the title — 20 to 25dp,
- * and the tightest case still leaves 90.
- *
- * ## The glyph names the destination, not the state
- *
- * A sun on the deep ground and a moon on the other, because a control is labelled by
- * what pressing it does. A moon meaning "you are in the dark" is the control every
- * reader has to press once to discover what it meant.
- *
- * Both grounds are dark since the second one stopped being a light theme, so the pair
- * now reads as *lighter* and *darker* rather than as day and night — which is what the
- * two grounds actually are, one step apart on the same ramp. The spoken labels say so
- * in as many words; the glyphs are the same two, because a sun and a moon are the pair
- * every reader already knows for that direction and inventing a third icon to be
- * literal about five L* would cost more legibility than it buys.
- *
- * The same two boxes as [CastivioBackChip], for the same reason: the pill is what
- * the drawing states and the interaction box is what a thumb presses and a remote
- * lands on, and those are two different sizes on all four frames.
- *
- * @param chip [com.castivio.core.design.theme.CastivioMetrics.chip] — the drawn pill,
- *   round, so this is its diameter.
- * @param touchTarget [com.castivio.core.design.theme.CastivioMetrics.touchTarget].
- * @param label what a screen reader announces. Supplied by the caller, because a
- *   shared component may not own copy.
- */
-@Composable
-fun CastivioThemeChip(
-    dark: Boolean,
-    chip: Dp,
-    touchTarget: Dp,
-    fontSize: Dp,
-    label: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val colors = CastivioTheme.colors
-    val shape = RoundedCornerShape(percent = 50)
-
-    Box(
-        modifier
-            .heightIn(min = touchTarget)
-            .widthIn(min = touchTarget)
-            .clickable(role = Role.Button, onClick = onClick)
-            .semantics(mergeDescendants = true) { contentDescription = label },
-        contentAlignment = Alignment.Center,
-    ) {
-        Box(
-            Modifier
-                .size(chip)
-                .clip(shape)
-                .background(colors.glassFill)
-                .border(BorderStroke(1.dp, colors.edgeQuiet), shape),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                imageVector = if (dark) Icons.Rounded.LightMode else Icons.Rounded.DarkMode,
-                contentDescription = null,
-                tint = colors.onBackgroundVariant,
-                modifier = Modifier.size(fontSize * CHIP_ICON),
-            )
-        }
-    }
-}
-
-/**
- * The same chip, wired to whoever is offering the choice.
- *
- * Draws nothing where no [CastivioThemeSwitch] has been provided — a preview, a test
- * measuring something else — so no caller has to know whether to show it.
- *
- * The two labels are the caller's because a shared component may not own copy, and
- * because there are two of them: what a screen reader should say is what the press
- * will *do*, and that is a different sentence on each ground.
- */
-@Composable
-fun CastivioThemeSwitchChip(
-    chip: Dp,
-    touchTarget: Dp,
-    fontSize: Dp,
-    toLighter: String,
-    toDarker: String,
-    modifier: Modifier = Modifier,
-) {
-    val switch = LocalThemeSwitch.current ?: return
-    CastivioThemeChip(
-        dark = switch.isDark,
-        chip = chip,
-        touchTarget = touchTarget,
-        fontSize = fontSize,
-        label = if (switch.isDark) toLighter else toDarker,
-        onClick = switch::toggle,
-        modifier = modifier,
-    )
 }
 
 /**

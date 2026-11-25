@@ -20,10 +20,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Logout
 import androidx.compose.material.icons.rounded.CheckCircle
-import androidx.compose.material.icons.rounded.DarkMode
 import androidx.compose.material.icons.rounded.ErrorOutline
 import androidx.compose.material.icons.rounded.Language
-import androidx.compose.material.icons.rounded.LightMode
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Schedule
@@ -60,13 +58,12 @@ import com.castivio.core.design.components.castivioChipStyle
 import com.castivio.core.design.components.castivioFocusScale
 import com.castivio.core.design.theme.CastivioMetrics
 import com.castivio.core.design.theme.CastivioTheme
-import com.castivio.core.design.theme.LocalThemeSwitch
 import com.castivio.core.design.theme.Motion
 
 /**
  * Home's header, as the owner drew it (design/mockups/home-header-ar.html, frame `v4`, approved 2026-11-24): one band across
  * the whole width with the lockup at one end, the clock and the date at the other, and between them the page's seven
- * buttons -- refresh, switch playlist, catch-up, account, settings, language, the appearance and exit -- each a glyph with its word
+ * buttons -- refresh, switch playlist, catch-up, account, settings, language and exit -- each a glyph with its word
  * under it, standing on the application's own backdrop.
  *
  * ## The band keeps its order in every language
@@ -85,7 +82,7 @@ import com.castivio.core.design.theme.Motion
  * Refresh asks the provider again ([HomeViewModel.refresh]) and says how it went on itself -- a spinner while it asks, the
  * success green or the failure red after, in the look [refreshLook] decides. Switch playlist opens the menu of saved
  * playlists ([PlaylistPicker]) hanging from the button. Catch-up, settings, language and exit are the shell's doors. The
- * appearance button turns the theme over through [LocalThemeSwitch], and is not drawn where no switch was provided.
+ * application has one appearance (owner, 2026-11-25), so there is no appearance button.
  */
 @Composable
 internal fun HomeHeader(
@@ -104,7 +101,6 @@ internal fun HomeHeader(
     onExit: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val themeSwitch = LocalThemeSwitch.current
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
         Row(
             // No band and no line of their own (owner, 2026-11-25): the buttons stand on the application's own backdrop.
@@ -146,18 +142,6 @@ internal fun HomeHeader(
                 HeaderAction(Icons.Rounded.Person, stringResource(R.string.home_account), labelled, frame, onAccount)
                 HeaderAction(Icons.Rounded.Settings, stringResource(R.string.home_settings), labelled, frame, onSettings)
                 HeaderAction(Icons.Rounded.Language, stringResource(R.string.home_language), labelled, frame, onLanguage)
-                if (themeSwitch != null) {
-                    HeaderAction(
-                        icon = if (themeSwitch.isDark) Icons.Rounded.LightMode else Icons.Rounded.DarkMode,
-                        label = stringResource(R.string.home_theme),
-                        labelled = labelled,
-                        frame = frame,
-                        onClick = themeSwitch::toggle,
-                        spoken = stringResource(
-                            if (themeSwitch.isDark) R.string.home_theme_lighter else R.string.home_theme_darker,
-                        ),
-                    )
-                }
                 HeaderAction(Icons.AutoMirrored.Rounded.Logout, stringResource(R.string.home_exit), labelled, frame, onExit)
             }
 
