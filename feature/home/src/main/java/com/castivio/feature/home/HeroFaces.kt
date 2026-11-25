@@ -24,6 +24,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
@@ -101,7 +102,8 @@ internal fun NotLoadedFace(
             Modifier.fillMaxWidth().padding(top = maxHeight * HERO_GLYPH_CENTRE - glyph / 2),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            GradientGlyph(icon = icon, hue = hue, size = glyph)
+            // As faint as the section's picture behind it (owner, 2026-11-25): kept, but part of the picture, not over it.
+            Box(Modifier.alpha(NOT_LOADED_GLYPH_ALPHA)) { GradientGlyph(icon = icon, hue = hue, size = glyph) }
             Text(
                 text = stringResource(R.string.home_load_hero_title),
                 style = castivioTitleStyle(frame.fsLabel),
@@ -400,3 +402,6 @@ private const val PLATE_ASPECT = 2.1f
 private val PLATE_INSET = 3.dp
 
 private val PROGRAMME_BAR = 4.dp
+
+/** The not-loaded live card's glyph: the section pictures' own transparency (HomeScreen's ART_ALPHA). */
+private const val NOT_LOADED_GLYPH_ALPHA = 0.4f

@@ -1102,10 +1102,13 @@ private fun SectionLine(
                             overflow = TextOverflow.Ellipsis,
                         )
                         LineLoad(section, frame)
+                        // Under its words, on their side, as on the radio's card (owner, 2026-11-25): not over the picture.
+                        if (face == HeroFace.NotLoaded) {
+                            Spacer(Modifier.height(frame.chipPad / 2))
+                            TileLoadPill(frame)
+                        }
                     }
                 }
-                // The line's empty end is what both new faces use.
-                if (face == HeroFace.NotLoaded) TileLoadPill(frame)
                 if (offer != null) TileThumb(offer, height = lineHeight)
             }
         }

@@ -48,7 +48,7 @@ import com.castivio.domain.MediaKind
  * A press does what the large cards' resume faces did: the shell opens the section with that item started inside it.
  *
  * The row is always there (owner, 2026-11-25, design/mockups/home-continue-empty-ar.png): a slot with nothing watched in it
- * yet is its section's own picture at the large cards' transparency, its name, and "nothing watched yet" -- whether or not
+ * yet is its section's own picture, far fainter than on the large cards, its name, and "nothing watched yet" -- whether or not
  * the section is on the device, which the large card above says -- and a press on it opens the section, as the large card does.
  */
 @Composable
@@ -200,7 +200,7 @@ private fun ContinueCard(
 }
 
 /**
- * A slot with nothing watched in it yet: its section's picture across the card at the large cards' transparency, with its
+ * A slot with nothing watched in it yet: its section's picture across the card, only just seen, with its
  * objects on the side away from the words, and the section's name over "nothing watched yet".
  *
  * Unlike a filled card this one follows the interface's direction: its words are the application's own, not a provider's
@@ -278,8 +278,11 @@ private fun nothingYet(kind: MediaKind): Int = when (kind) {
     else -> R.string.home_continue_none_live
 }
 
-/** An empty slot's picture: the large cards' own transparency (HomeScreen's ART_ALPHA), at the owner's word. */
-private const val EMPTY_ART_ALPHA = 0.4f
+/**
+ * An empty slot's picture: far fainter than the large cards' 40% (owner, 2026-11-25) -- the same four pictures twice on one
+ * screen was a repetition, so here they are only just there.
+ */
+private const val EMPTY_ART_ALPHA = 0.12f
 
 /** The row always lays out four slots. */
 private const val SLOTS = 4

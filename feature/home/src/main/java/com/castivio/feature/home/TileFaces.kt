@@ -19,8 +19,8 @@ import com.castivio.core.design.theme.CastivioMetrics
  */
 
 /**
- * The card's drawing of its press when its section has never been downloaded: the large card's button, shorter, at the end of the
- * line. The card is the control -- this is not focusable, and a press on the card is a press on the section.
+ * The card's drawing of its press when its section has never been downloaded: the large card's button, shorter, under the
+ * words (owner, 2026-11-25). The card is the control -- this is not focusable, and a press on the card is a press on the section.
  */
 @Composable
 internal fun TileLoadPill(frame: CastivioMetrics, modifier: Modifier = Modifier) {
