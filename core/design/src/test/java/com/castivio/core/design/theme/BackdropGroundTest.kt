@@ -25,10 +25,11 @@ import org.junit.Test
  */
 class BackdropGroundTest {
 
-    private val warmCentre = 0.05f to 1.00f
-    private val coolCentre = 0.95f to 0.30f
-    private val warmRadius = 0.55f
-    private val coolRadius = 0.52f
+    // Since 2026-11-25 one light from the top centre and no side glow (its radius is 0, so it is not drawn): the rule the
+    // slices follow is held on the one light there is.
+    private val warmCentre = 0.50f to 0.00f
+    private val warmRadius = 0.60f
+
 
     private fun glowCentre(ground: Rect, at: Pair<Float, Float>) =
         ground.topLeft + Offset(ground.width * at.first, ground.height * at.second)
@@ -47,10 +48,8 @@ class BackdropGroundTest {
 
         assertEquals(Offset(0f, 0f), ground.topLeft)
         assertEquals(Offset(size.width, size.height), ground.bottomRight)
-        assertEquals(Offset(size.width * 0.05f, size.height), glowCentre(ground, warmCentre))
-        assertEquals(Offset(size.width * 0.95f, size.height * 0.30f), glowCentre(ground, coolCentre))
-        assertEquals(size.width * 0.55f, ground.width * warmRadius, 0f)
-        assertEquals(size.width * 0.52f, ground.width * coolRadius, 0f)
+        assertEquals(Offset(size.width * 0.50f, 0f), glowCentre(ground, warmCentre))
+        assertEquals(size.width * 0.60f, ground.width * warmRadius, 0f)
     }
 
     // ------------------------------------------- a slice draws the same one ground
@@ -59,7 +58,7 @@ class BackdropGroundTest {
      * A panel inside the window draws *its slice* of the ground, not a miniature.
      *
      * The glow keeps the radius it has on the window — which is the whole defect this
-     * fixes. Sized to a 200dp popup the cool glow had a 104dp radius inside a 200dp
+     * fixes. Sized to a 200dp popup the light had a 104dp radius inside a 200dp
      * box: a bright patch instead of ambient light.
      */
     @Test
@@ -73,19 +72,19 @@ class BackdropGroundTest {
 
         assertEquals(window.width, ground.width, 0f)
         assertEquals(window.height, ground.height, 0f)
-        assertEquals(833f * 0.52f, ground.width * coolRadius, 0f)
+        assertEquals(833f * 0.60f, ground.width * warmRadius, 0f)
 
         // Sized to the panel it would have been a quarter of that, and half the
         // panel's own width — which is what a patch rather than a wash looks like.
-        val wrong = panel.width * coolRadius
-        assertTrue("$wrong should be far smaller", wrong < ground.width * coolRadius / 3f)
+        val wrong = panel.width * warmRadius
+        assertTrue("$wrong should be far smaller", wrong < ground.width * warmRadius / 3f)
     }
 
     /**
      * The glow lands in the same place on the screen whichever surface draws it.
      *
      * Two drawings of one ground: the window's own, and a panel's slice of it. The
-     * cool glow's centre must be the same point on the screen in both, or the panel
+     * light's centre must be the same point on the screen in both, or the panel
      * is lit from somewhere the board is not.
      */
     @Test
@@ -93,10 +92,10 @@ class BackdropGroundTest {
         val window = Size(833f, 385f)
         val panelAt = Offset(593f, 150f)
 
-        val fromWindow = glowCentre(Rect(Offset.Zero, window), coolCentre)
+        val fromWindow = glowCentre(Rect(Offset.Zero, window), warmCentre)
         val fromPanel = glowCentre(
             Rect(Offset.Zero, window).translate(-panelAt.x, -panelAt.y),
-            coolCentre,
+            warmCentre,
         )
 
         // The panel's answer is in its own coordinates; put it back on the screen.

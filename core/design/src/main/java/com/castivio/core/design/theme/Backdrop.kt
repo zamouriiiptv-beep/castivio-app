@@ -365,22 +365,24 @@ private class Ground(
 )
 
 private fun buildGround(ground: Rect, colors: CastivioColors): Ground {
-    // The geometry is the theme's business, not the ground's: both glows keep their
-    // corner, their radius and their alpha in either mode, and only the hue is asked
-    // for again. A light page with the aurora somewhere else would be a second layout.
-    val warmCentre = ground.topLeft + Offset(ground.width * 0.05f, ground.height)
-    val warmRadius = ground.width * 0.55f
-    val coolCentre = ground.topLeft + Offset(ground.width * 0.95f, ground.height * 0.30f)
-    val coolRadius = ground.width * 0.52f
+    // **Even from side to side** (owner, 2026-11-25): the ramp ran corner to corner, a violet glow sat in one lower corner
+    // and an azure one on the other side, so one side of the screen was blue and the other near black and the cards
+    // between them looked two colours. Now the ramp runs top to bottom -- the lift at the top, the void at the foot -- and
+    // one soft light comes from the top centre, at half the old warm glow's weight; the side glow is gone (radius 0, which
+    // the draw skips). Both modes keep the same geometry; only the hue is asked for again.
+    val warmCentre = ground.topLeft + Offset(ground.width * 0.50f, 0f)
+    val warmRadius = ground.width * 0.60f
+    val coolCentre = ground.topLeft + Offset(ground.width * 0.50f, 0f)
+    val coolRadius = 0f
     return Ground(
         rect = ground,
         colors = colors,
         base = Brush.linearGradient(
-            colors = colors.backdropStops,
+            colors = colors.backdropStops.reversed(),
             start = ground.topLeft,
-            end = ground.bottomRight,
+            end = ground.bottomLeft,
         ),
-        warm = glow(colors.backdropWarmGlow, colors.backdropGlowWarm, warmCentre, warmRadius),
+        warm = glow(colors.backdropWarmGlow, colors.backdropGlowWarm * TOP_LIGHT_SHARE, warmCentre, warmRadius),
         warmCentre = warmCentre,
         warmRadius = warmRadius,
         cool = glow(colors.backdropCoolGlow, colors.backdropGlowCool, coolCentre, coolRadius),
@@ -388,6 +390,9 @@ private fun buildGround(ground: Rect, colors: CastivioColors): Ground {
         coolRadius = coolRadius,
     )
 }
+
+/** The top light's weight against the old corner glow's. */
+private const val TOP_LIGHT_SHARE = 0.5f
 
 private fun glow(color: Color, alpha: Float, centre: Offset, radius: Float): Brush =
     Brush.radialGradient(
