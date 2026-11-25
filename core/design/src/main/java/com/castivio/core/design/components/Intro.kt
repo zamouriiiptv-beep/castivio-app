@@ -66,11 +66,11 @@ private const val OPACITY_MS = 420L
 
 /** Still, breathing. */
 private const val HOLD_FROM = 800L
-private const val HOLD_TO = 1100L
+private const val HOLD_TO = 2100L
 
 /** Into the application. */
-private const val HANDOVER_FROM = 1100L
-private const val HANDOVER_TO = 1200L
+private const val HANDOVER_FROM = 2100L
+private const val HANDOVER_TO = 2300L
 
 /** The whole of it. Nothing composes after this. */
 const val INTRO_MS = HANDOVER_TO
@@ -111,7 +111,7 @@ private fun span(t: Long, from: Long, to: Long): Float =
  * The film, as arithmetic. Pure: no clock, no composition, no device.
  *
  * [elapsedMs] is clamped to the film's length first. `withFrameNanos` does not
- * promise to land on 1200 — a dropped frame delivers 1216 — and without the
+ * promise to land on the film's end — a dropped frame delivers 16ms past it — and without the
  * clamp the breath term would carry on past the end of the timeline and make
  * the last frame depend on how busy the device was.
  */

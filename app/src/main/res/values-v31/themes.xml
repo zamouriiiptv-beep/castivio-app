@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Android 12 and up draw their own splash screen with the application's icon before the first frame. Castivio has its
+      own intro (the CASTIVIO mark, core/design Intro.kt), so the system's is left plain: the window's ground with no icon,
+      and the intro is the first branded thing on screen (owner, 2026-11-25: "الا يمكن حدف الشعار").
+    -->
+    <style name="Theme.CastivioTV" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/castivio_window_background</item>
+        <item name="android:statusBarColor">@color/castivio_window_background</item>
+        <item name="android:navigationBarColor">@color/castivio_window_background</item>
+        <item name="android:windowSplashScreenBackground">@color/castivio_window_background</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_transparent</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">@android:color/transparent</item>
+    </style>
+</resources>

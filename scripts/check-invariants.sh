@@ -323,6 +323,10 @@ for bundle in $BUNDLES; do
  # the sibling bundle has. A whole missing file renders the whole screen in
  # English, and the per-key loop above cannot see a file that is not there.
  for peer in "$RES"/values-*; do
+   # A configuration qualifier (an API level, night, a screen size) is not a locale and carries no strings.
+   case "$(basename "$peer")" in
+     values-v[0-9]*|values-night*|values-notnight*|values-land*|values-port*|values-sw[0-9]*|values-w[0-9]*|values-h[0-9]*|values-television*) continue ;;
+   esac
    if [ ! -f "$peer/$NAME" ]; then
      problems="$problems
   $(basename "$peer")  missing the whole $NAME"

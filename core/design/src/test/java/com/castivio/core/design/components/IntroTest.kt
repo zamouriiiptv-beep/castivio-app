@@ -91,7 +91,7 @@ class IntroTest {
      */
     @Test
     fun `the mark does not move or fade during the hold`() {
-        for (t in 800L..1100L step 20L) {
+        for (t in 800L..2100L step 20L) {
             val f = introFrame(t)
             assertEquals("the mark faded at ${t}ms", 1f, f.markAlpha, 0.0005f)
             assertEquals("the mark moved at ${t}ms", 1f, f.markScale, 0.0005f)
@@ -101,7 +101,7 @@ class IntroTest {
     /** And the glow does breathe, in scale, by about a percent. */
     @Test
     fun `the glow breathes and stays under two percent of scale`() {
-        val scales = (800L..1100L step 10L).map { introFrame(it).glowScale }
+        val scales = (800L..2100L step 10L).map { introFrame(it).glowScale }
         val swing = scales.max() - scales.min()
         assertTrue("the glow does not breathe at all", swing > 0.002f)
         assertTrue("the glow breathes by $swing, which is a pulse", swing < 0.02f)
@@ -163,9 +163,9 @@ class IntroTest {
      * full-screen box over the application eating every touch.
      */
     @Test
-    fun `the application is handed over in the last 100ms, completely`() {
-        assertEquals("the handover started early", 0f, introFrame(1100L).appAlpha, 0f)
-        assertTrue("the handover had not begun by 1150ms", introFrame(1150L).appAlpha > 0f)
+    fun `the application is handed over in the last 200ms, completely`() {
+        assertEquals("the handover started early", 0f, introFrame(2100L).appAlpha, 0f)
+        assertTrue("the handover had not begun by 2200ms", introFrame(2200L).appAlpha > 0f)
         assertEquals("the handover did not complete", 1f, introFrame(INTRO_MS).appAlpha, 0f)
         assertTrue("the intro never reports itself finished", introFrame(INTRO_MS).finished)
         assertTrue("the intro finished early", !introFrame(INTRO_MS - 1).finished)
