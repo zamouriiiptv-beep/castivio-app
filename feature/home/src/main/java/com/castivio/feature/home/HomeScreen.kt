@@ -909,6 +909,19 @@ private fun HeroCard(
     ) {
         Box(Modifier.fillMaxSize()) {
         SectionArt(section.art)
+        // The stadium's pitch and goal are white and bright where the name and the count stand (owner, 2026-11-25,
+        // design/mockups/home-live-scrim-ar.png): a fade into the page's own ground from the middle of the card down, so
+        // the words read and the goal stays seen behind them.
+        Box(
+            Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        HERO_SCRIM_FROM to colors.background.copy(alpha = 0f),
+                        1f to colors.background.copy(alpha = HERO_SCRIM_ALPHA),
+                    ),
+                ),
+        )
         when (face) {
             HeroFace.Plain -> PlainFace(section, frame)
             HeroFace.NotLoaded -> NotLoadedFace(
@@ -2210,6 +2223,10 @@ private const val RADIO_SHARE = 0.15f
 
 /** The section pictures' opacity over the card's ground: 0.5 tried, then lighter at the owner's word, 2026-11-25. */
 private const val ART_ALPHA = 0.4f
+
+/** Where the live card's fade starts, of its height, and how dark it is at the foot. */
+private const val HERO_SCRIM_FROM = 0.42f
+private const val HERO_SCRIM_ALPHA = 0.72f
 
 /** The same picture behind a poster of what was watched last: lighter, so the two do not crowd (owner, 2026-11-25). */
 private const val ART_ALPHA_BEHIND_POSTER = 0.3f
