@@ -102,7 +102,7 @@ internal fun NotLoadedFace(
             Modifier.fillMaxWidth().padding(top = maxHeight * HERO_GLYPH_CENTRE - glyph / 2),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            // As faint as the section's picture behind it (owner, 2026-11-25): kept, but part of the picture, not over it.
+            // Faint, near the section's picture behind it (owner, 2026-11-25): kept, but part of the picture, not over it.
             Box(Modifier.alpha(NOT_LOADED_GLYPH_ALPHA)) { GradientGlyph(icon = icon, hue = hue, size = glyph) }
             Text(
                 text = stringResource(R.string.home_load_hero_title),
@@ -389,7 +389,7 @@ private fun GradientGlyph(icon: ImageVector, hue: Color, size: Dp) {
  * The glyph of the invitation: half the card's height, so that the frame of it the ornament echoes -- drawn for a glyph at
  * [HERO_GLYPH_CENTRE] -- stands round it as it stood round the watermark, and so that it keeps its proportion on every surface.
  */
-private const val NOT_LOADED_GLYPH_SHARE = 0.5f
+private const val NOT_LOADED_GLYPH_SHARE = 0.44f
 
 /** The resumed channel's logo and the earlier channels' plates, as shares of the card's height. */
 private const val CONTINUE_LOGO_SHARE = 0.365f
@@ -403,5 +403,5 @@ private val PLATE_INSET = 3.dp
 
 private val PROGRAMME_BAR = 4.dp
 
-/** The not-loaded live card's glyph: the section pictures' own transparency (HomeScreen's ART_ALPHA). */
-private const val NOT_LOADED_GLYPH_ALPHA = 0.4f
+/** The not-loaded live card's glyph: a little clearer than the pictures' 40% (owner, 2026-11-25), and 12% smaller. */
+private const val NOT_LOADED_GLYPH_ALPHA = 0.55f

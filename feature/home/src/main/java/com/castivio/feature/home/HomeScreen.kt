@@ -77,6 +77,7 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.LayoutCoordinates
@@ -812,7 +813,8 @@ private fun Section.sentence(): String = when (tally) {
 private fun Section.ink(): Color {
     val colors = CastivioTheme.colors
     return when (tally) {
-        Tally.Unfetched -> colors.primary
+        // A little brighter than the primary (owner, 2026-11-25): beside the violet button it read faint.
+        Tally.Unfetched -> lerp(colors.primary, colors.onBackgroundStrong, NOT_FETCHED_LIFT)
         Tally.Empty -> colors.onBackgroundMuted
         // White, as in the owner's drawing (2026-11-25): the card's colour is its picture now, not its figure.
         Tally.Counted -> colors.onBackgroundStrong
@@ -2225,6 +2227,9 @@ private const val RADIO_SHARE = 0.15f
 
 /** The section pictures' opacity over the card's ground: 0.5 tried, then lighter at the owner's word, 2026-11-25. */
 private const val ART_ALPHA = 0.4f
+
+/** How far "not downloaded yet" is lifted from the primary toward the strong ink. */
+private const val NOT_FETCHED_LIFT = 0.3f
 
 /** Where the live card's fade starts, of its height, and how dark it is at the foot. */
 private const val HERO_SCRIM_FROM = 0.42f
