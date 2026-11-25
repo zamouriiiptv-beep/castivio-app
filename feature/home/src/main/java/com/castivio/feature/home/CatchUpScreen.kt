@@ -1,10 +1,6 @@
 package com.castivio.feature.home
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -16,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -34,76 +29,59 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.castivio.core.design.components.CastivioChip
 import com.castivio.core.design.components.CastivioSpinner
 import com.castivio.core.design.components.InteractiveGlassCard
-import com.castivio.core.design.components.ProviderArtwork
 import com.castivio.core.design.components.castivioBodyStyle
 import com.castivio.core.design.components.castivioChipStyle
-import com.castivio.core.design.components.castivioTitleStyle
 import com.castivio.core.design.theme.CastivioTheme
 import com.castivio.core.design.theme.Spacing
 import com.castivio.domain.Channel
 
 /**
- * The catch-up screen: one channel's archive, by day, and a programme to watch.
+ * One channel's archive, by day, and a programme to watch: the pane beside Catch-up's list of channels
+ * (owner, 2026-11-25, design/mockups/catchup-17-ltr-ar.png). The band over the page -- the board's own, shared with every board --
+ * holds its search, which looks among this channel's programmes; the pane is the days and the programmes, left to right.
  *
- * A screen of its own that covers the same ground as the guide -- the rail and the list, stopping before the picture, so
- * the channel goes on playing beside it and the surface never moves -- and that replaces the guide's list while it is
- * open. Back leaves it, and **leaving is what ends it**: the request for the archive is cancelled with the screen, and
- * nothing about a channel's archive is asked again until the viewer opens it again.
+ * **Leaving is what ends it**: the request for the archive is cancelled with the pane, and opening another channel from the
+ * list beside it asks for that one's.
  *
  * ## What it shows, and what it does not make up
  *
  * The programmes the provider's own archive lists, with the day, the start and the end. There is no programme artwork
- * because an archive listing has none, and the card does not borrow one: its picture is the channel's own logo, which is
- * what the viewer would recognise it by. A day with nothing in it is not drawn, and a week is not padded out: the
+ * because an archive listing has none, and the card does not borrow one: every card here is the channel highlighted beside
+ * it, so its logo on each card said nothing. A day with nothing in it is not drawn, and a week is not padded out: the
  * provider says how far back it goes, and that is how many days there are.
  *
  * ## What choosing does
  *
- * The programme's address is made -- no request -- and handed to the same `onPlay` a channel row uses, so the player that
- * is already on screen opens it. Nothing here plays anything itself.
+ * The programme's address is made -- no request -- and handed to the same `onPlay` a channel row uses, so the player opens
+ * over this page. Nothing here plays anything itself.
  */
 @Composable
-internal fun CatchUpOverlay(
+internal fun CatchUpProgrammes(
     channel: Channel,
     m: ChannelsMetrics,
     model: CatchUpViewModel,
     onPlay: (CatalogSelection) -> Unit,
     onClose: () -> Unit,
+    modifier: Modifier = Modifier,
     /**
-     * The player is open over this screen. The screen stays composed under it -- that is what lets Back land on the same
+     * The player is open over this page. The page stays composed under it -- that is what lets Back land on the same
      * programmes, on the same day, scrolled to the same place -- and takes the cursor back when this turns false.
      */
     playing: Boolean = false,
-    /**
-     * The room on the end side that the screen leaves uncovered. The channels' board keeps its picture there, and the
-     * default is that column; Catch-up's own page has no picture and passes nothing.
-     */
-    reserveEnd: Dp = m.player + m.playerGap,
-    /**
-     * The language's own direction, for the header: the page is drawn left to right like the board it covers, and a caller
-     * that has made it so passes the direction it was made from. The default is the one in force here.
-     */
-    direction: LayoutDirection = LocalLayoutDirection.current,
 ) {
     val colors = CastivioTheme.colors
-    val shape = RoundedCornerShape(m.panelRadius)
     val state by model.state.collectAsStateWithLifecycle()
     val view by model.view.collectAsStateWithLifecycle()
-    val searchText by model.searchText.collectAsStateWithLifecycle()
     // The card the cursor goes to when the programmes appear and when the player closes over them: the programme the viewer
     // started last if this day still shows it, and the first one otherwise.
     val landing = remember { FocusRequester() }
@@ -125,64 +103,7 @@ internal fun CatchUpOverlay(
         if (state.phase == CatchUpPhase.READY && !playing) runCatching { landing.requestFocus() }
     }
 
-    Box(
-        Modifier
-            .fillMaxSize()
-            .padding(end = reserveEnd)
-            .background(colors.scrim)
-            // Swallows the press so a tap on the dimmed board behind does not reach a channel row, as the guide's does.
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-                onClick = onClose,
-            ),
-        contentAlignment = Alignment.CenterStart,
-    ) {
-        Column(
-            Modifier
-                .fillMaxHeight()
-                .fillMaxWidth()
-                .padding(m.panelPad)
-                .clip(shape)
-                .background(colors.backgroundElevated)
-                .border(1.dp, colors.glassBorder, shape)
-                .padding(m.wellPad),
-        ) {
-            // The header every page of Catch-up has: Back, what this is -- the feature, the channel -- and the one search box,
-            // which here looks among this channel's programmes. The days and the programmes under it keep the board's order.
-            CatchUpHeader(
-                m = m,
-                direction = direction,
-                onBack = back,
-                searchText = searchText,
-                onSearch = model::search,
-                onSearchFocus = {},
-                searchHint = stringResource(R.string.catchup_search_programmes),
-            ) {
-                Text(
-                    text = stringResource(R.string.catchup_title),
-                    style = castivioTitleStyle(m.frame.fsLabel),
-                    color = colors.onBackgroundStrong,
-                    maxLines = 1,
-                )
-                ProviderArtwork(
-                    url = channel.artworkUrl,
-                    description = null,
-                    modifier = Modifier.size(m.frame.fsLabel * LOGO_IN_LABELS),
-                    seed = channel.title,
-                )
-                Text(
-                    text = channel.title,
-                    style = castivioChipStyle(m.frame.fsLabel),
-                    color = colors.onBackgroundStrong,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f, fill = false),
-                )
-            }
-
-            Spacer(Modifier.height(m.guideGap))
-
+    Column(modifier.fillMaxHeight()) {
             when (state.phase) {
                 CatchUpPhase.IDLE, CatchUpPhase.LOADING -> Message(m) {
                     CastivioSpinner()
@@ -201,22 +122,18 @@ internal fun CatchUpOverlay(
                 }
 
                 CatchUpPhase.READY -> {
-                    // The days, newest first. Only the days the archive has: nothing is padded out to a week.
-                    LazyRow(horizontalArrangement = Arrangement.spacedBy(m.guideGap)) {
-                        itemsIndexed(state.days, key = { index, day -> "${index}_${day.date}" }) { index, day ->
-                            val selected = index == state.dayIndex
-                            InteractiveGlassCard(
-                                onClick = { model.selectDay(index) },
-                                shape = RoundedCornerShape(m.panelRadius),
-                                fill = if (selected) SolidColor(colors.primaryContainer) else SolidColor(colors.glassFill),
-                            ) {
-                                Text(
-                                    text = if (day.label == DayLabel.DATE) day.date else dayName(day.label),
-                                    style = castivioChipStyle(m.frame.fsLabel),
-                                    color = colors.onBackgroundStrong,
-                                    maxLines = 1,
-                                    modifier = Modifier.padding(horizontal = m.controlPadH, vertical = Spacing.sm),
-                                )
+                    // The days, newest first, from the left. Only the days the archive has: nothing is padded out to a week. A few
+                    // share the width as one bar, as drawn; more than fit that way scroll.
+                    if (state.days.size <= DAYS_AS_BAR) {
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(m.guideGap)) {
+                            state.days.forEachIndexed { index, day ->
+                                DayTab(day, index == state.dayIndex, m, Modifier.weight(1f)) { model.selectDay(index) }
+                            }
+                        }
+                    } else {
+                        LazyRow(horizontalArrangement = Arrangement.spacedBy(m.guideGap)) {
+                            itemsIndexed(state.days, key = { index, day -> "${index}_${day.date}" }) { index, day ->
+                                DayTab(day, index == state.dayIndex, m) { model.selectDay(index) }
                             }
                         }
                     }
@@ -245,8 +162,6 @@ internal fun CatchUpOverlay(
                                 gridItemsIndexed(view.cards, key = { _, card -> card.programme.locator }) { _, card ->
                                     ProgrammeCard(
                                         card = card,
-                                        logo = channel.artworkUrl,
-                                        logoSeed = channel.title,
                                         m = m,
                                         modifier = Modifier
                                             .fillMaxWidth()
@@ -292,26 +207,20 @@ internal fun CatchUpOverlay(
                     }
                 }
             }
-        }
     }
 }
 
 /**
- * One programme, small enough for three rows of them to share the panel: when it was on at the start of the top line and
- * the channel's logo at its end, and the title under them, standing on the card's floor.
+ * One programme, small enough for three rows of them to share the pane: when it was on, and the title under it, standing on
+ * the card's floor. No logo: the channel is the one highlighted beside the pane.
  *
  * The card's size is the caller's. The title is the one part that can be long, so it is the part that gives: it holds two
  * lines and then ends in an ellipsis, and the card never grows to make room for it. It is in a band that takes whatever
  * the top line leaves, with the text at the bottom, so the names of a row stand on one line.
- *
- * It had three bands -- the logo large in the middle -- when two rows shared the panel and a card was half as tall again;
- * at three rows there is no room for a middle, and the logo is the small one beside the time that it was before.
  */
 @Composable
 private fun ProgrammeCard(
     card: CatchUpCard,
-    logo: String?,
-    logoSeed: String?,
     m: ChannelsMetrics,
     modifier: Modifier,
     onClick: () -> Unit,
@@ -324,21 +233,12 @@ private fun ProgrammeCard(
         fill = SolidColor(colors.glassFill),
     ) {
         Column(Modifier.fillMaxSize().padding(Spacing.sm), verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-                Text(
-                    text = card.timeText,
-                    style = castivioBodyStyle(m.frame.fsBody),
-                    color = colors.onBackgroundMuted,
-                    maxLines = 1,
-                    modifier = Modifier.weight(1f),
-                )
-                ProviderArtwork(
-                    url = logo,
-                    description = null,
-                    modifier = Modifier.size(m.frame.fsLabel * LOGO_IN_CARD),
-                    seed = logoSeed,
-                )
-            }
+            Text(
+                text = card.timeText,
+                style = castivioBodyStyle(m.frame.fsBody),
+                color = colors.onBackgroundMuted,
+                maxLines = 1,
+            )
             Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.BottomStart) {
                 Text(
                     text = card.title,
@@ -348,6 +248,29 @@ private fun ProgrammeCard(
                     overflow = TextOverflow.Ellipsis,
                 )
             }
+        }
+    }
+}
+
+/** One day of the archive: its name or its date, filled with the chosen colour when it is the one shown. */
+@Composable
+private fun DayTab(day: CatchUpDayView, selected: Boolean, m: ChannelsMetrics, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    val colors = CastivioTheme.colors
+    InteractiveGlassCard(
+        onClick = onClick,
+        modifier = modifier,
+        shape = RoundedCornerShape(m.panelRadius),
+        fill = if (selected) SolidColor(colors.primaryContainer) else SolidColor(colors.glassFill),
+    ) {
+        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            Text(
+                text = if (day.label == DayLabel.DATE) day.date else dayName(day.label),
+                style = castivioChipStyle(m.frame.fsLabel),
+                color = colors.onBackgroundStrong,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(horizontal = m.controlPadH, vertical = Spacing.sm),
+            )
         }
     }
 }
@@ -386,8 +309,5 @@ private const val VISIBLE_ROWS = 3
 /** The floor under a card's height, so a very short panel still draws a card that can be read and scrolls instead. */
 private val CARD_MIN_HEIGHT = 76.dp
 
-/** The channel's logo in the header, a little taller than the label beside it. */
-private const val LOGO_IN_LABELS = 1.6f
-
-/** The logo on a programme card, at the end of the top line: about as tall as two lines of the label's own size. */
-private const val LOGO_IN_CARD = 1.8f
+/** Days up to this many share the width as one bar; more scroll in a row. */
+private const val DAYS_AS_BAR = 4

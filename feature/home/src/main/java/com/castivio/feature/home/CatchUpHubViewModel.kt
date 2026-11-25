@@ -45,7 +45,7 @@ sealed interface HubStage {
     data class Channels(val group: ArchiveGroup?) : HubStage
 
     /**
-     * One channel's programmes, over its list: the screen [CatchUpOverlay] draws.
+     * One channel's programmes, beside its list: the pane [CatchUpProgrammes] draws.
      *
      * [fromGroups] is a channel found by the search on the first page, which has no category open: Back returns to that
      * page, and its results, and not to a list of "all" it was never in.
@@ -60,7 +60,7 @@ data class HubGroups(val groups: List<ArchiveGroup>) {
 
 /**
  * Catch-up as a place of its own: the categories that keep an archive, a category's channels, and -- through
- * [CatchUpOverlay] -- a channel's programmes.
+ * [CatchUpProgrammes] -- a channel's programmes.
  *
  * ## What it reads, and how much
  *
@@ -176,7 +176,8 @@ class CatchUpHubViewModel @Inject constructor(
         _stage.value = when (val at = _stage.value) {
             HubStage.Groups -> HubStage.Programmes(null, channel, fromGroups = true)
             is HubStage.Channels -> HubStage.Programmes(at.group, channel)
-            is HubStage.Programmes -> return
+            // Another channel from the list beside the programmes: its programmes, in the same place (owner, 2026-11-25).
+            is HubStage.Programmes -> if (at.channel.id == channel.id) return else at.copy(channel = channel)
         }
     }
 

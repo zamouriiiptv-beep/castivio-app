@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -23,6 +24,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -74,7 +77,7 @@ import com.castivio.domain.Channel
 
 /**
  * **Catch-up, a place of its own.** The categories that keep an archive, a category's channels, and -- over them -- a
- * channel's programmes, which is the screen [CatchUpOverlay] draws and which plays through the same hand-off a film does.
+ * channel's programmes beside its list, the pane [CatchUpProgrammes] draws, which plays through the same hand-off a film does.
  *
  * Home's rail opens it; it replaces the button on every channel's guide, and the channels that have nothing to
  * replay are not in it, so nobody opens a screen of programmes that cannot be played to find that out.
@@ -129,90 +132,133 @@ fun CatchUpHubScreen(
         ) {
             val m = channelsMetricsFor(tv = tv, width = maxWidth, height = maxHeight)
 
-            Column(
-                Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = m.edge)
-                    .padding(top = m.boardTop, bottom = m.boardBottom),
-            ) {
-                BoardBand(
-                    section = stringResource(R.string.catchup_title),
-                    // Short, because the cell it stands in is a fixed 90dp or so, and the same at every place: what this
-                    // page is and which category is open are the panel's header's to say, and said twice they were repeated
-                    // here (and the sentence cut off).
-                    list = stringResource(R.string.catchup_band),
-                    m = m,
-                    searchText = "",
-                    onSearch = {},
-                    onSearchFocus = {},
-                    withSearch = false,
-                    // The panel below has its own arrow, which steps back through the categories before it leaves.
-                    withBack = false,
-                )
-
-                Spacer(Modifier.height(m.headerGap))
-
-                HubPanel(
-                    m = m,
-                    direction = direction,
-                    searchText = searchText,
-                    onSearch = hub::search,
-                    onSearchFocus = { searchFocused = it },
-                    // A category's channels read "choose a channel", then the category -- the action first, as a title, and what
-                    // it is chosen from after it, in the brighter of the two lines because it is the data.
-                    title = when (stage) {
-                        HubStage.Groups -> stringResource(R.string.catchup_title)
-                        else -> stringResource(R.string.catchup_pick_channel)
-                    },
-                    hint = when (val at = stage) {
-                        HubStage.Groups -> stringResource(R.string.catchup_hub_subtitle)
-                        is HubStage.Channels -> at.group?.name ?: stringResource(R.string.catchup_all)
-                        is HubStage.Programmes -> at.group?.name ?: stringResource(R.string.catchup_all)
-                    },
-                    hintIsName = stage != HubStage.Groups,
-                    onBack = { if (!hub.back()) onBack() },
+            val at = stage
+            if (at is HubStage.Programmes) {
+                // A channel's programmes beside the list it was chosen from (owner, 2026-11-25,
+                // design/mockups/catchup-17-ltr-ar.png): under the band every board has, the channels at the left and the
+                // channel's days and programmes beside them, all from the left. Another channel is one press away.
+                val programmeSearch by programmes.searchText.collectAsStateWithLifecycle()
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = m.edge)
+                        .padding(top = m.boardTop, bottom = m.boardBottom),
                 ) {
-                    val found = matches
-                    val onFirstPage = stage == HubStage.Groups || (stage as? HubStage.Programmes)?.fromGroups == true
-                    when {
-                        // The categories, or -- while something is searched -- what matched among them and the channels.
-                        onFirstPage && found == null -> GroupsPage(
-                            groups = groups,
-                            m = m,
-                            autoFocus = !searchFocused,
-                            supported = supported,
-                            onOpen = hub::openGroup,
-                        )
-                        onFirstPage && found != null -> SearchResults(
-                            found = found,
+                    BoardHeader(
+                        m = m,
+                        searchText = programmeSearch,
+                        onSearch = programmes::search,
+                        hint = stringResource(R.string.catchup_search_programmes),
+                        // Programmes are in the order they were on: there is no other order to offer.
+                        order = null,
+                    )
+                    Spacer(Modifier.height(m.headerGap))
+                    val shape = RoundedCornerShape(m.panelRadius)
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .clip(shape)
+                            .background(CastivioTheme.colors.backgroundElevated)
+                            .border(1.dp, CastivioTheme.colors.glassBorder, shape)
+                            .padding(m.wellPad),
+                        horizontalArrangement = Arrangement.spacedBy(m.guideGap),
+                    ) {
+                        ChannelSide(
+                            // The channels' own search, at the head of their list (owner, 2026-11-25); the band's looks
+                            // among the programmes.
+                            searchText = searchText,
+                            onSearch = hub::search,
                             channels = channels,
+                            selected = at.channel,
                             m = m,
-                            direction = direction,
-                            onOpenGroup = hub::openGroup,
-                            onOpenChannel = hub::openChannel,
-                        )
-                        else -> ChannelsPage(
-                            channels = channels,
-                            m = m,
-                            searching = searchText.isNotBlank(),
-                            autoFocus = !searchFocused,
                             onOpen = hub::openChannel,
+                            modifier = Modifier.fillMaxWidth(SIDE_SHARE).fillMaxHeight(),
+                        )
+                        CatchUpProgrammes(
+                            channel = at.channel,
+                            m = m,
+                            model = programmes,
+                            onPlay = onPlay,
+                            onClose = { hub.back() },
+                            playing = playing,
+                            modifier = Modifier.weight(1f),
                         )
                     }
                 }
-            }
+            } else {
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = m.edge)
+                        .padding(top = m.boardTop, bottom = m.boardBottom),
+                ) {
+                    BoardBand(
+                        section = stringResource(R.string.catchup_title),
+                        // Short, because the cell it stands in is a fixed 90dp or so, and the same at every place: what this
+                        // page is and which category is open are the panel's header's to say, and said twice they were repeated
+                        // here (and the sentence cut off).
+                        list = stringResource(R.string.catchup_band),
+                        m = m,
+                        searchText = "",
+                        onSearch = {},
+                        onSearchFocus = {},
+                        withSearch = false,
+                        // The panel below has its own arrow, which steps back through the categories before it leaves.
+                        withBack = false,
+                    )
 
-            (stage as? HubStage.Programmes)?.let { at ->
-                CatchUpOverlay(
-                    channel = at.channel,
-                    m = m,
-                    model = programmes,
-                    onPlay = onPlay,
-                    onClose = { hub.back() },
-                    playing = playing,
-                    reserveEnd = 0.dp,
-                    direction = direction,
-                )
+                    Spacer(Modifier.height(m.headerGap))
+
+                    HubPanel(
+                        m = m,
+                        direction = direction,
+                        searchText = searchText,
+                        onSearch = hub::search,
+                        onSearchFocus = { searchFocused = it },
+                        // A category's channels read "choose a channel", then the category -- the action first, as a title, and what
+                        // it is chosen from after it, in the brighter of the two lines because it is the data.
+                        title = when (stage) {
+                            HubStage.Groups -> stringResource(R.string.catchup_title)
+                            else -> stringResource(R.string.catchup_pick_channel)
+                        },
+                        hint = when (val at = stage) {
+                            HubStage.Groups -> stringResource(R.string.catchup_hub_subtitle)
+                            is HubStage.Channels -> at.group?.name ?: stringResource(R.string.catchup_all)
+                            is HubStage.Programmes -> at.group?.name ?: stringResource(R.string.catchup_all)
+                        },
+                        hintIsName = stage != HubStage.Groups,
+                        onBack = { if (!hub.back()) onBack() },
+                    ) {
+                        val found = matches
+                        val onFirstPage = stage == HubStage.Groups || (stage as? HubStage.Programmes)?.fromGroups == true
+                        when {
+                            // The categories, or -- while something is searched -- what matched among them and the channels.
+                            onFirstPage && found == null -> GroupsPage(
+                                groups = groups,
+                                m = m,
+                                autoFocus = !searchFocused,
+                                supported = supported,
+                                onOpen = hub::openGroup,
+                            )
+                            onFirstPage && found != null -> SearchResults(
+                                found = found,
+                                channels = channels,
+                                m = m,
+                                direction = direction,
+                                onOpenGroup = hub::openGroup,
+                                onOpenChannel = hub::openChannel,
+                            )
+                            else -> ChannelsPage(
+                                channels = channels,
+                                m = m,
+                                searching = searchText.isNotBlank(),
+                                autoFocus = !searchFocused,
+                                onOpen = hub::openChannel,
+                            )
+                        }
+                    }
+                }
             }
         }
     }
@@ -475,9 +521,65 @@ private fun ChannelsPage(
     }
 }
 
+/**
+ * The list beside a channel's programmes: its own search at its head, then the category's channels with an archive, the open
+ * one in the chosen colour. A press on another opens its programmes in the pane beside, and the list stays where it was
+ * scrolled.
+ */
+@Composable
+private fun ChannelSide(
+    searchText: String,
+    onSearch: (String) -> Unit,
+    channels: LazyPagingItems<Channel>,
+    selected: Channel,
+    m: ChannelsMetrics,
+    onOpen: (Channel) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val colors = CastivioTheme.colors
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(m.guideGap)) {
+        HeaderSearchField(
+            text = searchText,
+            m = m,
+            onType = onSearch,
+            hint = stringResource(R.string.channels_search_hint),
+            modifier = Modifier.fillMaxWidth(),
+        )
+        if (channels.itemCount == 0 && searchText.isNotBlank() && channels.loadState.refresh !is LoadState.Loading) {
+            Text(
+                text = stringResource(R.string.catchup_search_none),
+                style = castivioBodyStyle(m.frame.fsBody),
+                color = colors.onBackgroundMuted,
+            )
+        }
+        LazyColumn(Modifier.fillMaxWidth().weight(1f), verticalArrangement = Arrangement.spacedBy(m.guideGap)) {
+            items(channels.itemCount, key = channels.itemKey { it.id }) { index ->
+                channels[index]?.let { channel ->
+                    ChannelEntry(
+                        channel = channel,
+                        m = m,
+                        selected = channel.id == selected.id,
+                        // The side is narrow: the number gives its room to the name.
+                        numbered = false,
+                        onClick = { onOpen(channel) },
+                    )
+                }
+            }
+        }
+    }
+}
+
 /** One channel: its number and logo and name, and how many days the provider says it keeps. */
 @Composable
-private fun ChannelEntry(channel: Channel, m: ChannelsMetrics, onClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun ChannelEntry(
+    channel: Channel,
+    m: ChannelsMetrics,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    /** The channel whose programmes are open beside the list. */
+    selected: Boolean = false,
+    numbered: Boolean = true,
+) {
     val colors = CastivioTheme.colors
     val tv = CastivioTheme.device.isTv
     val days = CatchUpPolicy.daysOf(channel.catchUpHours)
@@ -485,7 +587,7 @@ private fun ChannelEntry(channel: Channel, m: ChannelsMetrics, onClick: () -> Un
         onClick = onClick,
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(m.panelRadius),
-        fill = SolidColor(colors.glassFill),
+        fill = if (selected) SolidColor(colors.primaryContainer) else SolidColor(colors.glassFill),
     ) {
         // The floor is the row's, so what is in it is centred: see [GroupCard].
         Row(
@@ -497,7 +599,7 @@ private fun ChannelEntry(channel: Channel, m: ChannelsMetrics, onClick: () -> Un
             horizontalArrangement = Arrangement.spacedBy(m.controlPadH),
         ) {
             // A plate only for a channel that has a number: a provider that numbers none would otherwise show an empty one.
-            channel.number?.let { number ->
+            channel.number?.takeIf { numbered }?.let { number ->
                 Text(
                     text = number.toString(),
                     style = castivioChipStyle(m.frame.fsChip),
@@ -653,6 +755,9 @@ private fun Empty(m: ChannelsMetrics, @StringRes message: Int = R.string.catchup
         )
     }
 }
+
+/** The list of channels beside a channel's programmes, of the panel's width. */
+private const val SIDE_SHARE = 0.3f
 
 /** The line under the title a little larger than a body line: it is what the page says it is for. */
 private const val HINT_SCALE = 1.2f

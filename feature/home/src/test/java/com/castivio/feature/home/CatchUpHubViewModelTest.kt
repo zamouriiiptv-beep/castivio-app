@@ -104,6 +104,19 @@ class CatchUpHubViewModelTest {
     }
 
     @Test
+    fun `another channel from the list beside the programmes opens its programmes, and back still returns to the list`() {
+        val hub = hub()
+        val other = channel.copy(id = "c2", title = "Two")
+        hub.openGroup(france)
+        hub.openChannel(channel)
+        hub.openChannel(other)
+        assertEquals(HubStage.Programmes(france, other), hub.stage.value)
+
+        assertTrue(hub.back())
+        assertEquals(HubStage.Channels(france), hub.stage.value)
+    }
+
+    @Test
     fun `back leaves the places in the opposite order and says so`() {
         val hub = hub()
         hub.openGroup(france)
