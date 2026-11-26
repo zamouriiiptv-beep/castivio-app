@@ -191,7 +191,7 @@ internal fun metricsFor(tv: Boolean, width: Dp, height: Dp): Metrics {
         pillHeight = px(72f),
         pillSize = px(28f),
         pillIcon = px(34f),
-        idsHeight = px(116f),
+        idsHeight = maxOf(px(116f), frame.touchTarget),
         idsGap = px(50f),
         idIcon = px(52f),
         idLabelSize = px(30f),
