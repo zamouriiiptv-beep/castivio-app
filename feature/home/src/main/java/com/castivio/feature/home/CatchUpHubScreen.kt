@@ -1,5 +1,6 @@
 package com.castivio.feature.home
 
+import android.view.View
 import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
@@ -43,8 +44,10 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -309,7 +312,17 @@ private fun DaysColumn(
     Column(modifier, verticalArrangement = Arrangement.spacedBy(m.guideGap)) {
         Text(
             text = stringResource(R.string.catchup_archive_of, channel.title),
-            style = castivioChipStyle(m.frame.fsChip),
+            // In the language's own direction (owner, 2026-11-26): Arabic reads "أرشيف" from the right, the channel's name
+            // after it; a language read from the left starts at the left as before. The language's and not the sentence's,
+            // since some put the channel's name -- Latin, mostly -- first.
+            style = castivioChipStyle(m.frame.fsChip).copy(
+                textDirection = if (LocalConfiguration.current.layoutDirection == View.LAYOUT_DIRECTION_RTL) {
+                    TextDirection.Rtl
+                } else {
+                    TextDirection.Ltr
+                },
+            ),
+            modifier = Modifier.fillMaxWidth(),
             color = colors.onBackgroundVariant,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
