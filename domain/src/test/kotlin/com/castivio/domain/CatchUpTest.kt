@@ -76,6 +76,14 @@ class CatchUpTest {
     }
 
     @Test
+    fun `two entries for the same start are one programme, the first kept`() {
+        val first = programme(now - 3 * hour, title = "first")
+        val again = programme(now - 3 * hour, hours = 0.5, title = "again")
+
+        assertEquals(listOf("first"), CatchUpPolicy.replayable(listOf(first, again), now, 24).map { it.title })
+    }
+
+    @Test
     fun `a programme that ends exactly now is over`() {
         val justOver = programme(now - hour, title = "just over")
 

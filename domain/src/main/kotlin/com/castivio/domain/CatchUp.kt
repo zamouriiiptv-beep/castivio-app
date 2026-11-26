@@ -156,12 +156,17 @@ object CatchUpPolicy {
      *
      * A programme that has not finished is the live channel's, and one that began before the window is out of the
      * archive however the provider listed it. A zero-length entry is a gap in a guide and not a programme.
+     *
+     * **One programme per address.** A provider can list the same start twice -- the same show sent again, or two entries
+     * for one slot -- and both make the same address. They are one recording, so the first is kept: two cards that play
+     * the same thing are a repetition, and two list items with one key stop the screen (a device, 2026-11-26).
      */
     fun replayable(items: List<CatchUpProgramme>, nowMs: Long, archiveHours: Int): List<CatchUpProgramme> {
         val earliest = nowMs - archiveHours.toLong() * HOUR_MS
         return items
             .asSequence()
             .filter { it.stopMs > it.startMs && it.stopMs <= nowMs && it.startMs >= earliest }
+            .distinctBy { it.locator }
             .sortedByDescending { it.startMs }
             .toList()
     }
