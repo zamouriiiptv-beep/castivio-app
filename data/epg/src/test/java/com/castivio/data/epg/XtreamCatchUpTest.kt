@@ -59,7 +59,7 @@ class XtreamCatchUpTest {
         val api = FakeArchive(
             Outcome.Success(
                 listOf(
-                    entry("yesterday", startAgoHours = 26.0),
+                    entry("yesterday", startAgoHours = 26.0, serverStart = "2026-07-23 19:30:00"),
                     entry("this morning", startAgoHours = 5.0),
                     entry("too old", startAgoHours = 100.0),
                     entry("still on", startAgoHours = 0.5),
