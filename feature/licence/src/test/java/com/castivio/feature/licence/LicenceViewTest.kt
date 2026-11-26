@@ -357,4 +357,25 @@ class LicenceViewTest {
         )
         assertNull(licenceView(EntitlementState.Lifetime).action)
     }
+
+    /**
+     * The gate goes on by itself only for a licence in force: annual or lifetime. A trial,
+     * a lapsed licence or one that cannot be confirmed keeps the screen where it is.
+     */
+    @Test
+    fun `only a licence in force lets the gate go on`() {
+        assertTrue(isActiveLicence(EntitlementState.Lifetime))
+        assertTrue(isActiveLicence(EntitlementState.AnnualActive(expiresAtMs = 1, daysRemaining = 300)))
+        for (state in listOf(
+            EntitlementState.TrialActive(expiresAtMs = 1, daysRemaining = 3),
+            EntitlementState.TrialExpired,
+            EntitlementState.AnnualExpired(),
+            EntitlementState.Unknown,
+            EntitlementState.Revoked(revokedAtMs = 0),
+        )) {
+            assertFalse("$state let the gate go on", isActiveLicence(state))
+        }
+        assertTrue("the green screen is not given time to be read", ACTIVATED_PAUSE_MS in 1_500L..3_000L)
+    }
 }
+

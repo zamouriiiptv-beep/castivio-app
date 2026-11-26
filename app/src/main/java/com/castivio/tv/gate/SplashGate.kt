@@ -96,8 +96,13 @@ internal fun SplashGate(
         // Castivio's own licence, which is not the provider's subscription. Back
         // leaves the app: there is no screen behind this one, because the gate
         // sent the user here precisely because the app may not be used.
+        //
+        // When a licence arrives while it is up -- the trial is over and the user has just
+        // bought one -- the gate decides again by itself: adding a playlist when there is
+        // none yet, Home when there is (owner, 2026-11-26).
         is StartDestination.Licence -> LicenceWithLanguage(
             onLeave = onExit,
+            onActivated = model::refresh,
             modifier = modifier,
         )
     }

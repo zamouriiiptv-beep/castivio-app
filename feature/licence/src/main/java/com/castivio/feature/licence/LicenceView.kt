@@ -253,3 +253,14 @@ internal fun licenceView(state: EntitlementState): LicenceView = when (state) {
         action = LicenceAction.Support,
     )
 }
+
+/**
+ * A licence the device may be used with: paid for and in force. The one fact the gate needs
+ * to go on from the licence screen by itself -- see `LicenceRoute`.
+ */
+internal fun isActiveLicence(state: EntitlementState): Boolean =
+    state is EntitlementState.AnnualActive || state == EntitlementState.Lifetime
+
+/** How long "Licence active" stays on screen before the app goes on: long enough to be read. */
+internal const val ACTIVATED_PAUSE_MS = 2_000L
+

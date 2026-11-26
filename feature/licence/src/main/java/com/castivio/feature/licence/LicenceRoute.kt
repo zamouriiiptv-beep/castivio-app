@@ -15,6 +15,9 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -61,6 +64,13 @@ fun LicenceRoute(
      * debug affordance that ships.
      */
     forcedState: EntitlementState? = null,
+    /**
+     * Called when a licence arrives while this screen is up -- the trial had ended and the
+     * user has just bought or been given one -- after the screen has said so for a moment.
+     * The gate passes its own "decide again", which goes on to adding a playlist or to Home;
+     * null where the screen is not a gate and there is nowhere to go on to.
+     */
+    onActivated: (() -> Unit)? = null,
 ) {
     val model: LicenceViewModel = hiltViewModel()
     val real by model.state.collectAsStateWithLifecycle()
@@ -108,6 +118,25 @@ fun LicenceRoute(
             delay(POLL_MS)
             model.poll()
         }
+    }
+
+    // ## A licence arrives: say so, then go on
+    //
+    // The device came here without a licence (owner, 2026-11-26: a week's trial is over).
+    // When one arrives -- the portal, the owner's panel, a reseller -- the screen turns green
+    // for [ACTIVATED_PAUSE_MS] and the app goes on by itself, to adding a playlist or to Home,
+    // instead of asking the user to leave and come back. Only a change seen here counts: a
+    // screen opened over an active licence never moves anyone.
+    var sawNoLicence by remember { mutableStateOf(false) }
+    val licence = state.licence
+    LaunchedEffect(licence) {
+        if (licence != null && !isActiveLicence(licence)) sawNoLicence = true
+    }
+    val arrived = onActivated != null && sawNoLicence && licence != null && isActiveLicence(licence)
+    LaunchedEffect(arrived) {
+        if (!arrived) return@LaunchedEffect
+        delay(ACTIVATED_PAUSE_MS)
+        onActivated?.invoke()
     }
 
     BackHandler {

@@ -50,6 +50,7 @@ internal fun LicenceWithLanguage(
     modifier: Modifier = Modifier,
     /** Debug only; see `LicenceRoute`, which ignores it in a release build. */
     forcedState: EntitlementState? = null,
+    onActivated: (() -> Unit)? = null,
 ) {
     val locale = LocalLocaleController.current
     var picking by rememberSaveable { mutableStateOf(false) }
@@ -61,6 +62,7 @@ internal fun LicenceWithLanguage(
         onOpenLanguage = { picking = true },
         modifier = modifier,
         forcedState = forcedState,
+        onActivated = onActivated,
     )
 
     if (picking) {
