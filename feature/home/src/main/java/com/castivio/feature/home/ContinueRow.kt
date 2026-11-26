@@ -18,6 +18,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -180,14 +187,20 @@ private fun ContinueCard(
                         style = castivioChipStyle(frame.fsChip).copy(textDirection = TextDirection.Content, textAlign = TextAlign.Left),
                         color = colors.onBackgroundStrong,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
+                        overflow = TextOverflow.Clip,
+                        softWrap = false,
+                        // No dots at the end of a long name (owner, 2026-11-26): it runs to the card's edge and fades there.
+                        modifier = Modifier.fillMaxWidth().fadeOutEnd(),
                     )
                     Text(
                         line,
                         style = castivioBodyStyle(frame.fsChip * LINE_OF_CHIP).copy(textDirection = TextDirection.Content, textAlign = TextAlign.Left),
                         color = colors.onBackgroundMuted,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
+                        overflow = TextOverflow.Clip,
+                        softWrap = false,
+                        // No dots at the end of a long name (owner, 2026-11-26): it runs to the card's edge and fades there.
+                        modifier = Modifier.fillMaxWidth().fadeOutEnd(),
                     )
                     if (progress != null) {
                         Spacer(Modifier.height(pad / 2))
@@ -295,3 +308,28 @@ private const val POSTER_ASPECT = 0.68f
 
 /** The line under a card's name against the frame's chip text. */
 private const val LINE_OF_CHIP = 0.85f
+
+/**
+ * Fades what is drawn out over the last [FADE_OF_WIDTH] of the width, at the right -- the cards are drawn left to right in
+ * every language. Text that ends before that stretch is not touched; a name too long for the card fades instead of being cut
+ * with dots.
+ */
+private fun Modifier.fadeOutEnd(): Modifier =
+    graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+        .drawWithContent {
+            drawContent()
+            val from = size.width * (1f - FADE_OF_WIDTH)
+            drawRect(
+                brush = Brush.horizontalGradient(
+                    colors = listOf(Color.Black, Color.Transparent),
+                    startX = from,
+                    endX = size.width,
+                ),
+                topLeft = Offset(from, 0f),
+                size = Size(size.width - from, size.height),
+                blendMode = BlendMode.DstIn,
+            )
+        }
+
+/** How much of a name's width the fade takes, at its end. */
+private const val FADE_OF_WIDTH = 0.14f
