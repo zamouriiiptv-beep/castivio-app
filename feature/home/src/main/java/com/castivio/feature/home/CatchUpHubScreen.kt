@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -122,8 +123,6 @@ fun CatchUpHubScreen(
 
             when (val at = stage) {
                 is HubStage.Programmes -> {
-                    // A day's programmes beside the list it was chosen from: under the band, the channels at the left and the
-                    // channel's days and programmes beside them. Another channel is one press away.
                     val programmeSearch by programmes.searchText.collectAsStateWithLifecycle()
                     Column(
                         Modifier
@@ -140,31 +139,18 @@ fun CatchUpHubScreen(
                             order = null,
                         )
                         Spacer(Modifier.height(m.headerGap))
-                        Row(
-                            Modifier.fillMaxWidth().weight(1f),
-                            horizontalArrangement = Arrangement.spacedBy(m.railGap),
-                        ) {
-                            ChannelSide(
-                                // The channels' own search, at the head of their list; the band's looks among the programmes.
-                                searchText = searchText,
-                                onSearch = hub::search,
-                                withSearch = true,
-                                channels = channels,
-                                selected = at.channel,
-                                m = m,
-                                onOpen = hub::openChannel,
-                                modifier = Modifier.fillMaxWidth(SIDE_SHARE).fillMaxHeight().homeCard(m).padding(m.wellPad),
-                            )
-                            CatchUpProgrammes(
-                                channel = at.channel,
-                                m = m,
-                                model = programmes,
-                                onPlay = onPlay,
-                                onClose = { hub.back() },
-                                playing = playing,
-                                modifier = Modifier.weight(1f).homeCard(m).padding(m.wellPad),
-                            )
-                        }
+                        // The chosen day's programmes across the page (owner, 2026-11-26,
+                        // design/mockups/catchup-22-one-day-ar.png): no channels beside them and no other days; both are on the
+                        // first page, one Back away.
+                        CatchUpProgrammes(
+                            channel = at.channel,
+                            m = m,
+                            model = programmes,
+                            onPlay = onPlay,
+                            onClose = { hub.back() },
+                            playing = playing,
+                            modifier = Modifier.fillMaxWidth().weight(1f).homeCard(m).padding(m.wellPad),
+                        )
                     }
                 }
 
@@ -347,6 +333,9 @@ private fun DayEntry(day: CatchUpDayView, m: ChannelsMetrics, onClick: () -> Uni
         shape = RoundedCornerShape(m.panelRadius),
         fill = SolidColor(colors.glassFill),
     ) {
+        Box {
+        // The archive's picture, only just there, as on the programmes' cards.
+        CatchUpArt(Modifier.matchParentSize())
         Row(
             Modifier
                 .fillMaxWidth()
@@ -387,6 +376,7 @@ private fun DayEntry(day: CatchUpDayView, m: ChannelsMetrics, onClick: () -> Uni
                 tint = colors.onBackgroundMuted,
                 modifier = Modifier.size(Sizing.iconSm),
             )
+        }
         }
     }
 }
@@ -611,8 +601,6 @@ private fun Empty(m: ChannelsMetrics, @StringRes message: Int = R.string.catchup
     }
 }
 
-/** The list of channels beside a channel's programmes, of the panel's width. */
-private const val SIDE_SHARE = 0.3f
 
 /** The first page's columns, of the width: the bouquets, then the channels; the days take what is left. */
 private const val GROUPS_SHARE = 0.27f

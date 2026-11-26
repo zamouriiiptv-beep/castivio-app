@@ -1,6 +1,11 @@
 package com.castivio.feature.home
 
 import androidx.activity.compose.BackHandler
+import com.castivio.core.design.components.ProviderArtwork
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -12,12 +17,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed as gridItemsIndexed
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -119,19 +122,43 @@ internal fun CatchUpProgrammes(
                 }
 
                 CatchUpPhase.READY -> {
-                    // The days, newest first, from the left. Only the days the archive has: nothing is padded out to a week. A few
-                    // share the width as one bar, as drawn; more than fit that way scroll.
-                    if (state.days.size <= DAYS_AS_BAR) {
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(m.guideGap)) {
-                            state.days.forEachIndexed { index, day ->
-                                DayTab(day, index == state.dayIndex, m, Modifier.weight(1f)) { model.selectDay(index) }
+                    // The day the viewer chose on the first page, and only it (owner, 2026-11-26,
+                    // design/mockups/catchup-22-one-day-ar.png): the channel and the day over its programmes. Another day is
+                    // chosen where this one was, in the days' column.
+                    state.days.getOrNull(state.dayIndex)?.let { shownDay ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(m.controlPadH),
+                        ) {
+                            ProviderArtwork(
+                                url = channel.artworkUrl,
+                                description = null,
+                                modifier = Modifier.size(m.frame.fsLabel * LOGO_IN_TITLE),
+                                seed = channel.title,
+                            )
+                            Text(
+                                text = channel.title,
+                                style = castivioChipStyle(m.frame.fsLabel),
+                                color = colors.onBackgroundStrong,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.weight(1f, fill = false),
+                            )
+                            Text(text = "·", style = castivioChipStyle(m.frame.fsLabel), color = colors.onBackgroundMuted)
+                            if (shownDay.label != DayLabel.DATE) {
+                                Text(
+                                    text = dayName(shownDay.label),
+                                    style = castivioChipStyle(m.frame.fsLabel),
+                                    color = colors.hueAzure,
+                                    maxLines = 1,
+                                )
                             }
-                        }
-                    } else {
-                        LazyRow(horizontalArrangement = Arrangement.spacedBy(m.guideGap)) {
-                            itemsIndexed(state.days, key = { index, day -> "${index}_${day.date}" }) { index, day ->
-                                DayTab(day, index == state.dayIndex, m) { model.selectDay(index) }
-                            }
+                            Text(
+                                text = shownDay.date,
+                                style = castivioBodyStyle(m.frame.fsBody),
+                                color = colors.onBackgroundVariant,
+                                maxLines = 1,
+                            )
                         }
                     }
 
@@ -150,7 +177,7 @@ internal fun CatchUpProgrammes(
                             // Another day, or another search, begins at the top, not at wherever the last one was scrolled to.
                             val grid = remember(state.dayIndex, view.term) { LazyGridState() }
                             LazyVerticalGrid(
-                                columns = GridCells.Adaptive(CARD_MIN_WIDTH),
+                                columns = GridCells.Fixed(PROGRAMME_COLUMNS),
                                 state = grid,
                                 modifier = Modifier.fillMaxSize(),
                                 horizontalArrangement = Arrangement.spacedBy(m.guideGap),
@@ -229,6 +256,8 @@ private fun ProgrammeCard(
         shape = RoundedCornerShape(m.panelRadius),
         fill = SolidColor(colors.glassFill),
     ) {
+        Box(Modifier.fillMaxSize()) {
+        CatchUpArt(Modifier.matchParentSize())
         Column(Modifier.fillMaxSize().padding(Spacing.sm), verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
             Text(
                 text = card.timeText,
@@ -246,28 +275,6 @@ private fun ProgrammeCard(
                 )
             }
         }
-    }
-}
-
-/** One day of the archive: its name or its date, filled with the chosen colour when it is the one shown. */
-@Composable
-private fun DayTab(day: CatchUpDayView, selected: Boolean, m: ChannelsMetrics, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    val colors = CastivioTheme.colors
-    InteractiveGlassCard(
-        onClick = onClick,
-        modifier = modifier,
-        shape = RoundedCornerShape(m.panelRadius),
-        fill = if (selected) SolidColor(colors.primaryContainer) else SolidColor(colors.glassFill),
-    ) {
-        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-            Text(
-                text = if (day.label == DayLabel.DATE) day.date else dayName(day.label),
-                style = castivioChipStyle(m.frame.fsLabel),
-                color = colors.onBackgroundStrong,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(horizontal = m.controlPadH, vertical = Spacing.sm),
-            )
         }
     }
 }
@@ -297,14 +304,32 @@ private fun dayName(label: DayLabel): String = when (label) {
     DayLabel.DATE -> ""
 }
 
-/** A card is at least this wide: the grid fits as many columns as the panel holds, three on a television, fewer on a phone. */
-private val CARD_MIN_WIDTH = 150.dp
-
 /** Rows of programmes shown whole at a time; the rest are a scroll away. */
 private const val VISIBLE_ROWS = 3
 
 /** The floor under a card's height, so a very short panel still draws a card that can be read and scrolls instead. */
 private val CARD_MIN_HEIGHT = 76.dp
 
-/** Days up to this many share the width as one bar; more scroll in a row. */
-private const val DAYS_AS_BAR = 4
+/** The programmes of the day, this many to a row across the page's width: four, as drawn. */
+private const val PROGRAMME_COLUMNS = 4
+
+/** The channel's logo over the day's programmes, a little taller than the label beside it. */
+private const val LOGO_IN_TITLE = 1.6f
+
+/**
+ * The archive's picture behind a card (owner, 2026-11-26): only just there, at the weight the empty "continue" slots on
+ * Home carry theirs, so a page of them says "archive" without a picture repeated loudly twelve times.
+ */
+internal const val CATCHUP_ART_ALPHA = 0.12f
+
+/** The archive's picture, filling what it is given, at [CATCHUP_ART_ALPHA]. */
+@Composable
+internal fun CatchUpArt(modifier: Modifier = Modifier) {
+    Image(
+        painter = painterResource(R.drawable.catchup_art),
+        contentDescription = null,
+        contentScale = ContentScale.Crop,
+        alpha = CATCHUP_ART_ALPHA,
+        modifier = modifier,
+    )
+}
