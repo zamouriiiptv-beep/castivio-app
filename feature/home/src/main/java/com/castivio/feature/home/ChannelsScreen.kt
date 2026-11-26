@@ -5,7 +5,6 @@ import android.view.View
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.border
@@ -92,14 +91,12 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.selected
@@ -115,6 +112,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.em
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -124,6 +122,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.castivio.core.common.format.CastivioDates
 import com.castivio.core.design.components.CastivioIconButton
+import com.castivio.core.design.components.CastivioLockup
 import com.castivio.core.design.components.CastivioMiddleEllipsisText
 import com.castivio.core.design.components.DelayedSpinner
 import com.castivio.core.design.components.EmptyState
@@ -159,7 +158,6 @@ import com.castivio.domain.isProviderHeading
 import java.util.Calendar
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-import com.castivio.core.design.R as DesignR
 
 /**
  * Live TV, drawn as the approved Channels reference draws it.
@@ -611,18 +609,12 @@ internal fun BoardBand(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(m.osdGap, Alignment.CenterHorizontally),
             ) {
-                Image(
-                    painter = painterResource(DesignR.drawable.castivio_logo),
-                    contentDescription = null,
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier.height(m.header * MARK_OF_HEADER).testTag(BAND_MARK_TAG),
-                )
-                Text(
-                    text = stringResource(R.string.gate_wordmark),
-                    style = castivioTitleStyle(m.frame.fsLabel * WORDMARK_OF_LABEL),
-                    color = colors.onBackgroundStrong,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
+                // Home's own lockup, at Home's own size (owner, 2026-11-25): the mark and the tracked CASTIVIO, so moving
+                // from Home to a board does not change the signature. Never taller than the band.
+                CastivioLockup(
+                    markSize = minOf(m.frame.brand, m.header),
+                    wordSize = (m.frame.fsTitle.value * BAND_WORD_OF_TITLE).sp,
+                    modifier = Modifier.testTag(BAND_MARK_TAG),
                 )
             }
 
@@ -3912,19 +3904,8 @@ private const val LOGO_SCALE = 1.05f
  */
 private const val QUALITY_OF_BODY = 0.84f
 
-/**
- * The mark's height inside the band, as a share of it: the television, which is the whole of the picture.
- *
- * The picture is trimmed to the television. It used to be a portrait canvas with the television in its middle third
- * and empty ground above and below, drawn as tall as the band -- so the television was 38% of the picture, about 13dp
- * on a handset, and read small however the share was set. A child cannot be taller than the band it stands in, so
- * the way to a larger mark was a picture with nothing in it but the mark.
- *
- * 0.7 of a 34dp band was 24dp (`design/mockups/band-mark.html`); the owner then asked for the pair a little larger
- * and in the middle of its cell, and chose 0.8 -- 27dp, a seventh larger -- from
- * `design/mockups/channels-band-brand-ar.html`, over 0.91, which nearly fills the band.
- */
-internal const val MARK_OF_HEADER = 0.8f
+/** The band's wordmark against the frame's title size: Home's own 0.75, so the two headers sign alike. */
+internal const val BAND_WORD_OF_TITLE = 0.75f
 
 /** The tag the band's mark carries, so a test can find a picture that says nothing to a reader. */
 internal const val BAND_MARK_TAG = "castivio.band.mark"
@@ -3975,18 +3956,6 @@ private const val NO_GUIDE_STACKED_OF_BODY = 7f
 /** The hairline between the clock and the dates, as a share of the band. */
 private const val RULE_OF_HEADER = 0.56f
 
-/**
- * The wordmark, against the frame's label step.
- *
- * The mark and the name sit over the category rail with the whole of its width to
- * themselves and were drawn at the step a chip uses, which made the product's own name
- * the smallest confident thing on the screen. This is the one place on the board that
- * can afford to be larger than the type scale's own answer.
- *
- * 1.36 since the owner chose the larger pair, option A of `design/mockups/channels-band-brand-ar.html`: the same
- * 15% as the mark, so the two keep their proportion. It was 1.18.
- */
-private const val WORDMARK_OF_LABEL = 1.36f
 
 /**
  * A heading's letter spacing.

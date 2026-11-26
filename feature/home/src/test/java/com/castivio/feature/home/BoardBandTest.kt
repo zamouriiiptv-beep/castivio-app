@@ -30,6 +30,7 @@ import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
 import com.castivio.core.design.theme.CastivioTheme
+import com.castivio.core.design.components.CastivioMark
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -70,7 +71,7 @@ open class BoardBandTest {
                 metrics = m
                 focus = LocalFocusManager.current
                 backLabel = stringResource(R.string.show_back)
-                wordmark = stringResource(R.string.gate_wordmark)
+                wordmark = CastivioMark.TEXT
                 BackHandler { backs++ }
                 BoardBand(
                     section = "Movies",
@@ -158,15 +159,14 @@ open class BoardBandTest {
     }
 
     @Test
-    fun `the mark is a little larger than the band's old share of it`() {
+    fun `the band signs with Home's lockup, at Home's size and never taller than the band`() {
         show()
 
         val mark = compose.onNodeWithTag(BAND_MARK_TAG).getUnclippedBoundsInRoot()
+        val m = metrics!!
 
-        // 0.8 of the band, where it was 0.7: about 14% taller, and still inside the band.
-        assertTrue("the share is $MARK_OF_HEADER", MARK_OF_HEADER > 0.7f)
-        assertEquals((metrics!!.header * MARK_OF_HEADER).value, mark.height.value, 1f)
-        assertTrue(mark.height <= metrics!!.header)
+        assertEquals(minOf(m.frame.brand, m.header).value, mark.height.value, 1f)
+        assertTrue(mark.height <= m.header)
     }
 
     @Test
