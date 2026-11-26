@@ -69,4 +69,5 @@
     <string name="licence_refresh">Освежи</string>
     <string name="licence_support_short">Подршка</string>
     <string name="licence_exit">Излаз</string>
+    <string name="licence_contact_provider">Обратите се добављачу од кога сте купили</string>
 </resources>

@@ -67,4 +67,5 @@
     <string name="licence_refresh">Muat ulang</string>
     <string name="licence_support_short">Dukungan</string>
     <string name="licence_exit">Keluar</string>
+    <string name="licence_contact_provider">Hubungi penyedia tempat Anda membeli</string>
 </resources>

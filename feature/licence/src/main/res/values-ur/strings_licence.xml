@@ -68,4 +68,5 @@
     <string name="licence_refresh">ریفریش</string>
     <string name="licence_support_short">سپورٹ</string>
     <string name="licence_exit">باہر نکلیں</string>
+    <string name="licence_contact_provider">جس فراہم کنندہ سے آپ نے خریدا تھا اس سے رابطہ کریں</string>
 </resources>

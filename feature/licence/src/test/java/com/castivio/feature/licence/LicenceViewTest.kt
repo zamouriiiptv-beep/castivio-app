@@ -377,5 +377,11 @@ class LicenceViewTest {
         }
         assertTrue("the green screen is not given time to be read", ACTIVATED_PAUSE_MS in 1_500L..3_000L)
     }
+
+    /** A withdrawn licence sends the user to whoever sold it, never to our own support. */
+    @Test
+    fun `a revoked licence points to the provider`() {
+        assertEquals(LicenceAction.Provider, licenceView(EntitlementState.Revoked(revokedAtMs = null)).action)
+    }
 }
 

@@ -116,6 +116,14 @@ internal enum class LicenceAction {
 
     /** Nothing the app can do. The user needs a person. */
     Support,
+
+    /**
+     * The licence was withdrawn by whoever sold it, and only they can give it back.
+     * Said as a sentence, not a button: the app knows no address for that seller
+     * (owner, 2026-11-26), and a button to our own support would send the user to
+     * the wrong person.
+     */
+    Provider,
 }
 
 /**
@@ -250,7 +258,7 @@ internal fun licenceView(state: EntitlementState): LicenceView = when (state) {
         tone = LicenceTone.Bad,
         status = R.string.licence_status_revoked,
         offersPlans = false,
-        action = LicenceAction.Support,
+        action = LicenceAction.Provider,
     )
 }
 

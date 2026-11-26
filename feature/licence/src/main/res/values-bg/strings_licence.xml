@@ -68,4 +68,5 @@
     <string name="licence_refresh">Опресни</string>
     <string name="licence_support_short">Поддръжка</string>
     <string name="licence_exit">Изход</string>
+    <string name="licence_contact_provider">Свържете се с доставчика, от когото сте купили</string>
 </resources>

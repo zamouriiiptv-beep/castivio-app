@@ -67,4 +67,5 @@
     <string name="licence_refresh">รีเฟรช</string>
     <string name="licence_support_short">ฝ่ายช่วยเหลือ</string>
     <string name="licence_exit">ออก</string>
+    <string name="licence_contact_provider">ติดต่อผู้ให้บริการที่คุณซื้อมา</string>
 </resources>

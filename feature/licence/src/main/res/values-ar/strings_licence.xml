@@ -72,4 +72,5 @@
     <string name="licence_refresh">تحديث</string>
     <string name="licence_support_short">الدعم</string>
     <string name="licence_exit">خروج</string>
+    <string name="licence_contact_provider">تواصل مع المزوّد الذي اشتريت منه</string>
 </resources>

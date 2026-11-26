@@ -593,7 +593,16 @@ private fun StatusCard(
         )
         ExpiryLine(fadeKey(state)?.expiresAtMs, m)
         val action = view.action
-        if (action != null) {
+        if (action == LicenceAction.Provider) {
+            // A sentence, not a button: only the seller can give the licence back.
+            Text(
+                text = stringResource(R.string.licence_contact_provider),
+                style = m.subtitleStyle,
+                color = colors.onBackground,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.testTag(LicenceTags.ACTION),
+            )
+        } else if (action != null) {
             CastivioButton(
                 modifier = Modifier
                     .testTag(LicenceTags.ACTION)
@@ -601,14 +610,14 @@ private fun StatusCard(
                 text = stringResource(
                     when (action) {
                         LicenceAction.Retry -> R.string.licence_retry
-                        LicenceAction.Support -> R.string.licence_support
+                        else -> R.string.licence_support
                     },
                 ),
                 weight = ButtonWeight.Secondary,
                 enabled = state.opening == null,
                 onClick = when (action) {
                     LicenceAction.Retry -> onRetry
-                    LicenceAction.Support -> onSupport
+                    else -> onSupport
                 },
             )
             LaunchedFocus(focus, enabled = true)

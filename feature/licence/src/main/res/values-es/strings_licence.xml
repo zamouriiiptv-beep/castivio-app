@@ -68,4 +68,5 @@
     <string name="licence_refresh">Actualizar</string>
     <string name="licence_support_short">Soporte</string>
     <string name="licence_exit">Salir</string>
+    <string name="licence_contact_provider">Contacta con el proveedor al que le compraste</string>
 </resources>

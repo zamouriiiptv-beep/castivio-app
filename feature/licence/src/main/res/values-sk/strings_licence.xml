@@ -70,4 +70,5 @@
     <string name="licence_refresh">Obnoviť</string>
     <string name="licence_support_short">Podpora</string>
     <string name="licence_exit">Ukončiť</string>
+    <string name="licence_contact_provider">Kontaktujte poskytovateľa, u ktorého ste nakúpili</string>
 </resources>
