@@ -105,13 +105,16 @@ fun LicenceRoute(
     // a press repeated harder.
     // ## The screen checks by itself
     //
-    // While a purchase would change something -- the plans are on offer -- the
-    // licence server is asked again every fifteen seconds, so a payment made on a
-    // phone turns this screen without anyone pressing anything. Keyed on that one
-    // fact: the loop starts when the plans appear and ends with the composition,
-    // or the moment a licence arrives and they go. A lifecycle-bound effect rather
+    // While the device has no licence in force, the licence server is asked again
+    // every fifteen seconds, so a payment made on a phone -- or a licence given back
+    // from a panel -- turns this screen without anyone pressing anything. Keyed on
+    // that one fact: the loop ends with the composition, or the moment a licence
+    // arrives. A lifecycle-bound effect rather
     // than a loop in the view model, so a screen nobody can see asks nothing.
-    val waiting = state.licence?.let { licenceView(it).offersPlans } == true
+    // Every state without a licence in force, not only the ones that show prices: a revoked
+    // licence given back from the owner's panel must turn the screen by itself too
+    // (owner, 2026-11-26), and so must one a reseller restores.
+    val waiting = state.licence?.let { !isActiveLicence(it) } == true
     LaunchedEffect(waiting) {
         if (!waiting) return@LaunchedEffect
         while (true) {
