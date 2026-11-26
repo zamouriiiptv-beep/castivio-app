@@ -30,7 +30,6 @@ import androidx.compose.ui.test.requestFocus
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
 import com.castivio.core.design.theme.CastivioTheme
-import com.castivio.core.design.components.CastivioMark
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -60,7 +59,6 @@ open class BoardBandTest {
     private var backs = 0
     private var focus: FocusManager? = null
     private var backLabel = ""
-    private var wordmark = ""
     private var metrics: ChannelsMetrics? = null
 
     /** The band, over a `BackHandler` that counts what the Back key would have done. */
@@ -71,7 +69,6 @@ open class BoardBandTest {
                 metrics = m
                 focus = LocalFocusManager.current
                 backLabel = stringResource(R.string.show_back)
-                wordmark = CastivioMark.TEXT
                 BackHandler { backs++ }
                 BoardBand(
                     section = "Movies",
@@ -147,13 +144,14 @@ open class BoardBandTest {
     fun `the mark and the name stand in the middle of the space before the section's name`() {
         show()
 
-        val mark = compose.onNodeWithTag(BAND_MARK_TAG).getUnclippedBoundsInRoot()
-        val name = compose.onNode(hasText(wordmark)).getUnclippedBoundsInRoot()
+        // The lockup as one: the mark at its start and the name at its end. The name's own text node is wider than the name
+        // by the trailing track the lockup takes back out (see `Wordmark`), so its end is the lockup's, not the node's.
+        val lockup = compose.onNodeWithTag(BAND_MARK_TAG).getUnclippedBoundsInRoot()
         val section = compose.onNode(hasText("Movies")).getUnclippedBoundsInRoot()
 
         // From the frame's edge -- the band's own start -- to the mark, and from the name to where the section's name begins.
-        val before = mark.left.value
-        val after = (section.left - name.right).value
+        val before = lockup.left.value
+        val after = (section.left - lockup.right).value
         assertTrue("the pair has $before before it and $after after it", before > 0f && after > 0f)
         assertEquals(before, after, 1.5f)
     }
