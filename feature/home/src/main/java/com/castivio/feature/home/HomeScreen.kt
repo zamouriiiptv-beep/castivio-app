@@ -2094,9 +2094,12 @@ private fun AccountRow(label: String, frame: CastivioMetrics, value: @Composable
             color = CastivioTheme.colors.onBackgroundVariant,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(1f),
+            // A column of its own, the same width on every row (owner, 2026-11-26, design/mockups/home-account-2-ar.png): the
+            // values then start on one line beside it, and the three marks stand one above the other.
+            modifier = Modifier.fillMaxWidth(ACCOUNT_LABEL_SHARE),
         )
         Row(
+            Modifier.weight(1f),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(frame.chipPad / 2),
             content = value,
@@ -2123,28 +2126,28 @@ private fun licenceHue(state: HomeState): Color {
     }
 }
 
-/** A term's value: its mark, "ends on" and its date when it has one, and its word beside it, all in its colour but the date. */
+/** A term's value: its mark and its word in its colour, then "ends on" and its date when it has one. */
 @Composable
 private fun RowScope.TermValue(term: Term, hue: Color, frame: CastivioMetrics, ends: String) {
     StateMark(if (hue == CastivioTheme.colors.danger) Icons.Rounded.ErrorOutline else Icons.Rounded.CheckCircle, hue)
     val at = term.atMs
     if (at != null) {
-        // "Ends on" before the date (owner, 2026-11-25), so the date is read as the end and not as a start.
+        // The state beside its mark, then when it ends (owner, 2026-11-26): "✓ trial · ends on 26-11-2026", so the word that
+        // says what the date is about is next to the mark that colours it, and not at the far end of the line.
         Text(
-            ends,
+            stringResource(term.word),
+            style = castivioChipStyle(frame.fsChip * ACCOUNT_TEXT_SCALE),
+            color = hue,
+            maxLines = 1,
+        )
+        Text(
+            "· $ends",
             style = castivioChipStyle(frame.fsChip * FACT_LABEL_RATIO * ACCOUNT_TEXT_SCALE),
             color = CastivioTheme.colors.onBackgroundVariant,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
         FactValue(rememberDate(at), CastivioTheme.colors.onBackgroundStrong, frame)
-        Text(
-            stringResource(term.word),
-            style = castivioChipStyle(frame.fsChip * FACT_LABEL_RATIO * ACCOUNT_TEXT_SCALE),
-            color = hue,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
     } else {
         FactValue(stringResource(term.word), hue, frame)
     }
@@ -2196,6 +2199,9 @@ private const val ACCOUNT_TEXT_SCALE = 1.15f
 
 /** The account panel's width, of a dialog's usual share. */
 private const val ACCOUNT_WIDTH_SHARE = 0.9f
+
+/** The account's names, a column of this share of a row; the values start beside it. */
+private const val ACCOUNT_LABEL_SHARE = 0.34f
 private const val FACT_VALUE_RATIO = 0.8f
 
 /** The licence turns amber in its last week. */
