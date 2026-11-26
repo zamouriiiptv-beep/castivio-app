@@ -1,7 +1,8 @@
 # Castivio — engineering rules
 
 A premium IPTV player: Android phone, tablet, TV, Google TV, Fire TV first, then
-desktop, then the TV platforms, then Apple. The business logic is written once and
+the TV platforms (Samsung, LG and the others), then Apple, and desktop last (owner,
+2026-11-26). The owner tests every platform on real devices. The business logic is written once and
 rendered many times, so almost none of it is allowed to know what a screen is.
 
 Read this before changing anything. `ARCHITECTURE.md` describes the data layer,
