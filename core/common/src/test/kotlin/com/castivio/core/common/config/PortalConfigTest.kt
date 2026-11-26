@@ -24,6 +24,11 @@ class PortalConfigTest {
     }
 
     @Test
+    fun `the address the licence screen spells out is that host`() {
+        assertEquals(PortalConfig.PRODUCTION, "https://" + ActivationDestination.HOST)
+    }
+
+    @Test
     fun `a configured address is kept, without a trailing slash`() {
         assertEquals("https://test.example.app", PortalConfig.of("https://test.example.app").baseUrl)
         assertEquals("https://test.example.app", PortalConfig.of("  https://test.example.app/  ").baseUrl)

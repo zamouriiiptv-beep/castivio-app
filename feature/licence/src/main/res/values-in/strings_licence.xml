@@ -14,14 +14,9 @@
   "Subscription" belongs to the provider. Castivio sells a licence.
 -->
 <resources>
-    <string name="licence_title">Lisensi Castivio</string>
     <string name="licence_language">Bahasa</string>
     <string name="licence_mac_label">ALAMAT MAC</string>
     <string name="licence_key_label">KUNCI PERANGKAT</string>
-    <string name="licence_copy_mac">Salin alamat MAC</string>
-    <string name="licence_copy_key">Salin kunci perangkat</string>
-    <string name="licence_copied_mac">Alamat MAC disalin</string>
-    <string name="licence_copied_key">Kunci perangkat disalin</string>
     <string name="licence_mac_spoken">Alamat MAC %s</string>
     <string name="licence_plan_annual">Tahunan</string>
     <string name="licence_plan_lifetime">Seumur hidup</string>
@@ -51,31 +46,25 @@
     <string name="licence_valid_until">Berlaku sampai %s</string>
     <string name="licence_retry">Coba lagi</string>
     <string name="licence_support">Hubungi dukungan</string>
-    <string name="licence_qr_caption">Pindai kode QR untuk mengaktifkan perangkat ini.</string>
-    <string name="licence_legal_title">Informasi hukum</string>
-    <string name="licence_legal_link">Informasi Hukum</string>
-    <string name="licence_legal_back_hint">Kembali untuk menutup</string>
-    <string name="licence_legal_about_title">Tentang Castivio</string>
-    <string name="licence_legal_about_body">Castivio adalah pemutar media untuk konten yang sudah Anda miliki. Aplikasi ini memutar playlist dan siaran yang Anda tambahkan sendiri, atau yang Anda peroleh dari penyedia layanan pilihan Anda yang dibayar terpisah. Castivio bukan layanan konten dan tidak berafiliasi dengan penyedia mana pun.</string>
-    <string name="licence_legal_scope_title">Cakupan lisensi</string>
-    <string name="licence_legal_scope_body">Lisensi Castivio mengizinkan penggunaan aplikasi pada perangkat tempat lisensi diterbitkan. Lisensi terikat pada perangkat itu dan tidak dapat dipindahtangankan, dijual kembali, atau dibagikan. Lisensi hanya mencakup aplikasi dan tidak memberi hak atas saluran, film, serial, atau siaran apa pun.</string>
-    <string name="licence_legal_content_title">Tanggung jawab konten</string>
-    <string name="licence_legal_copyright_title">Hak cipta</string>
-    <string name="licence_legal_copyright_body">Aplikasi Castivio, namanya, antarmukanya, dan kode sumbernya dilindungi hak cipta dan tetap menjadi milik pemiliknya. Castivio menyertakan huruf Inter dan IBM Plex Sans Arabic di bawah SIL Open Font License 1.1. Semua merek dagang, nama, dan konten lain adalah milik pemiliknya masing-masing.</string>
-    <string name="licence_legal_privacy_title">Privasi</string>
-    <string name="licence_legal_privacy_body">Castivio tidak memiliki akun pengguna dan tidak meminta data pribadi. Playlist Anda, kredensial penyedia, dan apa yang Anda tonton disimpan di perangkat ini dan tidak dikirim ke Castivio. Pengenal yang tampil di layar lisensi hanya dipakai untuk menerbitkan dan memverifikasi lisensi perangkat ini.</string>
-    <string name="licence_legal_refund_title">Kebijakan pengembalian dana</string>
-    <string name="licence_legal_refund_body">Aplikasi tidak pernah memproses pembayaran. Lisensi dibeli melalui portal aktivasi Castivio, dan setiap pengembalian dana diajukan serta diselesaikan di sana sesuai ketentuan yang ditampilkan saat pembelian. Apa pun yang dibayarkan kepada penyedia konten adalah urusan penyedia tersebut dan di luar kendali Castivio.</string>
-    <string name="licence_legal_support_title">Dukungan</string>
-    <string name="licence_legal_support_body">Dukungan diberikan melalui portal aktivasi Castivio. Sebutkan kunci perangkat yang tampil di layar lisensi: kunci itu mengenali perangkat ini dan tidak mengatakan apa pun tentang Anda. Castivio tidak dapat membantu soal layanan, kredensial, atau tagihan penyedia konten.</string>
-    <string name="licence_legal_acceptance_title">Penerimaan ketentuan</string>
-    <string name="licence_legal_acceptance_body">Menggunakan Castivio berarti menerima ketentuan pada halaman ini. Jika Anda tidak menerimanya, jangan gunakan aplikasi ini. Versi mendatang dapat memperbaruinya; yang berlaku selalu yang ditampilkan di sini.</string>
-    <string name="licence_legal_close">Tutup</string>
-    <string name="licence_legal_full">Castivio hanyalah aplikasi pemutar media. Aplikasi ini tidak menyediakan, menghosting, menyiarkan, menjual, atau mendistribusikan saluran, film, serial, siaran langsung, maupun konten media apa pun. Semua konten disediakan sepenuhnya oleh pengguna atau oleh penyedia layanan yang dipilih pengguna. Pengguna sepenuhnya bertanggung jawab memastikan bahwa mereka memiliki hak hukum untuk mengakses dan menggunakan kontennya. Castivio tidak bertanggung jawab atas ketersediaan, legalitas, pelisensian, atau kualitas konten maupun layanan pihak ketiga mana pun.</string>
 
     <plurals name="licence_trial_days">
         <item quantity="other">Masa uji coba Anda tersisa %d hari.</item>
     </plurals>
 
     <string name="licence_sentinel" translatable="false">id</string>
+    <string name="licence_hero_title">Lanjutkan menonton di perangkat ini</string>
+    <string name="licence_hero_choose">Pilih lisensi dan aktifkan dalam waktu kurang dari semenit</string>
+    <string name="licence_best_value">Paling hemat</string>
+    <string name="licence_feature_all">Semua fitur, tanpa iklan</string>
+    <string name="licence_feature_renews">Diperpanjang setiap tahun</string>
+    <string name="licence_feature_forever">Tidak perlu diperpanjang</string>
+    <string name="licence_feature_instant">Aktivasi instan dan aman</string>
+    <string name="licence_phone_title">Aktifkan dari ponsel</string>
+    <string name="licence_step_scan">Pindai kode dengan kamera ponsel</string>
+    <string name="licence_step_pay">Pilih lisensi dan bayar</string>
+    <string name="licence_step_auto">TV aktif secara otomatis</string>
+    <string name="licence_or_visit">Atau buka</string>
+    <string name="licence_refresh">Muat ulang</string>
+    <string name="licence_support_short">Dukungan</string>
+    <string name="licence_exit">Keluar</string>
 </resources>

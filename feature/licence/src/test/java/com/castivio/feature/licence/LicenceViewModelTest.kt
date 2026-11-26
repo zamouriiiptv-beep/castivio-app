@@ -35,7 +35,7 @@ import org.junit.Test
  * The state holder, on the JVM, with no device and no Compose.
  *
  * Everything asserted here is behaviour a user can observe and a screenshot
- * cannot: which link a plan opens, whether two copy confirmations interfere,
+ * cannot: which link a plan opens, whether the quiet check stays quiet,
  * whether a handoff that goes nowhere leaves a card spinning forever.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -51,8 +51,10 @@ class LicenceViewModelTest {
     @After
     fun tearDown() = Dispatchers.resetMain()
 
-    private fun model() = LicenceViewModel(
-        entitlement = FakeEntitlement(licence) { refreshResult },
+    private fun model(
+        onRefresh: () -> Outcome<EntitlementState> = { refreshResult },
+    ) = LicenceViewModel(
+        entitlement = FakeEntitlement(licence, onRefresh),
         identity = FakeIdentity,
         dispatchers = object : AppDispatchers {
             override val main: CoroutineDispatcher = dispatcher
@@ -168,65 +170,34 @@ class LicenceViewModelTest {
     }
 
     /**
-     * The two copy confirmations are independent.
+     * The screen's own fifteen-second check asks the server and says nothing.
      *
-     * A user who copies the address and then the key within a second should see
-     * both ticks. This is stated as a test because the sibling screen's file
-     * claimed independence in a comment while modelling a shared flag underneath
-     * it — a disagreement that survives review because both halves read fine.
+     * A failure every fifteen seconds is not news the user asked for: no busy state, no
+     * failure line. And it stands aside while the user's own refresh is in flight.
      */
     @Test
-    fun `copying one identifier does not clear the other`() = runTest(dispatcher) {
-        val model = model()
+    fun `a poll asks quietly`() = runTest(dispatcher) {
+        var asked = 0
+        refreshResult = Outcome.Failure(com.castivio.core.common.AppError.NOT_CONFIGURED)
+        val counting = model(onRefresh = { asked++; refreshResult })
         advanceUntilIdle()
 
-        model.copied(Copied.Address)
-        advanceTimeBy(500)
-        model.copied(Copied.Key)
-
-        assertTrue("the address tick went out early", model.state.value.addressCopied)
-        assertTrue("the key tick never lit", model.state.value.keyCopied)
-
-        // The address was copied first, so its tick clears first, and the line
-        // follows whichever is still lit rather than going blank.
-        //
-        // `advanceTimeBy` and **not** `advanceUntilIdle`. The second runs every
-        // pending task whatever it is scheduled for, so it fires the key's timer
-        // as well and the test then asserts that a tick which has legitimately
-        // expired is still lit. That is the whole failure this test had on its
-        // first run: the harness was asked to skip to the end and then asked
-        // about the middle.
-        advanceTimeBy(1_200)
-        assertFalse(
-            "the address tick is still lit 1700ms after it was set, and it lasts 1500",
-            model.state.value.addressCopied,
-        )
-        assertTrue(
-            "the key tick went out with the address tick -- the two timers are " +
-                "sharing state again",
-            model.state.value.keyCopied,
-        )
-        assertEquals(
-            "the status line went blank instead of following the tick still lit",
-            Copied.Key,
-            model.state.value.lastCopied,
-        )
+        counting.poll()
+        advanceUntilIdle()
+        assertEquals("the poll did not ask the server", 1, asked)
+        assertFalse("a quiet poll reported its failure", counting.state.value.failed)
+        assertNull("a quiet poll looked busy", counting.state.value.opening)
     }
 
-    /** And both go out in the end. A tick that never clears stops being feedback. */
     @Test
-    fun `a copy confirmation is taken back`() = runTest(dispatcher) {
-        val model = model()
+    fun `a poll stands aside while a handoff is in flight`() = runTest(dispatcher) {
+        var asked = 0
+        val model = model(onRefresh = { asked++; refreshResult })
         advanceUntilIdle()
-        model.copied(Copied.Address)
-        advanceTimeBy(3_000)
-
-        assertFalse("the tick never cleared", model.state.value.addressCopied)
-        assertEquals(
-            "the status line still names a copy that is over",
-            Copied.None,
-            model.state.value.lastCopied,
-        )
+        model.portalFor(PricingDefaults.config.purchasable.first())
+        model.poll()
+        advanceUntilIdle()
+        assertEquals("a poll ran over the user's own handoff", 0, asked)
     }
 
     /** Support is told which device is asking, so the call does not start with hex. */

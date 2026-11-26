@@ -48,6 +48,13 @@ object ActivationDestination {
     const val URL: String = "https://castivio.app/activate"
 
     /**
+     * The portal's address as a person types it: no scheme, no path. The licence
+     * screen spells it under its steps for a phone without a camera ("Or visit
+     * castivio.app"), and the home page there leads to activation in one press.
+     */
+    const val HOST: String = "castivio.app"
+
+    /**
      * Where a user goes when the app cannot help them.
      *
      * Two states offer this and only two: a licence that was withdrawn, and a

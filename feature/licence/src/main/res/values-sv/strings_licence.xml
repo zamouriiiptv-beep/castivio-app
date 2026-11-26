@@ -14,14 +14,9 @@
   "Subscription" belongs to the provider. Castivio sells a licence.
 -->
 <resources>
-    <string name="licence_title">Castivio-licens</string>
     <string name="licence_language">Språk</string>
     <string name="licence_mac_label">MAC-ADRESS</string>
     <string name="licence_key_label">ENHETSNYCKEL</string>
-    <string name="licence_copy_mac">Kopiera MAC-adressen</string>
-    <string name="licence_copy_key">Kopiera enhetsnyckeln</string>
-    <string name="licence_copied_mac">MAC-adressen kopierad</string>
-    <string name="licence_copied_key">Enhetsnyckeln kopierad</string>
     <string name="licence_mac_spoken">MAC-adress %s</string>
     <string name="licence_plan_annual">Årligen</string>
     <string name="licence_plan_lifetime">Livstid</string>
@@ -51,27 +46,6 @@
     <string name="licence_valid_until">Giltig till %s</string>
     <string name="licence_retry">Försök igen</string>
     <string name="licence_support">Kontakta supporten</string>
-    <string name="licence_qr_caption">Skanna QR-koden för att aktivera den här enheten.</string>
-    <string name="licence_legal_title">Juridisk information</string>
-    <string name="licence_legal_link">Juridisk information</string>
-    <string name="licence_legal_back_hint">Bakåt stänger</string>
-    <string name="licence_legal_about_title">Om Castivio</string>
-    <string name="licence_legal_about_body">Castivio är en mediespelare för innehåll du redan har. Den spelar upp spellistor och strömmar som du lägger till själv eller får från en tjänsteleverantör som du valt och betalar separat. Castivio är ingen innehållstjänst och är inte knutet till någon leverantör.</string>
-    <string name="licence_legal_scope_title">Licensens omfattning</string>
-    <string name="licence_legal_scope_body">En Castivio-licens ger rätt att använda appen på den enhet den utfärdats för. Den är bunden till den enheten och kan inte överlåtas, säljas vidare eller delas. Licensen omfattar endast appen och ger ingen rätt till någon kanal, film, serie eller ström.</string>
-    <string name="licence_legal_content_title">Ansvar för innehåll</string>
-    <string name="licence_legal_copyright_title">Upphovsrätt</string>
-    <string name="licence_legal_copyright_body">Appen Castivio, dess namn, dess gränssnitt och dess källkod skyddas av upphovsrätt och förblir ägarens egendom. Castivio innehåller typsnitten Inter och IBM Plex Sans Arabic under SIL Open Font License 1.1. Alla övriga varumärken, namn och innehåll tillhör sina respektive ägare.</string>
-    <string name="licence_legal_privacy_title">Integritet</string>
-    <string name="licence_legal_privacy_body">Castivio har inga användarkonton och ber inte om några personuppgifter. Dina spellistor, dina inloggningsuppgifter hos leverantören och det du tittar på stannar på den här enheten och skickas inte till Castivio. Identifierarna på licensskärmen används bara för att utfärda och kontrollera en licens för den här enheten.</string>
-    <string name="licence_legal_refund_title">Återbetalning</string>
-    <string name="licence_legal_refund_body">Appen hanterar aldrig en betalning. Licenser köps via Castivios aktiveringsportal, och varje återbetalning begärs och avgörs där enligt de villkor som visades vid köpet. Det som betalas till en innehållsleverantör är leverantörens eget och utanför Castivios kontroll.</string>
-    <string name="licence_legal_support_title">Support</string>
-    <string name="licence_legal_support_body">Support ges via Castivios aktiveringsportal. Ange enhetsnyckeln från licensskärmen: den identifierar den här enheten och säger ingenting om dig. Castivio kan inte hjälpa till med en innehållsleverantörs tjänst, inloggningsuppgifter eller fakturering.</string>
-    <string name="licence_legal_acceptance_title">Godkännande av villkoren</string>
-    <string name="licence_legal_acceptance_body">Att använda Castivio innebär att godta villkoren på den här sidan. Godtar du dem inte ska du inte använda appen. En framtida version kan uppdatera dem; det som gäller är alltid det som visas här.</string>
-    <string name="licence_legal_close">Stäng</string>
-    <string name="licence_legal_full">Castivio är enbart en mediespelarapp. Den tillhandahåller, lagrar, sänder, säljer eller distribuerar inga kanaler, filmer, serier, liveströmmar eller medieinnehåll. Allt innehåll tillhandahålls uteslutande av användaren eller av den tjänsteleverantör som användaren har valt. Användarna ansvarar helt själva för att säkerställa att de har de juridiska rättigheterna att komma åt och använda sitt innehåll. Castivio tar inget ansvar för tillgänglighet, laglighet, licensiering eller kvalitet hos innehåll eller tjänster från tredje part.</string>
 
     <plurals name="licence_trial_days">
         <item quantity="one">Det är %d dag kvar av din provperiod.</item>
@@ -79,4 +53,19 @@
     </plurals>
 
     <string name="licence_sentinel" translatable="false">sv</string>
+    <string name="licence_hero_title">Fortsätt titta på den här enheten</string>
+    <string name="licence_hero_choose">Välj en licens och aktivera den på under en minut</string>
+    <string name="licence_best_value">Bäst värde</string>
+    <string name="licence_feature_all">Alla funktioner, ingen reklam</string>
+    <string name="licence_feature_renews">Förnyas varje år</string>
+    <string name="licence_feature_forever">Förnyas aldrig</string>
+    <string name="licence_feature_instant">Direkt och säker aktivering</string>
+    <string name="licence_phone_title">Aktivera från telefonen</string>
+    <string name="licence_step_scan">Skanna koden med telefonens kamera</string>
+    <string name="licence_step_pay">Välj licens och betala</string>
+    <string name="licence_step_auto">Tv:n aktiveras automatiskt</string>
+    <string name="licence_or_visit">Eller gå till</string>
+    <string name="licence_refresh">Uppdatera</string>
+    <string name="licence_support_short">Support</string>
+    <string name="licence_exit">Avsluta</string>
 </resources>

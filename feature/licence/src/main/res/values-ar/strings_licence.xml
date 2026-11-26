@@ -14,14 +14,9 @@
   "Subscription" belongs to the provider. Castivio sells a licence.
 -->
 <resources>
-    <string name="licence_title">ترخيص Castivio</string>
     <string name="licence_language">اللغة</string>
     <string name="licence_mac_label">عنوان MAC</string>
     <string name="licence_key_label">مفتاح الجهاز</string>
-    <string name="licence_copy_mac">نسخ عنوان MAC</string>
-    <string name="licence_copy_key">نسخ مفتاح الجهاز</string>
-    <string name="licence_copied_mac">تم نسخ عنوان MAC</string>
-    <string name="licence_copied_key">تم نسخ مفتاح الجهاز</string>
     <string name="licence_mac_spoken">عنوان MAC ‏%s</string>
     <string name="licence_plan_annual">سنوي</string>
     <string name="licence_plan_lifetime">مدى الحياة</string>
@@ -29,7 +24,7 @@
     <string name="licence_once">مرة واحدة لهذا الجهاز</string>
     <string name="licence_chip_trial">نسخة تجريبية</string>
     <string name="licence_chip_active">الترخيص مفعّل</string>
-    <string name="licence_chip_trial_ended">انتهت التجربة</string>
+    <string name="licence_chip_trial_ended">انتهت الفترة التجريبية</string>
     <string name="licence_chip_expired">انتهى الترخيص</string>
     <string name="licence_chip_none">لا يوجد ترخيص</string>
     <string name="licence_chip_verify">يلزم التحقق</string>
@@ -51,27 +46,6 @@
     <string name="licence_valid_until">صالح حتى %s</string>
     <string name="licence_retry">إعادة المحاولة</string>
     <string name="licence_support">التواصل مع الدعم</string>
-    <string name="licence_qr_caption">امسح رمز QR لتفعيل هذا الجهاز</string>
-    <string name="licence_legal_title">معلومات قانونية</string>
-    <string name="licence_legal_link">معلومات قانونية</string>
-    <string name="licence_legal_back_hint">عُد للإغلاق</string>
-    <string name="licence_legal_about_title">عن Castivio</string>
-    <string name="licence_legal_about_body">Castivio مشغّل وسائط للمحتوى الذي تملكه بالفعل. يشغّل قوائم التشغيل والبثوث التي تضيفها بنفسك أو تحصل عليها من مزوّد خدمة اخترته وتدفع له بشكل منفصل. Castivio ليس خدمة محتوى وليس تابعًا لأي مزوّد.</string>
-    <string name="licence_legal_scope_title">نطاق الترخيص</string>
-    <string name="licence_legal_scope_body">يتيح ترخيص Castivio استخدام التطبيق على الجهاز الصادر له. وهو مرتبط بذلك الجهاز ولا يمكن نقله أو إعادة بيعه أو مشاركته. يغطي الترخيص التطبيق فقط ولا يمنح أي حق في أي قناة أو فيلم أو مسلسل أو بث.</string>
-    <string name="licence_legal_content_title">المسؤولية عن المحتوى</string>
-    <string name="licence_legal_copyright_title">حقوق النشر</string>
-    <string name="licence_legal_copyright_body">تطبيق Castivio واسمه وواجهته وشفرته المصدرية محمية بحقوق النشر وتبقى ملكًا لصاحبها. يتضمن Castivio خطي Inter و IBM Plex Sans Arabic بموجب رخصة SIL Open Font License 1.1. أما سائر العلامات التجارية والأسماء والمحتويات فهي ملك لأصحابها.</string>
-    <string name="licence_legal_privacy_title">الخصوصية</string>
-    <string name="licence_legal_privacy_body">لا توجد في Castivio حسابات مستخدمين ولا يطلب أي بيانات شخصية. تُخزَّن قوائم التشغيل وبيانات اعتماد المزوّد وما تشاهده على هذا الجهاز ولا تُرسَل إلى Castivio. تُستخدم المعرّفات الظاهرة في شاشة الترخيص فقط لإصدار ترخيص لهذا الجهاز والتحقق منه.</string>
-    <string name="licence_legal_refund_title">سياسة الاسترداد</string>
-    <string name="licence_legal_refund_body">لا يعالج التطبيق أي عملية دفع. تُشترى التراخيص عبر بوابة تفعيل Castivio، ويُطلب أي استرداد ويُسوّى هناك وفق الشروط المعروضة وقت الشراء. أما ما يُدفع لمزوّد المحتوى فهو شأن ذلك المزوّد وخارج سيطرة Castivio.</string>
-    <string name="licence_legal_support_title">الدعم</string>
-    <string name="licence_legal_support_body">يُقدَّم الدعم عبر بوابة تفعيل Castivio. اذكر مفتاح الجهاز الظاهر في شاشة الترخيص: فهو يعرّف هذا الجهاز ولا يكشف عنك شيئًا. لا يستطيع Castivio المساعدة في خدمة مزوّد المحتوى أو بيانات اعتماده أو فواتيره.</string>
-    <string name="licence_legal_acceptance_title">قبول الشروط</string>
-    <string name="licence_legal_acceptance_body">استخدامك Castivio يعني قبولك الشروط الواردة في هذه الصفحة. إن لم تقبلها فلا تستخدم التطبيق. قد يحدّث إصدار لاحق هذه الشروط، والنسخة السارية هي دائمًا المعروضة هنا.</string>
-    <string name="licence_legal_close">إغلاق</string>
-    <string name="licence_legal_full">Castivio هو تطبيق مشغّل وسائط فقط. وهو لا يوفّر ولا يستضيف ولا يبثّ ولا يبيع ولا يوزّع أي قنوات أو أفلام أو مسلسلات أو بثوث مباشرة أو محتوى وسائط. يُقدَّم كل المحتوى حصريًا من المستخدم أو من مزوّد الخدمة الذي يختاره. يتحمّل المستخدمون وحدهم مسؤولية التأكد من امتلاكهم الحقوق القانونية للوصول إلى محتواهم واستخدامه. ولا يتحمّل Castivio أي مسؤولية عن توفّر أو قانونية أو ترخيص أو جودة أي محتوى أو خدمات تابعة لجهات خارجية.</string>
 
     <plurals name="licence_trial_days">
         <item quantity="zero">يتبقى %d يوم على انتهاء الفترة التجريبية</item>
@@ -83,4 +57,19 @@
     </plurals>
 
     <string name="licence_sentinel" translatable="false">ar</string>
+    <string name="licence_hero_title">واصل المشاهدة على هذا الجهاز</string>
+    <string name="licence_hero_choose">اختر ترخيصًا وفعّله في أقل من دقيقة</string>
+    <string name="licence_best_value">الأفضل قيمة</string>
+    <string name="licence_feature_all">كل المزايا، بلا إعلانات</string>
+    <string name="licence_feature_renews">يُجدَّد كل سنة</string>
+    <string name="licence_feature_forever">بلا تجديد أبدًا</string>
+    <string name="licence_feature_instant">تفعيل فوري وآمن</string>
+    <string name="licence_phone_title">فعّل من هاتفك</string>
+    <string name="licence_step_scan">امسح الرمز بكاميرا هاتفك</string>
+    <string name="licence_step_pay">اختر الترخيص وادفع</string>
+    <string name="licence_step_auto">يُفعَّل التلفاز تلقائيًا</string>
+    <string name="licence_or_visit">أو ادخل إلى</string>
+    <string name="licence_refresh">تحديث</string>
+    <string name="licence_support_short">الدعم</string>
+    <string name="licence_exit">خروج</string>
 </resources>

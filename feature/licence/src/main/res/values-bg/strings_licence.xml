@@ -14,14 +14,9 @@
   "Subscription" belongs to the provider. Castivio sells a licence.
 -->
 <resources>
-    <string name="licence_title">Лиценз за Castivio</string>
     <string name="licence_language">Език</string>
     <string name="licence_mac_label">MAC АДРЕС</string>
     <string name="licence_key_label">КЛЮЧ НА УСТРОЙСТВОТО</string>
-    <string name="licence_copy_mac">Копирай MAC адреса</string>
-    <string name="licence_copy_key">Копирай ключа на устройството</string>
-    <string name="licence_copied_mac">MAC адресът е копиран</string>
-    <string name="licence_copied_key">Ключът на устройството е копиран</string>
     <string name="licence_mac_spoken">MAC адрес %s</string>
     <string name="licence_plan_annual">Годишен</string>
     <string name="licence_plan_lifetime">Доживотен</string>
@@ -51,27 +46,6 @@
     <string name="licence_valid_until">Валиден до %s</string>
     <string name="licence_retry">Опитай отново</string>
     <string name="licence_support">Свържете се с поддръжката</string>
-    <string name="licence_qr_caption">Сканирайте QR кода, за да активирате това устройство.</string>
-    <string name="licence_legal_title">Правна информация</string>
-    <string name="licence_legal_link">Правна информация</string>
-    <string name="licence_legal_back_hint">Назад за затваряне</string>
-    <string name="licence_legal_about_title">За Castivio</string>
-    <string name="licence_legal_about_body">Castivio е медиен плейър за съдържание, което вече притежавате. Възпроизвежда плейлисти и потоци, които добавяте сами или получавате от избран от вас доставчик, на когото плащате отделно. Castivio не е услуга за съдържание и не е свързан с никакъв доставчик.</string>
-    <string name="licence_legal_scope_title">Обхват на лиценза</string>
-    <string name="licence_legal_scope_body">Лицензът на Castivio позволява използване на приложението на устройството, за което е издаден. Той е обвързан с това устройство и не може да се прехвърля, препродава или споделя. Лицензът обхваща само приложението и не дава права върху канали, филми, сериали или потоци.</string>
-    <string name="licence_legal_content_title">Отговорност за съдържанието</string>
-    <string name="licence_legal_copyright_title">Авторски права</string>
-    <string name="licence_legal_copyright_body">Приложението Castivio, неговото име, интерфейс и изходен код са защитени с авторско право и остават собственост на притежателя им. Castivio включва шрифтовете Inter и IBM Plex Sans Arabic по лиценз SIL Open Font License 1.1. Всички други търговски марки, имена и съдържание принадлежат на съответните им собственици.</string>
-    <string name="licence_legal_privacy_title">Поверителност</string>
-    <string name="licence_legal_privacy_body">Castivio няма потребителски профили и не иска лични данни. Вашите плейлисти, данните за доставчика и това, което гледате, се съхраняват на това устройство и не се изпращат към Castivio. Идентификаторите, показани на екрана за лиценз, се използват само за издаване и проверка на лиценз за това устройство.</string>
-    <string name="licence_legal_refund_title">Политика за възстановяване</string>
-    <string name="licence_legal_refund_body">Приложението никога не обработва плащания. Лицензите се купуват през портала за активиране на Castivio и всяко възстановяване се заявява и урежда там, съгласно условията, показани при покупката. Платеното на доставчик на съдържание е негово и е извън контрола на Castivio.</string>
-    <string name="licence_legal_support_title">Поддръжка</string>
-    <string name="licence_legal_support_body">Поддръжката се осигурява през портала за активиране на Castivio. Посочете ключа на устройството от екрана за лиценз: той идентифицира устройството и не казва нищо за вас. Castivio не може да помогне с услугата, данните за достъп или фактурирането на доставчик на съдържание.</string>
-    <string name="licence_legal_acceptance_title">Приемане на условията</string>
-    <string name="licence_legal_acceptance_body">Използването на Castivio означава приемане на условията на тази страница. Ако не ги приемате, не използвайте приложението. Бъдеща версия може да ги обнови; в сила винаги е показаната тук.</string>
-    <string name="licence_legal_close">Затвори</string>
-    <string name="licence_legal_full">Castivio е само приложение — медиен плейър. То не предоставя, не хоства, не излъчва, не продава и не разпространява канали, филми, сериали, живи потоци или медийно съдържание. Цялото съдържание се доставя единствено от потребителя или от избрания от него доставчик на услуги. Потребителите носят цялата отговорност да се уверят, че имат законните права да достъпват и използват своето съдържание. Castivio не поема отговорност за наличността, законността, лицензирането или качеството на каквото и да е съдържание или услуги на трети страни.</string>
 
     <plurals name="licence_trial_days">
         <item quantity="one">Остава %d ден от пробния период.</item>
@@ -79,4 +53,19 @@
     </plurals>
 
     <string name="licence_sentinel" translatable="false">bg</string>
+    <string name="licence_hero_title">Продължете да гледате на това устройство</string>
+    <string name="licence_hero_choose">Изберете лиценз и го активирайте за по-малко от минута</string>
+    <string name="licence_best_value">Най-изгодно</string>
+    <string name="licence_feature_all">Всички функции, без реклами</string>
+    <string name="licence_feature_renews">Подновява се всяка година</string>
+    <string name="licence_feature_forever">Без подновяване</string>
+    <string name="licence_feature_instant">Мигновено и сигурно активиране</string>
+    <string name="licence_phone_title">Активирайте от телефона</string>
+    <string name="licence_step_scan">Сканирайте кода с камерата на телефона</string>
+    <string name="licence_step_pay">Изберете лиценз и платете</string>
+    <string name="licence_step_auto">Телевизорът се активира автоматично</string>
+    <string name="licence_or_visit">Или посетете</string>
+    <string name="licence_refresh">Опресни</string>
+    <string name="licence_support_short">Поддръжка</string>
+    <string name="licence_exit">Изход</string>
 </resources>

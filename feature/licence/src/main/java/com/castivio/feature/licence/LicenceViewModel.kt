@@ -43,14 +43,27 @@ internal data class LicenceUiState(
 
     /** A handoff or a refresh that did not work. Cleared by the next attempt. */
     val failed: Boolean = false,
+) {
+    /** The header's Refresh is asking the licence server, and turns while it does. */
+    val refreshing: Boolean get() = opening == REFRESHING
 
-    val addressCopied: Boolean = false,
-    val keyCopied: Boolean = false,
-    val lastCopied: Copied = Copied.None,
-)
+    /** A plan's portal is being opened. */
+    val handingOff: Boolean get() = opening != null && opening != REFRESHING
+}
 
-/** Which identifier the status line is currently describing. */
-internal enum class Copied { None, Address, Key }
+/** The busy state that is not a plan: [LicenceViewModel.refresh] is in flight. */
+internal const val REFRESHING = "refresh"
+
+/**
+ * How often a screen waiting on a purchase asks the licence server again.
+ *
+ * The user pays on their phone and the television is meant to notice by itself —
+ * "the TV activates automatically" is the third step the screen promises. Fifteen
+ * seconds is the owner's figure (2026-11-26): a payment lands and the screen turns
+ * within the time it takes to look back up at it, and a screen left open all evening
+ * asks 240 times an hour, which a licence server answers without noticing.
+ */
+internal const val POLL_MS = 15_000L
 
 /**
  * The licence screen's state holder.
@@ -173,7 +186,7 @@ internal class LicenceViewModel @Inject constructor(
         _state.update { it.copy(failed = false) }
     }
 
-    /** Ask the licence server again. The only action the blocked states offer. */
+    /** Ask the licence server again: the header's Refresh, and the Retry the unavailable state offers. */
     fun refresh() {
         if (_state.value.opening != null) return
         // Held in the same slot the handoff uses, so that `cancelHandoff` stops
@@ -189,49 +202,25 @@ internal class LicenceViewModel @Inject constructor(
     }
 
     /**
-     * Confirm a copy, and take the confirmation back a moment later.
+     * Ask the licence server again, quietly: the screen's own fifteen-second check.
      *
-     * One timer per identifier, cancelled individually, because the two
-     * confirmations are independent: copying the address must not cut short the
-     * tick on the key.
+     * Not [refresh]. Nothing turns, nothing is reported and a failure says nothing —
+     * the user did not ask, so an unreachable server every fifteen seconds is not
+     * news to put in front of them. A good answer arrives through
+     * `EntitlementRepository.state`, which this screen already collects, so the
+     * screen turns by itself. It stands aside while the user's own refresh or a
+     * handoff is in flight, and while its own previous question is unanswered.
      */
-    fun copied(what: Copied) {
-        _state.update {
-            when (what) {
-                Copied.Address -> it.copy(addressCopied = true, lastCopied = what)
-                Copied.Key -> it.copy(keyCopied = true, lastCopied = what)
-                Copied.None -> it
-            }
-        }
-        if (what == Copied.None) return
-
-        copyTimers.remove(what)?.cancel()
-        copyTimers[what] = viewModelScope.launch {
-            delay(COPY_FEEDBACK_MS)
-            _state.update {
-                val cleared = when (what) {
-                    Copied.Address -> it.copy(addressCopied = false)
-                    Copied.Key -> it.copy(keyCopied = false)
-                    Copied.None -> it
-                }
-                cleared.copy(
-                    lastCopied = when {
-                        cleared.addressCopied -> Copied.Address
-                        cleared.keyCopied -> Copied.Key
-                        else -> Copied.None
-                    },
-                )
-            }
-            copyTimers.remove(what)
-        }
+    fun poll() {
+        if (_state.value.opening != null || pollJob?.isActive == true) return
+        pollJob = viewModelScope.launch { entitlement.refresh() }
     }
 
     private var openTimer: Job? = null
-    private val copyTimers = mutableMapOf<Copied, Job>()
+    private var pollJob: Job? = null
 
     private companion object {
         const val QR_PIXELS = 512
-        const val COPY_FEEDBACK_MS = 1_500L
 
         /**
          * How long the handoff spinner lives before the screen gives the user
@@ -242,9 +231,6 @@ internal class LicenceViewModel @Inject constructor(
          * *launch* is allowed to look like it is happening.
          */
         const val HANDOFF_MS = 4_000L
-
-        /** A sentinel for the busy state that is not a plan. */
-        const val REFRESHING = "refresh"
     }
 }
 

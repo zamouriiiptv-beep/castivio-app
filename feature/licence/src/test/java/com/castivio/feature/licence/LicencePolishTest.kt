@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
+import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -36,7 +37,7 @@ import java.util.Locale
  * would go on passing without.
  *
  *  - An active licence is shown no prices.
- *  - The legal notice is reachable, and closes.
+ *  - The drawing's promises: the lit card, the dollar prices, the header's Exit.
  *  - The condition resolves to the new one, at every motion level.
  *
  * Text-driven sizes are not asserted anywhere here — Robolectric does not lay
@@ -326,88 +327,58 @@ class LicencePolishTest {
         )
     }
 
-    // -- The legal notice ---------------------------------------------------
+    // -- The drawing (owner, 2026-11-26) ------------------------------------
 
+    /** One card is lit and tagged, the lifetime one, as on the portal. */
     @Test
-    fun `the legal page is one press from the footer and closes again`() {
-        show(EntitlementState.Unknown)
-
-        assertEquals("the legal page is open before anything was pressed", 0, nodes(LicenceTags.LEGAL))
-
-        compose.onNodeWithTag(LicenceTags.FOOTER).performClick()
-        compose.waitForIdle()
-        assertEquals("pressing the link did not open the legal page", 1, nodes(LicenceTags.LEGAL))
-
-        compose.onNodeWithTag(LicenceTags.LEGAL_CLOSE).performClick()
-        compose.waitForIdle()
-        assertEquals("the legal page would not close", 0, nodes(LicenceTags.LEGAL))
+    fun `the lifetime plan alone wears the best value tag`() {
+        show(EntitlementState.TrialExpired)
+        assertEquals(
+            "the best-value tag is not drawn exactly once",
+            1,
+            textNodes(res.getString(R.string.licence_best_value)),
+        )
+        val lit = PricingDefaults.config.purchasable.filter(::isBestValue).map { it.plan }
+        assertEquals(listOf(com.castivio.domain.entitlement.Plan.LIFETIME), lit)
     }
 
-    /**
-     * All eight sections are on the page, headings and bodies both.
-     *
-     * Enumerated rather than spot-checked: a page that renders seven of eight is
-     * a page missing a legal section, and the one it drops will be whichever one
-     * nobody scrolled to.
-     */
+    /** The prices the portal asks for, in its shape. */
     @Test
-    fun `every legal section is rendered`() {
-        show(EntitlementState.Unknown)
-        compose.onNodeWithTag(LicenceTags.FOOTER).performClick()
-        compose.waitForIdle()
-
-        for (id in LEGAL_STRINGS) {
-            assertTrue(
-                "the legal page is missing ${res.getResourceEntryName(id)}",
-                textNodes(res.getString(id)) >= 1,
-            )
-        }
-    }
-
-    /**
-     * Opening and closing it does not disturb the screen underneath.
-     *
-     * This is the claim that makes it an overlay rather than a second Activity:
-     * the entitlement, the address, the QR and the plans are the same objects
-     * afterwards, because nothing was ever torn down.
-     */
-    @Test
-    fun `the entitlement survives a trip to the legal page`() {
-        show(EntitlementState.TrialActive(expiresAtMs = 0, daysRemaining = 3))
-        val countdown = res.getQuantityString(R.plurals.licence_trial_days, 3, 3)
-        compose.onNodeWithText(countdown).assertExists()
-
-        compose.onNodeWithTag(LicenceTags.FOOTER).performClick()
-        compose.waitForIdle()
-        compose.onNodeWithTag(LicenceTags.LEGAL_CLOSE).performClick()
-        compose.waitForIdle()
-
-        compose.onNodeWithText(countdown).assertExists()
+    fun `the cards show the portal's dollar prices`() {
+        show(EntitlementState.TrialExpired)
         for (offer in PricingDefaults.config.purchasable) {
+            val id = offer.plan.name.lowercase()
+            val price = formatPrice(offer.priceMinor, offer.currency, Locale.US)
             assertEquals(
-                "the ${offer.plan} card did not come back",
+                "the $id card does not say $price",
                 1,
-                nodes(LicenceTags.plan(offer.plan.name.lowercase())),
+                compose.onAllNodes(hasContentDescription(price, substring = true)).fetchSemanticsNodes().size,
             )
         }
+        assertEquals("\$5.99", formatPrice(599, "USD", Locale.US))
     }
 
-    /**
-     * The link is in the footer in every state.
-     *
-     * A door that is present only in some conditions is a door somebody will
-     * report as missing.
-     */
+    /** Exit is the caller's leaving, one press away in the header. */
     @Test
-    fun `the footer carries the legal link in every state`() {
-        val ui = mutableStateOf(uiFor(EntitlementState.Unknown))
-        compose.setContent { Harness(ui, MotionLevel.DISABLED) }
-
-        for (state in states) {
-            ui.value = uiFor(state)
-            compose.waitForIdle()
-            compose.onNodeWithText(res.getString(R.string.licence_legal_link)).assertExists()
+    fun `the header's exit leaves`() {
+        var left = 0
+        compose.setContent {
+            CastivioTheme(motionLevel = MotionLevel.DISABLED) {
+                Box(Modifier.requiredSize(PHONE_WIDTH, PHONE_HEIGHT)) {
+                    LicenceScreen(
+                        state = uiFor(EntitlementState.TrialExpired),
+                        onPlan = {},
+                        onRetry = {},
+                        onSupport = {},
+                        onOpenLanguage = {},
+                        onExit = { left++ },
+                    )
+                }
+            }
         }
+        compose.onNodeWithTag(LicenceTags.EXIT).performClick()
+        compose.waitForIdle()
+        assertEquals("pressing Exit did not leave", 1, left)
     }
 
     // -- The fade -----------------------------------------------------------
@@ -493,8 +464,8 @@ private fun Harness(state: MutableState<LicenceUiState>, motion: MotionLevel) {
                 onPlan = {},
                 onRetry = {},
                 onSupport = {},
-                onCopied = {},
                 onOpenLanguage = {},
+                onExit = {},
             )
         }
     }
@@ -527,18 +498,6 @@ private val EVERY_LANGUAGE = listOf(
 
 /** A fixed instant, so the formatted date is the same on every run. */
 private const val EXPIRY_MS = 1_817_000_000_000L
-
-/** Every string the legal page is required to draw. */
-private val LEGAL_STRINGS = listOf(
-    R.string.licence_legal_about_title, R.string.licence_legal_about_body,
-    R.string.licence_legal_scope_title, R.string.licence_legal_scope_body,
-    R.string.licence_legal_content_title, R.string.licence_legal_full,
-    R.string.licence_legal_copyright_title, R.string.licence_legal_copyright_body,
-    R.string.licence_legal_privacy_title, R.string.licence_legal_privacy_body,
-    R.string.licence_legal_refund_title, R.string.licence_legal_refund_body,
-    R.string.licence_legal_support_title, R.string.licence_legal_support_body,
-    R.string.licence_legal_acceptance_title, R.string.licence_legal_acceptance_body,
-)
 
 /** The reference landscape phone, which is the frame the design is cut against. */
 private val PHONE_WIDTH = 873.dp

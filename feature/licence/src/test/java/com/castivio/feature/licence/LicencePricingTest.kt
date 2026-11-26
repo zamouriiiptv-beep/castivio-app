@@ -47,7 +47,7 @@ class LicencePricingTest {
      */
     @Test
     fun `no licence string in any locale carries a price`() {
-        val forbidden = listOf("€", "EUR", "$", "£", "6,00", "6.00", "15,00", "15.00")
+        val forbidden = listOf("€", "EUR", "USD", "$", "£", "5.99", "5,99", "14.99", "14,99")
         val keys = R.string::class.java.fields.filter { it.name.startsWith("licence_") }
         val offences = mutableListOf<String>()
 
@@ -115,7 +115,7 @@ class LicencePricingTest {
     @Test
     fun `every offered plan is priced in the same currency`() {
         val currencies = PricingDefaults.config.purchasable.map { it.currency }.toSet()
-        assertEquals(setOf("EUR"), currencies)
+        assertEquals(setOf("USD"), currencies)
     }
 
     /**
@@ -162,5 +162,18 @@ class LicencePricingTest {
         val text = formatPrice(600, "XTS", Locale.UK)
         assertTrue("the amount is missing from '$text'", text.contains("6"))
         assertTrue("the code is missing from '$text'", text.contains("XTS"))
+    }
+
+    /**
+     * The portal's shape in every language: `$5.99`, symbol first, a point, Western
+     * digits. The screen a user is sent from shows the price they will be asked for.
+     */
+    @Test
+    fun `the price is drawn the same way in every language`() {
+        for (tag in listOf("en", "ar", "fr", "de", "fa", "hi", "th", "zh-Hans", "pt-PT")) {
+            val locale = Locale.forLanguageTag(tag)
+            assertEquals("$tag drew the annual price differently", "\$5.99", formatPrice(599, "USD", locale))
+            assertEquals("$tag drew the lifetime price differently", "\$14.99", formatPrice(1_499, "USD", locale))
+        }
     }
 }

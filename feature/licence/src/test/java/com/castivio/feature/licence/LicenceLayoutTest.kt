@@ -119,11 +119,11 @@ class LicenceLayoutTest {
 
             val field = compose.onNodeWithTag(LicenceTags.FIELD).getUnclippedBoundsInRoot()
             assertTrue(
-                "$name: the field band is ${field.height}, which is not a band",
-                field.height > 150.dp,
+                "$name: the row of cards is ${field.height}, which is not a row of cards",
+                field.height > FIELD_FLOOR,
             )
 
-            compose.onNodeWithTag(LicenceTags.MAC_CAPSULE).assertHasSize("$name: the MAC capsule")
+            compose.onNodeWithTag(LicenceTags.MAC).assertHasSize("$name: the MAC address")
             compose.onNodeWithTag(LicenceTags.STATUS).assertExistsFor(name, "the status line")
             compose.onNodeWithTag(LicenceTags.QR).assertHasSize("$name: the QR")
 
@@ -132,8 +132,11 @@ class LicenceLayoutTest {
                     compose.onNodeWithTag(LicenceTags.plan(offer.plan.name.lowercase()))
                         .assertHasSize("$name: the ${offer.plan} card")
                 }
-            } else if (view.action != null) {
-                compose.onNodeWithTag(LicenceTags.ACTION).assertHasSize("$name: the ${view.action}")
+            } else {
+                compose.onNodeWithTag(LicenceTags.STATUS_CARD).assertHasSize("$name: the status card")
+                if (view.action != null) {
+                    compose.onNodeWithTag(LicenceTags.ACTION).assertHasSize("$name: the ${view.action}")
+                }
             }
         }
     }
@@ -205,7 +208,7 @@ class LicenceLayoutTest {
             tv = false,
             width = Frame.Phone.width,
             height = Frame.Phone.height,
-        ).statusHeight
+        ).subtitleHeight
         val actual = compose.onNodeWithTag(LicenceTags.STATUS).getUnclippedBoundsInRoot().height
 
         assertTrue(
@@ -213,68 +216,6 @@ class LicenceLayoutTest {
                 "$reserved. A line that appears rather than being reserved pushes the " +
                 "plan cards up at the instant somebody presses one.",
             actual >= reserved,
-        )
-    }
-
-    /**
-     * When the band runs short, the sentence yields and the controls do not.
-     *
-     * ## Why this is a test and not a comment
-     *
-     * `LicenceBudgetTest` records one combination that does not fit — a two-line
-     * legal footer at 800×360 while the navigation bar is transiently on screen,
-     * 9dp short — and calls it acceptable because the column measures capsules,
-     * then plans, then the reserved status line, and a `Column` gives what is
-     * left to the child it measures last. That claim is the entire reason the
-     * shortfall is tolerable, so it is worth more than an arithmetic assertion.
-     *
-     * ## Measured as a difference, so the harness cannot flatter it
-     *
-     * Robolectric's text is 35dp whatever the style, so no absolute height here
-     * would be the device's. Both heights are therefore read from the **same**
-     * composition at two frame heights and compared to each other — the
-     * inflation cancels, and what is left is the ordering, which is real.
-     *
-     * The two heights are close together, deliberately. Every size on this screen is
-     * a share of the height now, so a large difference would change the card's padding
-     * along with everything else and the comparison would be measuring the sizing
-     * system rather than the squeeze.
-     */
-    @Test
-    fun `a squeezed band takes it out of the status line, not the controls`() {
-        val height = mutableStateOf(ROOMY)
-        compose.setContent {
-            CastivioTheme {
-                Box(Modifier.requiredSize(800.dp, height.value)) { LicenceScreenUnderTest(null) }
-            }
-        }
-        fun measure(tag: String) = compose.onNodeWithTag(tag).getUnclippedBoundsInRoot().height
-
-        val roomyCapsule = measure(LicenceTags.MAC_CAPSULE)
-        val roomyCard = measure(LicenceTags.plan("annual"))
-        val roomyStatus = measure(LicenceTags.STATUS)
-
-        height.value = SQUEEZED
-        compose.waitForIdle()
-
-        assertEquals(
-            "the MAC capsule lost height in a squeezed band. The identity is " +
-                "measured first and must never be the thing that yields.",
-            roomyCapsule,
-            measure(LicenceTags.MAC_CAPSULE),
-        )
-        assertEquals(
-            "a plan card lost height in a squeezed band. The cards are the only " +
-                "controls on this screen, and they are measured before the status " +
-                "line precisely so that they are not the ones to go.",
-            roomyCard,
-            measure(LicenceTags.plan("annual")),
-        )
-        assertTrue(
-            "the status line kept its full $roomyStatus while the band was ${ROOMY - SQUEEZED} " +
-                "shorter, which means something else absorbed it. The ordering is " +
-                "no longer capsules, plans, status.",
-            measure(LicenceTags.STATUS) < roomyStatus,
         )
     }
 
@@ -327,8 +268,11 @@ class LicenceLayoutTest {
  * chosen to be short by less than the status line's reservation and more than nothing:
  * enough that the sentence has to give, not so much that the plans do.
  */
-private val ROOMY = 375.dp
-private val SQUEEZED = 340.dp
+/**
+ * Under the drawn card height on every frame here — 147dp on the shortest phone — and
+ * far above zero, which is the failure this exists to catch.
+ */
+private val FIELD_FLOOR = 120.dp
 
 private enum class Frame(val width: Dp, val height: Dp) {
     Phone(873.dp, 393.dp),
@@ -371,8 +315,8 @@ private fun LicenceScreenUnderTest(state: MutableState<LicenceUiState>?) {
         onPlan = {},
         onRetry = {},
         onSupport = {},
-        onCopied = {},
         onOpenLanguage = {},
+        onExit = {},
     )
 }
 
@@ -446,18 +390,23 @@ private fun ComposeContentTestRule.assertLicenceIsWhole(television: Boolean = fa
 
     val target = Sizing.minTarget(television)
 
-    placed("the field band", min = 150.dp, tag = LicenceTags.FIELD)
-    placed("the identity column", tag = LicenceTags.IDENTITY)
-    placed("the MAC capsule", min = target, tag = LicenceTags.MAC_CAPSULE)
-    placed("the device key capsule", min = target, tag = LicenceTags.KEY_CAPSULE)
-    placed("the plan row", tag = LicenceTags.PLANS)
+    placed("the header", tag = LicenceTags.HEADER)
+    placed("the header's Refresh", min = target, tag = LicenceTags.REFRESH)
+    placed("the header's Support", min = target, tag = LicenceTags.SUPPORT)
+    placed("the header's Language", min = target, tag = LicenceTags.LANGUAGE)
+    placed("the header's Exit", min = target, tag = LicenceTags.EXIT)
+    placed("the hero", tag = LicenceTags.HERO)
+    placed("the badge", tag = LicenceTags.BADGE)
+    placed("the status line", tag = LicenceTags.STATUS)
+    placed("the row of cards", min = FIELD_FLOOR, tag = LicenceTags.FIELD)
+    placed("the plan pair", tag = LicenceTags.PLANS)
     placed("the annual card", min = target, tag = LicenceTags.plan("annual"))
     placed("the lifetime card", min = target, tag = LicenceTags.plan("lifetime"))
-    placed("the status line", tag = LicenceTags.STATUS)
-    placed("the code zone", tag = LicenceTags.CODE_ZONE)
+    placed("the activation card", tag = LicenceTags.CODE_ZONE)
     placed("the QR", min = 100.dp, tag = LicenceTags.QR)
-    placed("the header", tag = LicenceTags.HEADER)
-    placed("the footer", tag = LicenceTags.FOOTER)
+    placed("the identifiers", tag = LicenceTags.IDS)
+    placed("the MAC address", tag = LicenceTags.MAC)
+    placed("the device key", tag = LicenceTags.KEY)
 
     if (missing.isNotEmpty()) {
         fail(

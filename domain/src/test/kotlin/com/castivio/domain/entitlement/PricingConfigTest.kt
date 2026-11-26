@@ -19,17 +19,17 @@ class PricingConfigTest {
     private val config = PricingDefaults.config
 
     @Test
-    fun `the shipped terms are seven days, six dollars a year, fifteen for life`() {
+    fun `the shipped terms are seven days, 5.99 dollars a year, 14.99 for life`() {
         assertEquals(7 * day, config.trialDurationMs)
 
         val annual = config.offer(Plan.ANNUAL)!!
-        assertEquals(600L, annual.priceMinor)
-        assertEquals("EUR", annual.currency)
+        assertEquals(599L, annual.priceMinor)
+        assertEquals("USD", annual.currency)
         assertEquals(365 * day, annual.periodMs)
 
         val lifetime = config.offer(Plan.LIFETIME)!!
-        assertEquals(1_500L, lifetime.priceMinor)
-        assertEquals("EUR", lifetime.currency)
+        assertEquals(1_499L, lifetime.priceMinor)
+        assertEquals("USD", lifetime.currency)
         assertNull("lifetime has no period", lifetime.periodMs)
     }
 

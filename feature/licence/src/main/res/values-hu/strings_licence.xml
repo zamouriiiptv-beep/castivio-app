@@ -14,14 +14,9 @@
   "Subscription" belongs to the provider. Castivio sells a licence.
 -->
 <resources>
-    <string name="licence_title">Castivio-licenc</string>
     <string name="licence_language">Nyelv</string>
     <string name="licence_mac_label">MAC-CÍM</string>
     <string name="licence_key_label">ESZKÖZKULCS</string>
-    <string name="licence_copy_mac">MAC-cím másolása</string>
-    <string name="licence_copy_key">Eszközkulcs másolása</string>
-    <string name="licence_copied_mac">MAC-cím másolva</string>
-    <string name="licence_copied_key">Eszközkulcs másolva</string>
     <string name="licence_mac_spoken">MAC-cím %s</string>
     <string name="licence_plan_annual">Éves</string>
     <string name="licence_plan_lifetime">Örökös</string>
@@ -51,27 +46,6 @@
     <string name="licence_valid_until">Érvényes eddig: %s</string>
     <string name="licence_retry">Újra</string>
     <string name="licence_support">Ügyfélszolgálat megkeresése</string>
-    <string name="licence_qr_caption">Olvassa be a QR-kódot az eszköz aktiválásához.</string>
-    <string name="licence_legal_title">Jogi információk</string>
-    <string name="licence_legal_link">Jogi információk</string>
-    <string name="licence_legal_back_hint">A Vissza bezárja</string>
-    <string name="licence_legal_about_title">A Castivióról</string>
-    <string name="licence_legal_about_body">A Castivio médialejátszó olyan tartalomhoz, amellyel már rendelkezel. Olyan lejátszási listákat és adásokat játszik le, amelyeket magad adsz hozzá, vagy amelyeket az általad választott és külön fizetett szolgáltatótól kapsz. A Castivio nem tartalomszolgáltatás, és nem áll kapcsolatban egyetlen szolgáltatóval sem.</string>
-    <string name="licence_legal_scope_title">A licenc hatálya</string>
-    <string name="licence_legal_scope_body">A Castivio licenc az alkalmazás használatát azon az eszközön engedi, amelyre kiállították. Ahhoz az eszközhöz kötött, nem ruházható át, nem adható tovább és nem osztható meg. A licenc kizárólag az alkalmazásra vonatkozik, és semmilyen jogot nem ad csatornához, filmhez, sorozathoz vagy adáshoz.</string>
-    <string name="licence_legal_content_title">Felelősség a tartalomért</string>
-    <string name="licence_legal_copyright_title">Szerzői jog</string>
-    <string name="licence_legal_copyright_body">A Castivio alkalmazás, a neve, a felülete és a forráskódja szerzői jogi védelem alatt áll, és a jogosult tulajdonában marad. A Castivio az Inter és az IBM Plex Sans Arabic betűtípusokat a SIL Open Font License 1.1 alatt tartalmazza. Minden más védjegy, név és tartalom a saját tulajdonosáé.</string>
-    <string name="licence_legal_privacy_title">Adatvédelem</string>
-    <string name="licence_legal_privacy_body">A Castivióban nincsenek felhasználói fiókok, és nem kér személyes adatokat. A lejátszási listáid, a szolgáltatói belépési adataid és az, amit nézel, ezen az eszközön marad, és nem kerül el a Castivióhoz. A licenc képernyőn látható azonosítókat csak az eszköz licencének kiállítására és ellenőrzésére használjuk.</string>
-    <string name="licence_legal_refund_title">Visszatérítés</string>
-    <string name="licence_legal_refund_body">Az alkalmazás soha nem dolgoz fel fizetést. A licenceket a Castivio aktiválási portálján lehet megvásárolni, és minden visszatérítést ott kell kérni és ott rendeznek, a vásárláskor megjelenített feltételek szerint. Amit tartalomszolgáltatónak fizettek, az az ő ügye, és a Castivio hatáskörén kívül esik.</string>
-    <string name="licence_legal_support_title">Támogatás</string>
-    <string name="licence_legal_support_body">A támogatás a Castivio aktiválási portálján keresztül érhető el. Add meg a licenc képernyőn látható eszközkulcsot: ez az eszközt azonosítja, rólad semmit nem árul el. A Castivio nem tud segíteni a tartalomszolgáltató szolgáltatásával, belépési adataival vagy számlázásával.</string>
-    <string name="licence_legal_acceptance_title">A feltételek elfogadása</string>
-    <string name="licence_legal_acceptance_body">A Castivio használata az ezen az oldalon szereplő feltételek elfogadását jelenti. Ha nem fogadod el őket, ne használd az alkalmazást. Egy későbbi verzió módosíthatja őket; mindig az van érvényben, ami itt látható.</string>
-    <string name="licence_legal_close">Bezárás</string>
-    <string name="licence_legal_full">A Castivio kizárólag médialejátszó alkalmazás. Nem szolgáltat, nem tárol, nem sugároz, nem értékesít és nem terjeszt csatornákat, filmeket, sorozatokat, élő adásokat vagy médiatartalmat. Minden tartalmat kizárólag a felhasználó vagy az általa választott szolgáltató biztosít. Kizárólag a felhasználók felelősek azért, hogy rendelkezzenek a tartalmuk eléréséhez és használatához szükséges jogokkal. A Castivio semmilyen felelősséget nem vállal harmadik felek tartalmának vagy szolgáltatásainak elérhetőségéért, jogszerűségéért, licenceléséért vagy minőségéért.</string>
 
     <plurals name="licence_trial_days">
         <item quantity="one">%d nap van hátra a próbaidőszakodból.</item>
@@ -79,4 +53,19 @@
     </plurals>
 
     <string name="licence_sentinel" translatable="false">hu</string>
+    <string name="licence_hero_title">Nézd tovább ezen az eszközön</string>
+    <string name="licence_hero_choose">Válassz licencet, és aktiváld egy percen belül</string>
+    <string name="licence_best_value">Legjobb ár-érték</string>
+    <string name="licence_feature_all">Minden funkció, reklámok nélkül</string>
+    <string name="licence_feature_renews">Évente megújul</string>
+    <string name="licence_feature_forever">Soha nem kell megújítani</string>
+    <string name="licence_feature_instant">Azonnali, biztonságos aktiválás</string>
+    <string name="licence_phone_title">Aktiválás telefonról</string>
+    <string name="licence_step_scan">Olvasd be a kódot a telefon kamerájával</string>
+    <string name="licence_step_pay">Válassz licencet, és fizess</string>
+    <string name="licence_step_auto">A tévé automatikusan aktiválódik</string>
+    <string name="licence_or_visit">Vagy látogass el ide:</string>
+    <string name="licence_refresh">Frissítés</string>
+    <string name="licence_support_short">Támogatás</string>
+    <string name="licence_exit">Kilépés</string>
 </resources>

@@ -14,14 +14,9 @@
   "Subscription" belongs to the provider. Castivio sells a licence.
 -->
 <resources>
-    <string name="licence_title">Castivio-lisenssi</string>
     <string name="licence_language">Kieli</string>
     <string name="licence_mac_label">MAC-OSOITE</string>
     <string name="licence_key_label">LAITEAVAIN</string>
-    <string name="licence_copy_mac">Kopioi MAC-osoite</string>
-    <string name="licence_copy_key">Kopioi laiteavain</string>
-    <string name="licence_copied_mac">MAC-osoite kopioitu</string>
-    <string name="licence_copied_key">Laiteavain kopioitu</string>
     <string name="licence_mac_spoken">MAC-osoite %s</string>
     <string name="licence_plan_annual">Vuosittain</string>
     <string name="licence_plan_lifetime">Kertaostos</string>
@@ -51,27 +46,6 @@
     <string name="licence_valid_until">Voimassa %s asti</string>
     <string name="licence_retry">Yritä uudelleen</string>
     <string name="licence_support">Ota yhteyttä tukeen</string>
-    <string name="licence_qr_caption">Aktivoi tämä laite skannaamalla QR-koodi.</string>
-    <string name="licence_legal_title">Oikeudelliset tiedot</string>
-    <string name="licence_legal_link">Oikeudelliset tiedot</string>
-    <string name="licence_legal_back_hint">Takaisin sulkee</string>
-    <string name="licence_legal_about_title">Tietoja Castiviosta</string>
-    <string name="licence_legal_about_body">Castivio on mediasoitin sisällölle, joka sinulla jo on. Se toistaa soittolistoja ja lähetyksiä, jotka lisäät itse tai saat valitsemaltasi palveluntarjoajalta, jolle maksat erikseen. Castivio ei ole sisältöpalvelu eikä liity mihinkään tarjoajaan.</string>
-    <string name="licence_legal_scope_title">Lisenssin laajuus</string>
-    <string name="licence_legal_scope_body">Castivio-lisenssi oikeuttaa käyttämään sovellusta sillä laitteella, jolle se on myönnetty. Se on sidottu kyseiseen laitteeseen eikä sitä voi siirtää, myydä edelleen tai jakaa. Lisenssi kattaa vain sovelluksen eikä anna oikeutta mihinkään kanavaan, elokuvaan, sarjaan tai lähetykseen.</string>
-    <string name="licence_legal_content_title">Vastuu sisällöstä</string>
-    <string name="licence_legal_copyright_title">Tekijänoikeus</string>
-    <string name="licence_legal_copyright_body">Sovellus Castivio, sen nimi, käyttöliittymä ja lähdekoodi ovat tekijänoikeuden suojaamia ja pysyvät omistajansa omaisuutena. Castivio sisältää kirjasimet Inter ja IBM Plex Sans Arabic SIL Open Font License 1.1 -lisenssillä. Kaikki muut tavaramerkit, nimet ja sisältö kuuluvat omistajilleen.</string>
-    <string name="licence_legal_privacy_title">Yksityisyys</string>
-    <string name="licence_legal_privacy_body">Castiviossa ei ole käyttäjätilejä eikä se kysy henkilötietoja. Soittolistasi, palveluntarjoajan tunnuksesi ja se, mitä katsot, pysyvät tässä laitteessa eikä niitä lähetetä Castiviolle. Lisenssinäytöllä näkyviä tunnisteita käytetään vain tämän laitteen lisenssin myöntämiseen ja tarkistamiseen.</string>
-    <string name="licence_legal_refund_title">Hyvitykset</string>
-    <string name="licence_legal_refund_body">Sovellus ei koskaan käsittele maksua. Lisenssit ostetaan Castivion aktivointiportaalista, ja hyvitystä pyydetään ja se ratkaistaan siellä ostohetkellä näytettyjen ehtojen mukaan. Sisällöntarjoajalle maksettu on tarjoajan oma asia eikä Castivion hallittavissa.</string>
-    <string name="licence_legal_support_title">Tuki</string>
-    <string name="licence_legal_support_body">Tuki annetaan Castivion aktivointiportaalin kautta. Mainitse lisenssinäytöllä näkyvä laiteavain: se yksilöi tämän laitteen eikä kerro sinusta mitään. Castivio ei voi auttaa sisällöntarjoajan palvelussa, tunnuksissa tai laskutuksessa.</string>
-    <string name="licence_legal_acceptance_title">Ehtojen hyväksyminen</string>
-    <string name="licence_legal_acceptance_body">Castivion käyttäminen tarkoittaa tämän sivun ehtojen hyväksymistä. Jos et hyväksy niitä, älä käytä sovellusta. Tuleva versio voi päivittää ehtoja; voimassa on aina se, joka näkyy tässä.</string>
-    <string name="licence_legal_close">Sulje</string>
-    <string name="licence_legal_full">Castivio on pelkkä mediasoitinsovellus. Se ei tarjoa, isännöi, lähetä, myy eikä jakele mitään kanavia, elokuvia, sarjoja, suoria lähetyksiä tai mediasisältöä. Kaiken sisällön toimittaa yksinomaan käyttäjä tai käyttäjän valitsema palveluntarjoaja. Käyttäjät vastaavat yksin siitä, että heillä on lailliset oikeudet käyttää sisältöään. Castivio ei vastaa millään tavalla kolmansien osapuolten sisällön tai palvelujen saatavuudesta, laillisuudesta, lisensoinnista tai laadusta.</string>
 
     <plurals name="licence_trial_days">
         <item quantity="one">Kokeilujaksoa on jäljellä %d päivä.</item>
@@ -79,4 +53,19 @@
     </plurals>
 
     <string name="licence_sentinel" translatable="false">fi</string>
+    <string name="licence_hero_title">Jatka katselua tällä laitteella</string>
+    <string name="licence_hero_choose">Valitse lisenssi ja aktivoi se alle minuutissa</string>
+    <string name="licence_best_value">Paras arvo</string>
+    <string name="licence_feature_all">Kaikki ominaisuudet, ei mainoksia</string>
+    <string name="licence_feature_renews">Uusiutuu vuosittain</string>
+    <string name="licence_feature_forever">Ei koskaan uusimista</string>
+    <string name="licence_feature_instant">Välitön ja turvallinen aktivointi</string>
+    <string name="licence_phone_title">Aktivoi puhelimella</string>
+    <string name="licence_step_scan">Skannaa koodi puhelimen kameralla</string>
+    <string name="licence_step_pay">Valitse lisenssi ja maksa</string>
+    <string name="licence_step_auto">Televisio aktivoituu automaattisesti</string>
+    <string name="licence_or_visit">Tai siirry osoitteeseen</string>
+    <string name="licence_refresh">Päivitä</string>
+    <string name="licence_support_short">Tuki</string>
+    <string name="licence_exit">Poistu</string>
 </resources>

@@ -18,15 +18,10 @@
   two must never be readable as one thing.
 -->
 <resources>
-    <string name="licence_title">Castivio licence</string>
     <string name="licence_language">Language</string>
 
     <string name="licence_mac_label">MAC ADDRESS</string>
     <string name="licence_key_label">DEVICE KEY</string>
-    <string name="licence_copy_mac">Copy MAC address</string>
-    <string name="licence_copy_key">Copy device key</string>
-    <string name="licence_copied_mac">MAC address copied</string>
-    <string name="licence_copied_key">Device key copied</string>
     <string name="licence_mac_spoken">MAC address %s</string>
 
     <string name="licence_plan_annual">Annual</string>
@@ -80,50 +75,6 @@
     <string name="licence_retry">Retry</string>
     <string name="licence_support">Contact Support</string>
 
-    <string name="licence_qr_caption">Scan the QR code to activate this device.</string>
-
-    <!--
-      The legal page, and the link that opens it.
-
-      The licence screen is an activation screen, so the footer is a link and
-      nothing else. Everything below is the page: eight sections, read in the
-      order they are listed in `LegalScreen`.
-
-      `licence_legal_full` is the content responsibility clause and is the
-      product's own final wording, carried verbatim rather than paraphrased.
-      The other seven bodies state what Castivio actually does — no accounts, no
-      payments in the application, a licence bound to one device — rather than
-      making commitments the application cannot keep.
-    -->
-    <string name="licence_legal_title">Legal information</string>
-    <string name="licence_legal_link">Legal Information</string>
-    <string name="licence_legal_back_hint">Back to close</string>
-
-    <string name="licence_legal_about_title">About Castivio</string>
-    <string name="licence_legal_about_body">Castivio is a media player for content you already have. It plays playlists and streams that you add yourself, or that you obtain from a service provider you have chosen and pay separately. Castivio is not a content service and is not affiliated with any provider.</string>
-
-    <string name="licence_legal_scope_title">Licence scope</string>
-    <string name="licence_legal_scope_body">A Castivio licence permits use of the application on the device it was issued to. It is bound to that device and cannot be transferred, resold or shared. The licence covers the application only and grants no right to any channel, film, series or stream.</string>
-
-    <string name="licence_legal_content_title">Content responsibility</string>
-
-    <string name="licence_legal_copyright_title">Copyright</string>
-    <string name="licence_legal_copyright_body">The Castivio application, its name, its interface and its source code are protected by copyright and remain the property of their owner. Castivio includes the Inter and IBM Plex Sans Arabic typefaces under the SIL Open Font License 1.1. All other trademarks, names and content belong to their respective owners.</string>
-
-    <string name="licence_legal_privacy_title">Privacy</string>
-    <string name="licence_legal_privacy_body">Castivio has no user accounts and asks for no personal details. Your playlists, your provider credentials and what you watch are stored on this device and are not sent to Castivio. The identifiers shown on the licence screen are used only to issue and verify a licence for this device.</string>
-
-    <string name="licence_legal_refund_title">Refund policy</string>
-    <string name="licence_legal_refund_body">The application never processes a payment. Licences are bought through the Castivio activation portal, and any refund is requested and settled there under the terms shown at the time of purchase. Anything paid to a content provider is that provider\'s own and is outside Castivio\'s control.</string>
-
-    <string name="licence_legal_support_title">Support</string>
-    <string name="licence_legal_support_body">Support is provided through the Castivio activation portal. Quote the device key shown on the licence screen: it identifies this device and says nothing about you. Castivio cannot help with a content provider\'s service, credentials or billing.</string>
-
-    <string name="licence_legal_acceptance_title">Acceptance of terms</string>
-    <string name="licence_legal_acceptance_body">Using Castivio means accepting the terms on this page. If you do not accept them, do not use the application. A future version may update these terms, and the version in force is always the one shown here.</string>
-    <string name="licence_legal_close">Close</string>
-    <string name="licence_legal_full">Castivio is a media player application only. It does not provide, host, broadcast, sell or distribute any channels, movies, series, live streams or media content. All content is supplied exclusively by the user or the user’s chosen service provider. Users are solely responsible for ensuring they have the legal rights to access and use their content. Castivio assumes no responsibility for the availability, legality, licensing or quality of any third-party content or services.</string>
-
     <!--
       The trial countdown is a sentence, and a sentence belongs on the status
       line rather than in a chip. The chip says which condition this is; the line
@@ -136,4 +87,19 @@
     </plurals>
 
     <string name="licence_sentinel" translatable="false">en</string>
+    <string name="licence_hero_title">Keep watching on this device</string>
+    <string name="licence_hero_choose">Choose a licence and activate it in under a minute</string>
+    <string name="licence_best_value">Best value</string>
+    <string name="licence_feature_all">Every feature, no ads</string>
+    <string name="licence_feature_renews">Renews every year</string>
+    <string name="licence_feature_forever">Never renews</string>
+    <string name="licence_feature_instant">Instant, secure activation</string>
+    <string name="licence_phone_title">Activate from your phone</string>
+    <string name="licence_step_scan">Scan the code with your phone camera</string>
+    <string name="licence_step_pay">Choose a licence and pay</string>
+    <string name="licence_step_auto">The TV activates automatically</string>
+    <string name="licence_or_visit">Or visit</string>
+    <string name="licence_refresh">Refresh</string>
+    <string name="licence_support_short">Support</string>
+    <string name="licence_exit">Exit</string>
 </resources>

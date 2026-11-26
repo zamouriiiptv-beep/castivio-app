@@ -14,14 +14,9 @@
   "Subscription" belongs to the provider. Castivio sells a licence.
 -->
 <resources>
-    <string name="licence_title">Castivio лиценца</string>
     <string name="licence_language">Језик</string>
     <string name="licence_mac_label">MAC АДРЕСА</string>
     <string name="licence_key_label">КЉУЧ УРЕЂАЈА</string>
-    <string name="licence_copy_mac">Копирај MAC адресу</string>
-    <string name="licence_copy_key">Копирај кључ уређаја</string>
-    <string name="licence_copied_mac">MAC адреса је копирана</string>
-    <string name="licence_copied_key">Кључ уређаја је копиран</string>
     <string name="licence_mac_spoken">MAC адреса %s</string>
     <string name="licence_plan_annual">Годишње</string>
     <string name="licence_plan_lifetime">Трајно</string>
@@ -51,27 +46,6 @@
     <string name="licence_valid_until">Važi do %s</string>
     <string name="licence_retry">Pokušaj ponovo</string>
     <string name="licence_support">Kontaktirajte podršku</string>
-    <string name="licence_qr_caption">Скенирајте QR код да бисте активирали овај уређај.</string>
-    <string name="licence_legal_title">Pravne informacije</string>
-    <string name="licence_legal_link">Pravne informacije</string>
-    <string name="licence_legal_back_hint">Nazad za zatvaranje</string>
-    <string name="licence_legal_about_title">O Castiviju</string>
-    <string name="licence_legal_about_body">Castivio je medija plejer za sadržaj koji već imate. Reprodukuje plejliste i prenose koje sami dodate ili dobijete od pružaoca usluge koga ste izabrali i plaćate zasebno. Castivio nije usluga sadržaja i nije povezan ni sa jednim pružaocem.</string>
-    <string name="licence_legal_scope_title">Obim licence</string>
-    <string name="licence_legal_scope_body">Licenca Castivio dozvoljava korišćenje aplikacije na uređaju za koji je izdata. Vezana je za taj uređaj i ne može se preneti, preprodati ni deliti. Licenca pokriva samo aplikaciju i ne daje nikakvo pravo na kanal, film, seriju ili prenos.</string>
-    <string name="licence_legal_content_title">Odgovornost za sadržaj</string>
-    <string name="licence_legal_copyright_title">Autorska prava</string>
-    <string name="licence_legal_copyright_body">Aplikacija Castivio, njeno ime, interfejs i izvorni kod zaštićeni su autorskim pravom i ostaju vlasništvo njihovog vlasnika. Castivio sadrži fontove Inter i IBM Plex Sans Arabic pod licencom SIL Open Font License 1.1. Svi ostali žigovi, nazivi i sadržaj pripadaju svojim vlasnicima.</string>
-    <string name="licence_legal_privacy_title">Privatnost</string>
-    <string name="licence_legal_privacy_body">Castivio nema korisničke naloge i ne traži lične podatke. Vaše plejliste, podaci za pristup pružaocu i ono što gledate čuvaju se na ovom uređaju i ne šalju se Castiviju. Identifikatori prikazani na ekranu licence koriste se samo za izdavanje i proveru licence za ovaj uređaj.</string>
-    <string name="licence_legal_refund_title">Politika povraćaja</string>
-    <string name="licence_legal_refund_body">Aplikacija nikada ne obrađuje plaćanje. Licence se kupuju preko Castivio portala za aktivaciju, a svaki povraćaj se traži i rešava tamo, prema uslovima prikazanim u trenutku kupovine. Sve plaćeno pružaocu sadržaja njegova je stvar i van kontrole Castivija.</string>
-    <string name="licence_legal_support_title">Podrška</string>
-    <string name="licence_legal_support_body">Podrška se pruža preko Castivio portala za aktivaciju. Navedite ključ uređaja prikazan na ekranu licence: on identifikuje ovaj uređaj i ne govori ništa o vama. Castivio ne može pomoći oko usluge, podataka za pristup ili naplate pružaoca sadržaja.</string>
-    <string name="licence_legal_acceptance_title">Prihvatanje uslova</string>
-    <string name="licence_legal_acceptance_body">Korišćenje Castivija znači prihvatanje uslova na ovoj stranici. Ako ih ne prihvatate, nemojte koristiti aplikaciju. Buduća verzija može izmeniti ove uslove; na snazi je uvek ona prikazana ovde.</string>
-    <string name="licence_legal_close">Zatvori</string>
-    <string name="licence_legal_full">Castivio je isključivo aplikacija za reprodukciju medija. Ne pruža, ne hostuje, ne emituje, ne prodaje i ne distribuira nikakve kanale, filmove, serije, prenose uživo ni medijski sadržaj. Sav sadržaj isključivo obezbeđuje korisnik ili pružalac usluge koji je korisnik izabrao. Korisnici su jedini odgovorni da obezbede zakonska prava za pristup i korišćenje svog sadržaja. Castivio ne preuzima nikakvu odgovornost za dostupnost, zakonitost, licenciranje ili kvalitet bilo kog sadržaja ili usluga trećih strana.</string>
 
     <plurals name="licence_trial_days">
         <item quantity="one">Preostao je %d dan probnog perioda.</item>
@@ -80,4 +54,19 @@
     </plurals>
 
     <string name="licence_sentinel" translatable="false">sr</string>
+    <string name="licence_hero_title">Наставите да гледате на овом уређају</string>
+    <string name="licence_hero_choose">Изаберите лиценцу и активирајте је за мање од минута</string>
+    <string name="licence_best_value">Најбоља вредност</string>
+    <string name="licence_feature_all">Све функције, без реклама</string>
+    <string name="licence_feature_renews">Обнавља се сваке године</string>
+    <string name="licence_feature_forever">Никад се не обнавља</string>
+    <string name="licence_feature_instant">Тренутна и безбедна активација</string>
+    <string name="licence_phone_title">Активирајте са телефона</string>
+    <string name="licence_step_scan">Скенирајте код камером телефона</string>
+    <string name="licence_step_pay">Изаберите лиценцу и платите</string>
+    <string name="licence_step_auto">Телевизор се активира аутоматски</string>
+    <string name="licence_or_visit">Или посетите</string>
+    <string name="licence_refresh">Освежи</string>
+    <string name="licence_support_short">Подршка</string>
+    <string name="licence_exit">Излаз</string>
 </resources>

@@ -106,23 +106,6 @@ class LicenceMotionTest {
         )
     }
 
-    /**
-     * A copy confirmation is not.
-     *
-     * It answers something the user did a moment ago, and a fade between the
-     * press and its acknowledgement is a delay dressed as a flourish. This is
-     * the assertion that keeps the two apart: the crossfade is keyed on the
-     * entitlement, so everything transient passes straight through it.
-     */
-    @Test
-    fun `a copy confirmation does not`() {
-        assertEquals(
-            "copying an identifier would restart the crossfade",
-            fadeKey(base),
-            fadeKey(base.copy(lastCopied = Copied.Address)),
-        )
-    }
-
     /** Nor does a handoff opening, or failing. */
     @Test
     fun `nor does a portal handoff`() {

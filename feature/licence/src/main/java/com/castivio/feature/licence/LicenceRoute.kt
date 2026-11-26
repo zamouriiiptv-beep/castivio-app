@@ -13,12 +13,14 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.only
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.castivio.domain.entitlement.EntitlementState
+import kotlinx.coroutines.delay
 
 /**
  * The licence screen, wired.
@@ -50,7 +52,7 @@ fun LicenceRoute(
      * screen is unreachable — every entitlement state that matters was
      * untestable by anyone holding a phone. This is the smallest thing that
      * closes that, and it deliberately overrides *only* the entitlement: the
-     * view model, the address, the QR, the copy controls and the portal handoff
+     * view model, the address, the QR and the portal handoff
      * are all the real ones, so what is being tested is the screen and not a
      * preview of it.
      *
@@ -91,6 +93,23 @@ fun LicenceRoute(
     // What back must never do is nothing at all. On a remote it is the
     // most-pressed key on the device, and a press that appears to be ignored is
     // a press repeated harder.
+    // ## The screen checks by itself
+    //
+    // While a purchase would change something -- the plans are on offer -- the
+    // licence server is asked again every fifteen seconds, so a payment made on a
+    // phone turns this screen without anyone pressing anything. Keyed on that one
+    // fact: the loop starts when the plans appear and ends with the composition,
+    // or the moment a licence arrives and they go. A lifecycle-bound effect rather
+    // than a loop in the view model, so a screen nobody can see asks nothing.
+    val waiting = state.licence?.let { licenceView(it).offersPlans } == true
+    LaunchedEffect(waiting) {
+        if (!waiting) return@LaunchedEffect
+        while (true) {
+            delay(POLL_MS)
+            model.poll()
+        }
+    }
+
     BackHandler {
         when {
             state.opening != null -> model.cancelHandoff()
@@ -114,8 +133,8 @@ fun LicenceRoute(
                 // no mail client to do something it cannot.
                 if (!context.openExternally(model.supportUrl())) model.handoffFailed()
             },
-            onCopied = model::copied,
             onOpenLanguage = onOpenLanguage,
+            onExit = onLeave,
         )
     }
 }
