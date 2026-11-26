@@ -23,4 +23,6 @@
     <!-- The line under the feature's name in the top band: one short word, because its cell is about 90dp. -->
     <string name="catchup_band">Archív</string>
     <string name="catchup_search_programmes">Hľadať relácie</string>
+    <string name="catchup_search_groups">Hľadať v balíkoch</string>
+    <string name="catchup_archive_of">Archív %1$s</string>
 </resources>

@@ -23,4 +23,6 @@
     <!-- The line under the feature's name in the top band: one short word, because its cell is about 90dp. -->
     <string name="catchup_band">संग्रह</string>
     <string name="catchup_search_programmes">कार्यक्रम खोजें</string>
+    <string name="catchup_search_groups">बुके खोजें</string>
+    <string name="catchup_archive_of">%1$s का संग्रह</string>
 </resources>

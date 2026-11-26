@@ -23,4 +23,6 @@
     <!-- The line under the feature's name in the top band: one short word, because its cell is about 90dp. -->
     <string name="catchup_band">아카이브</string>
     <string name="catchup_search_programmes">프로그램 검색</string>
+    <string name="catchup_search_groups">패키지 검색</string>
+    <string name="catchup_archive_of">%1$s 아카이브</string>
 </resources>

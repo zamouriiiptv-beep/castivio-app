@@ -23,4 +23,6 @@
     <!-- The line under the feature's name in the top band: one short word, because its cell is about 90dp. -->
     <string name="catchup_band">Arkiv</string>
     <string name="catchup_search_programmes">Søk i programmer</string>
+    <string name="catchup_search_groups">Søk i pakker</string>
+    <string name="catchup_archive_of">Arkiv for %1$s</string>
 </resources>

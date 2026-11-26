@@ -23,4 +23,6 @@
     <!-- The line under the feature's name in the top band: one short word, because its cell is about 90dp. -->
     <string name="catchup_band">Archivio</string>
     <string name="catchup_search_programmes">Cerca programmi</string>
+    <string name="catchup_search_groups">Cerca pacchetti</string>
+    <string name="catchup_archive_of">Archivio di %1$s</string>
 </resources>

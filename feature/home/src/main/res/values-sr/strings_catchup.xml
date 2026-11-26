@@ -23,4 +23,6 @@
     <!-- The line under the feature's name in the top band: one short word, because its cell is about 90dp. -->
     <string name="catchup_band">Архива</string>
     <string name="catchup_search_programmes">Претражи емисије</string>
+    <string name="catchup_search_groups">Претражи пакете</string>
+    <string name="catchup_archive_of">Архива %1$s</string>
 </resources>

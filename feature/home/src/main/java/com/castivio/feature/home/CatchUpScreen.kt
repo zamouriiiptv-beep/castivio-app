@@ -21,7 +21,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -93,11 +92,9 @@ internal fun CatchUpProgrammes(
     // Back closes a search that holds something before it leaves the screen, as it does on the pages under this one.
     val back = { if (!model.clearSearch()) onClose() }
 
-    // Asked when the screen opens, cancelled when it is left: the screen owns the request for exactly as long as it is on.
-    DisposableEffect(channel.id) {
-        model.open(channel)
-        onDispose { model.close() }
-    }
+    // The channel's listing: usually in hand already, opened for its days on the first page; another channel from the list
+    // beside asks for its own. Catch-up as a whole closes it when it is left.
+    LaunchedEffect(channel.id) { model.open(channel) }
     BackHandler(onBack = back)
     LaunchedEffect(state.phase, state.dayIndex, playing) {
         if (state.phase == CatchUpPhase.READY && !playing) runCatching { landing.requestFocus() }

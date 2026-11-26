@@ -102,6 +102,10 @@ class CatchUpViewModel @Inject constructor(
     /** Asks for [channel]'s archive. The one call that reaches a provider; a second while one is out replaces it. */
     fun open(channel: Channel) {
         val hours = channel.catchUpHours ?: return
+        // The same channel again -- its days were opened on the first page, and its programmes now -- is the listing in hand,
+        // on the day the viewer chose: nothing is asked twice and the day is not reset. A failure is asked again.
+        val phase = _state.value.phase
+        if (shown?.id == channel.id && phase != CatchUpPhase.IDLE && phase != CatchUpPhase.FAILED) return
         typed.value = ""
         loading?.cancel()
         opening?.cancel()

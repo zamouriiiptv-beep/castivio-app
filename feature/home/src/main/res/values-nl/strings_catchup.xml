@@ -23,4 +23,6 @@
     <!-- The line under the feature's name in the top band: one short word, because its cell is about 90dp. -->
     <string name="catchup_band">Archief</string>
     <string name="catchup_search_programmes">Programma\'s zoeken</string>
+    <string name="catchup_search_groups">Zoeken in pakketten</string>
+    <string name="catchup_archive_of">Archief van %1$s</string>
 </resources>

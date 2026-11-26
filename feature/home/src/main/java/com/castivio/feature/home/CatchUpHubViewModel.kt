@@ -34,23 +34,18 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
 /**
- * Where the viewer is in Catch-up. Three places, one inside the next, and Back leaves them in the opposite order.
+ * Where the viewer is in Catch-up: two places, and Back leaves the second for the first.
+ *
+ * The first page is three columns (owner, 2026-11-26, design/mockups/catchup-19-days-column-ar.png): the bouquets, the open
+ * bouquet's channels, and the chosen channel's days. A day opens the second place, that day's programmes beside the channels.
  */
 sealed interface HubStage {
 
-    /** The categories that keep an archive, and "all". */
-    data object Groups : HubStage
+    /** The three columns: [group] is the open bouquet (null is "all"), [channel] the one whose days are shown, if any. */
+    data class Browse(val group: ArchiveGroup? = null, val channel: Channel? = null) : HubStage
 
-    /** One category's channels with an archive; a null [group] is all of them. */
-    data class Channels(val group: ArchiveGroup?) : HubStage
-
-    /**
-     * One channel's programmes, beside its list: the pane [CatchUpProgrammes] draws.
-     *
-     * [fromGroups] is a channel found by the search on the first page, which has no category open: Back returns to that
-     * page, and its results, and not to a list of "all" it was never in.
-     */
-    data class Programmes(val group: ArchiveGroup?, val channel: Channel, val fromGroups: Boolean = false) : HubStage
+    /** One channel's programmes, beside its bouquet's channels: the pane [CatchUpProgrammes] draws. */
+    data class Programmes(val group: ArchiveGroup?, val channel: Channel) : HubStage
 }
 
 /** What the first page lists: the categories that hold a channel with an archive, and how many such channels there are. */
@@ -93,7 +88,7 @@ class CatchUpHubViewModel @Inject constructor(
     private val clock: TrustedTime,
 ) : ViewModel() {
 
-    private val _stage = MutableStateFlow<HubStage>(HubStage.Groups)
+    private val _stage = MutableStateFlow<HubStage>(HubStage.Browse())
     val stage: StateFlow<HubStage> = _stage.asStateFlow()
 
     /** Null until the first answer: the page says it is loading, and a null is not an empty answer. */
@@ -122,12 +117,18 @@ class CatchUpHubViewModel @Inject constructor(
         .debounce { if (it.isEmpty()) 0L else CATCHUP_SEARCH_PAUSE_MS }
         .distinctUntilChanged()
 
+    /** What the bouquets' own box holds, exactly as typed. */
+    private val groupTyped = MutableStateFlow("")
+
+    val groupSearchText: StateFlow<String> = groupTyped.asStateFlow()
+
     /**
-     * The categories the search matches, or null when nothing is searched -- or the categories have not arrived, which the
-     * first page says by itself. An empty list is an answer: the search found no category.
+     * The bouquets the left column lists: all of them, or those whose names match what is typed in its box. Null until
+     * the first answer. Read in memory -- there are hundreds at most -- so no pause is needed.
      */
-    val matches: StateFlow<List<ArchiveGroup>?> = combine(groups, term) { all, words ->
-        if (all == null || words.isEmpty()) null else matchingGroups(all.groups, words)
+    val shownGroups: StateFlow<HubGroups?> = combine(groups, groupTyped) { all, typedNow ->
+        val words = searchTermOf(typedNow)
+        if (all == null || words.isEmpty()) all else HubGroups(matchingGroups(all.groups, words))
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_MS), null)
 
     /**
@@ -153,63 +154,64 @@ class CatchUpHubViewModel @Inject constructor(
         }
         .cachedIn(viewModelScope)
 
-    /**
-     * The list a place and a search read, or null for the places that read none.
-     *
-     * The first page reads channels only for a search, across all categories; a category reads its own, narrowed by the
-     * search when there is one. A programme list over either reads what it is over, so Back finds the same rows.
-     */
+    /** The list a place reads: the open bouquet's channels, narrowed by the channels' search -- the same in both places. */
     private fun keyOf(stage: HubStage, words: String): ListKey? = when (stage) {
-        HubStage.Groups -> if (words.isEmpty()) null else ListKey(null, words)
-        is HubStage.Channels -> ListKey(stage.group?.id, words)
-        is HubStage.Programmes ->
-            if (stage.fromGroups) keyOf(HubStage.Groups, words) else ListKey(stage.group?.id, words)
+        is HubStage.Browse -> ListKey(stage.group?.id, words)
+        is HubStage.Programmes -> ListKey(stage.group?.id, words)
     }
 
-    /** A category's channels. What was typed goes: a category opened from search results is another place from that page. */
+    /** Another bouquet: its channels, with no channel chosen and nothing typed among the channels. */
     fun openGroup(group: ArchiveGroup?) {
         typed.value = ""
-        _stage.value = HubStage.Channels(group)
+        _stage.value = HubStage.Browse(group)
     }
 
+    /** A channel: its days in the third column, or -- beside the programmes -- its programmes. */
     fun openChannel(channel: Channel) {
         _stage.value = when (val at = _stage.value) {
-            HubStage.Groups -> HubStage.Programmes(null, channel, fromGroups = true)
-            is HubStage.Channels -> HubStage.Programmes(at.group, channel)
-            // Another channel from the list beside the programmes: its programmes, in the same place (owner, 2026-11-25).
+            is HubStage.Browse -> at.copy(channel = channel)
             is HubStage.Programmes -> if (at.channel.id == channel.id) return else at.copy(channel = channel)
         }
     }
 
-    /** The viewer typed in the search box. */
+    /** A day of the chosen channel: its programmes. Nothing happens with no channel chosen. */
+    fun openDay() {
+        val at = _stage.value as? HubStage.Browse ?: return
+        val channel = at.channel ?: return
+        _stage.value = HubStage.Programmes(at.group, channel)
+    }
+
+    /** The viewer typed in the channels' box, in the band. */
     fun search(text: String) {
         typed.value = text
     }
 
+    /** The viewer typed in the bouquets' box. */
+    fun searchGroups(text: String) {
+        groupTyped.value = text
+    }
+
     /**
-     * One step back. A search that holds something is closed first, in the place it was typed; then the places in the
-     * opposite order of how they were opened. False at the first page with nothing typed: there is nowhere inside Catch-up
-     * to go, and the caller leaves it.
+     * One step back: from the programmes to the three columns, the channel still chosen; on the columns a search that holds
+     * something is closed first. False when there is nothing left to close: the caller leaves Catch-up.
      */
     fun back(): Boolean {
-        val at = _stage.value
-        if (at !is HubStage.Programmes && typed.value.isNotEmpty()) {
-            typed.value = ""
-            return true
-        }
-        when (at) {
-            HubStage.Groups -> return false
-            is HubStage.Channels -> _stage.value = HubStage.Groups
-            is HubStage.Programmes ->
-                _stage.value = if (at.fromGroups) HubStage.Groups else HubStage.Channels(at.group)
+        when (val at = _stage.value) {
+            is HubStage.Programmes -> _stage.value = HubStage.Browse(at.group, at.channel)
+            is HubStage.Browse -> when {
+                typed.value.isNotEmpty() -> typed.value = ""
+                groupTyped.value.isNotEmpty() -> groupTyped.value = ""
+                else -> return false
+            }
         }
         return true
     }
 
-    /** The viewer left Catch-up: the next time begins at the categories, with nothing typed. */
+    /** The viewer left Catch-up: the next time begins at "all", with nothing chosen and nothing typed. */
     fun reset() {
         typed.value = ""
-        _stage.value = HubStage.Groups
+        groupTyped.value = ""
+        _stage.value = HubStage.Browse()
     }
 
     private data class ListKey(val groupId: String?, val term: String)

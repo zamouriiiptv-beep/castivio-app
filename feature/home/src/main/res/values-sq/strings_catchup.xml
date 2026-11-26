@@ -23,4 +23,6 @@
     <!-- The line under the feature's name in the top band: one short word, because its cell is about 90dp. -->
     <string name="catchup_band">Arkivi</string>
     <string name="catchup_search_programmes">Kërko programe</string>
+    <string name="catchup_search_groups">Kërko paketat</string>
+    <string name="catchup_archive_of">Arkivi i %1$s</string>
 </resources>

@@ -23,4 +23,6 @@
     <!-- The line under the feature's name in the top band: one short word, because its cell is about 90dp. -->
     <string name="catchup_band">存檔</string>
     <string name="catchup_search_programmes">搜尋節目</string>
+    <string name="catchup_search_groups">搜尋頻道包</string>
+    <string name="catchup_archive_of">%1$s 的回看</string>
 </resources>

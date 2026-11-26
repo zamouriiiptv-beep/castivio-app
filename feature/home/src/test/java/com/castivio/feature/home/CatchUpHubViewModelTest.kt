@@ -25,8 +25,8 @@ import org.junit.Before
 import org.junit.Test
 
 /**
- * Where the viewer is inside Catch-up: the three places and the order Back leaves them in, the first page being the only
- * one Back does not handle, and what a search does to them.
+ * Where the viewer is inside Catch-up: the three columns and a day's programmes, the order Back leaves them in, and what
+ * the two searches do.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class CatchUpHubViewModelTest {
@@ -81,67 +81,68 @@ class CatchUpHubViewModelTest {
     // ------------------------------------------------------------------------------- the stages
 
     @Test
-    fun `it opens on the categories`() {
-        assertEquals(HubStage.Groups, hub().stage.value)
+    fun `it opens on the three columns, at all, with no channel chosen`() {
+        assertEquals(HubStage.Browse(), hub().stage.value)
     }
 
     @Test
-    fun `a category opens its channels and a channel opens its programmes, over the same category`() {
+    fun `a bouquet opens its channels, and a channel shows its days beside them`() {
         val hub = hub()
         hub.openGroup(france)
-        assertEquals(HubStage.Channels(france), hub.stage.value)
+        assertEquals(HubStage.Browse(france), hub.stage.value)
         hub.openChannel(channel)
+        assertEquals(HubStage.Browse(france, channel), hub.stage.value)
+    }
+
+    @Test
+    fun `another bouquet lets the chosen channel go`() {
+        val hub = hub()
+        hub.openChannel(channel)
+        hub.openGroup(france)
+        assertEquals(HubStage.Browse(france, null), hub.stage.value)
+    }
+
+    @Test
+    fun `a day opens the chosen channel's programmes, and nothing with no channel chosen`() {
+        val hub = hub()
+        hub.openDay()
+        assertEquals(HubStage.Browse(), hub.stage.value)
+
+        hub.openGroup(france)
+        hub.openChannel(channel)
+        hub.openDay()
         assertEquals(HubStage.Programmes(france, channel), hub.stage.value)
     }
 
     @Test
-    fun `all is a category of none, and a channel opened from it keeps that`() {
-        val hub = hub()
-        hub.openGroup(null)
-        assertEquals(HubStage.Channels(null), hub.stage.value)
-        hub.openChannel(channel)
-        assertEquals(HubStage.Programmes(null, channel), hub.stage.value)
-    }
-
-    @Test
-    fun `another channel from the list beside the programmes opens its programmes, and back still returns to the list`() {
+    fun `another channel beside the programmes opens its programmes, and back returns to the columns`() {
         val hub = hub()
         val other = channel.copy(id = "c2", title = "Two")
         hub.openGroup(france)
         hub.openChannel(channel)
+        hub.openDay()
         hub.openChannel(other)
         assertEquals(HubStage.Programmes(france, other), hub.stage.value)
 
         assertTrue(hub.back())
-        assertEquals(HubStage.Channels(france), hub.stage.value)
+        assertEquals(HubStage.Browse(france, other), hub.stage.value)
     }
 
     @Test
-    fun `back leaves the places in the opposite order and says so`() {
+    fun `back on the columns with nothing typed is not handled, so the caller leaves Catch-up`() {
         val hub = hub()
         hub.openGroup(france)
-        hub.openChannel(channel)
-
-        assertTrue(hub.back())
-        assertEquals(HubStage.Channels(france), hub.stage.value)
-        assertTrue(hub.back())
-        assertEquals(HubStage.Groups, hub.stage.value)
-    }
-
-    @Test
-    fun `back on the first page is not handled, so the caller leaves Catch-up`() {
-        val hub = hub()
         assertFalse(hub.back())
-        assertEquals(HubStage.Groups, hub.stage.value)
     }
 
     @Test
-    fun `leaving Catch-up from any place makes the next visit begin at the categories`() {
+    fun `leaving Catch-up from any place makes the next visit begin at all`() {
         val hub = hub()
         hub.openGroup(france)
         hub.openChannel(channel)
+        hub.openDay()
         hub.reset()
-        assertEquals(HubStage.Groups, hub.stage.value)
+        assertEquals(HubStage.Browse(), hub.stage.value)
     }
 
     // ------------------------------------------------------------------------------------ the search
@@ -151,54 +152,39 @@ class CatchUpHubViewModelTest {
         val hub = hub()
         hub.search("  SPort ")
         assertEquals("  SPort ", hub.searchText.value)
+        hub.searchGroups(" fr ")
+        assertEquals(" fr ", hub.groupSearchText.value)
     }
 
     @Test
-    fun `back closes a search before it leaves the page, on the categories and inside one`() {
+    fun `back closes the channels' search, then the bouquets', before it leaves`() {
         val hub = hub()
-        hub.search("sport")
-        assertTrue(hub.back())
-        assertEquals("", hub.searchText.value)
-        assertEquals(HubStage.Groups, hub.stage.value)
-        assertFalse(hub.back())
-
-        hub.openGroup(france)
+        hub.searchGroups("fr")
         hub.search("tf")
         assertTrue(hub.back())
         assertEquals("", hub.searchText.value)
-        assertEquals(HubStage.Channels(france), hub.stage.value)
+        assertEquals("fr", hub.groupSearchText.value)
         assertTrue(hub.back())
-        assertEquals(HubStage.Groups, hub.stage.value)
+        assertEquals("", hub.groupSearchText.value)
+        assertFalse(hub.back())
     }
 
     @Test
-    fun `a category opened from the results starts with nothing typed`() {
+    fun `another bouquet starts with nothing typed among the channels`() {
         val hub = hub()
-        hub.search("sport")
+        hub.search("tf")
         hub.openGroup(france)
         assertEquals("", hub.searchText.value)
-        assertEquals(HubStage.Channels(france), hub.stage.value)
     }
 
     @Test
-    fun `a channel found on the first page goes back to the first page and its search`() {
+    fun `leaving Catch-up clears both searches as it clears the place`() {
         val hub = hub()
         hub.search("sport")
-        hub.openChannel(channel)
-        assertEquals(HubStage.Programmes(null, channel, fromGroups = true), hub.stage.value)
-        assertEquals("sport", hub.searchText.value)
-
-        assertTrue(hub.back())
-        assertEquals(HubStage.Groups, hub.stage.value)
-        assertEquals("sport", hub.searchText.value)
-    }
-
-    @Test
-    fun `leaving Catch-up clears the search as it clears the place`() {
-        val hub = hub()
-        hub.search("sport")
+        hub.searchGroups("fr")
         hub.reset()
         assertEquals("", hub.searchText.value)
+        assertEquals("", hub.groupSearchText.value)
     }
 
     // ---------------------------------------------------------------------------------- the counts

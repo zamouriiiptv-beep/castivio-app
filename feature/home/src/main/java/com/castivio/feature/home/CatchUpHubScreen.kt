@@ -4,12 +4,9 @@ import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.displayCutout
@@ -25,11 +22,10 @@ import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.CalendarMonth
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,7 +33,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -46,7 +41,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
@@ -59,13 +53,11 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
-import com.castivio.core.design.components.CastivioIconButton
 import com.castivio.core.design.components.CastivioSpinner
 import com.castivio.core.design.components.InteractiveGlassCard
 import com.castivio.core.design.components.ProviderArtwork
 import com.castivio.core.design.components.castivioBodyStyle
 import com.castivio.core.design.components.castivioChipStyle
-import com.castivio.core.design.components.castivioTitleStyle
 import com.castivio.core.design.icons.CastivioIcons
 import com.castivio.core.design.theme.CastivioTheme
 import com.castivio.core.design.theme.Sizing
@@ -75,28 +67,23 @@ import com.castivio.domain.CatchUpPolicy
 import com.castivio.domain.Channel
 
 /**
- * **Catch-up, a place of its own.** The categories that keep an archive, a category's channels, and -- over them -- a
- * channel's programmes beside its list, the pane [CatchUpProgrammes] draws, which plays through the same hand-off a film does.
+ * **Catch-up, a place of its own**, under the band every board has.
  *
- * Home's rail opens it; it replaces the button on every channel's guide, and the channels that have nothing to
- * replay are not in it, so nobody opens a screen of programmes that cannot be played to find that out.
+ * ## The first page: three columns (owner, 2026-11-26, design/mockups/catchup-19-days-column-ar.png)
+ *
+ * The bouquets that keep an archive, with their own search; the open bouquet's channels, which the band's search narrows;
+ * and the chosen channel's days -- today, yesterday, then dates. A day opens the second page: that day's programmes beside
+ * the bouquet's channels ([CatchUpProgrammes]), the page approved before. Everything reads from the left.
  *
  * ## Back, one place at a time
  *
- * Programmes, then the channels, then the categories, and from the categories out of Catch-up -- [CatchUpHubViewModel.back]
- * says which, and a false from it is the caller's [onBack]. A search that holds something is closed first.
- *
- * ## One search, one box
- *
- * At the end of the panel's header, the same box at every place a list is. On the first page it finds categories and
- * channels together, in two sections; inside a category, that category's channels. The header follows the language --
- * Back at the right in Arabic, pointing right -- while the lists under it keep the board's left-to-right order, because
- * what they hold are the provider's names.
+ * The programmes, then the three columns with the channel still chosen; there a search that holds something is closed
+ * first, and then Catch-up is left -- [CatchUpHubViewModel.back] says which.
  *
  * ## What it asks of the network
  *
- * Nothing. The pages read the catalogue; a provider is asked for a channel's programmes only when that channel is opened,
- * by [CatchUpViewModel], exactly as before.
+ * The bouquets and the channels read the catalogue. A provider is asked for a channel's listing when that channel is
+ * chosen, by [CatchUpViewModel], once: its days come from it, and so do the programmes the day opens.
  */
 @Composable
 fun CatchUpHubScreen(
@@ -109,19 +96,21 @@ fun CatchUpHubScreen(
     programmes: CatchUpViewModel = hiltViewModel(),
 ) {
     val tv = CastivioTheme.device.isTv
-    // The language's own direction, read before the board is made left to right: the panel's header follows it.
-    val direction = LocalLayoutDirection.current
     val stage by hub.stage.collectAsStateWithLifecycle()
-    val groups by hub.groups.collectAsStateWithLifecycle()
-    val matches by hub.matches.collectAsStateWithLifecycle()
+    val groups by hub.shownGroups.collectAsStateWithLifecycle()
+    val allGroups by hub.groups.collectAsStateWithLifecycle()
     val supported by hub.supported.collectAsStateWithLifecycle()
     val searchText by hub.searchText.collectAsStateWithLifecycle()
+    val groupSearch by hub.groupSearchText.collectAsStateWithLifecycle()
     val channels = hub.channels.collectAsLazyPagingItems()
-    // Whether the cursor is in the search box: a list that arrives while the viewer types must not take it away.
-    var searchFocused by remember { mutableStateOf(false) }
 
-    // Leaving Catch-up for Home ends this visit: the next one begins at the categories.
-    DisposableEffect(Unit) { onDispose { hub.reset() } }
+    // Leaving Catch-up for Home ends this visit: the next one begins at "all", and the listing in hand is let go.
+    DisposableEffect(Unit) {
+        onDispose {
+            hub.reset()
+            programmes.close()
+        }
+    }
     BackHandler { if (!hub.back()) onBack() }
 
     // Written left to right in every language, as the channels' board is: the names in it are the provider's.
@@ -131,125 +120,117 @@ fun CatchUpHubScreen(
         ) {
             val m = channelsMetricsFor(tv = tv, width = maxWidth, height = maxHeight)
 
-            val at = stage
-            if (at is HubStage.Programmes) {
-                // A channel's programmes beside the list it was chosen from (owner, 2026-11-25,
-                // design/mockups/catchup-17-ltr-ar.png): under the band every board has, the channels at the left and the
-                // channel's days and programmes beside them, all from the left. Another channel is one press away.
-                val programmeSearch by programmes.searchText.collectAsStateWithLifecycle()
-                Column(
-                    Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = m.edge)
-                        .padding(top = m.boardTop, bottom = m.boardBottom),
-                ) {
-                    BoardHeader(
-                        m = m,
-                        searchText = programmeSearch,
-                        onSearch = programmes::search,
-                        hint = stringResource(R.string.catchup_search_programmes),
-                        // Programmes are in the order they were on: there is no other order to offer.
-                        order = null,
-                    )
-                    Spacer(Modifier.height(m.headerGap))
-                    // Two of Home's cards side by side (owner, 2026-11-26), as the channels' board's columns are.
-                    Row(
+            when (val at = stage) {
+                is HubStage.Programmes -> {
+                    // A day's programmes beside the list it was chosen from: under the band, the channels at the left and the
+                    // channel's days and programmes beside them. Another channel is one press away.
+                    val programmeSearch by programmes.searchText.collectAsStateWithLifecycle()
+                    Column(
                         Modifier
-                            .fillMaxWidth()
-                            .weight(1f),
-                        horizontalArrangement = Arrangement.spacedBy(m.railGap),
+                            .fillMaxSize()
+                            .padding(horizontal = m.edge)
+                            .padding(top = m.boardTop, bottom = m.boardBottom),
                     ) {
-                        ChannelSide(
-                            // The channels' own search, at the head of their list (owner, 2026-11-25); the band's looks
-                            // among the programmes.
-                            searchText = searchText,
-                            onSearch = hub::search,
-                            channels = channels,
-                            selected = at.channel,
+                        BoardHeader(
                             m = m,
-                            onOpen = hub::openChannel,
-                            modifier = Modifier.fillMaxWidth(SIDE_SHARE).fillMaxHeight().homeCard(m).padding(m.wellPad),
+                            searchText = programmeSearch,
+                            onSearch = programmes::search,
+                            hint = stringResource(R.string.catchup_search_programmes),
+                            // Programmes are in the order they were on: there is no other order to offer.
+                            order = null,
                         )
-                        CatchUpProgrammes(
-                            channel = at.channel,
-                            m = m,
-                            model = programmes,
-                            onPlay = onPlay,
-                            onClose = { hub.back() },
-                            playing = playing,
-                            modifier = Modifier.weight(1f).homeCard(m).padding(m.wellPad),
-                        )
+                        Spacer(Modifier.height(m.headerGap))
+                        Row(
+                            Modifier.fillMaxWidth().weight(1f),
+                            horizontalArrangement = Arrangement.spacedBy(m.railGap),
+                        ) {
+                            ChannelSide(
+                                // The channels' own search, at the head of their list; the band's looks among the programmes.
+                                searchText = searchText,
+                                onSearch = hub::search,
+                                withSearch = true,
+                                channels = channels,
+                                selected = at.channel,
+                                m = m,
+                                onOpen = hub::openChannel,
+                                modifier = Modifier.fillMaxWidth(SIDE_SHARE).fillMaxHeight().homeCard(m).padding(m.wellPad),
+                            )
+                            CatchUpProgrammes(
+                                channel = at.channel,
+                                m = m,
+                                model = programmes,
+                                onPlay = onPlay,
+                                onClose = { hub.back() },
+                                playing = playing,
+                                modifier = Modifier.weight(1f).homeCard(m).padding(m.wellPad),
+                            )
+                        }
                     }
                 }
-            } else {
-                Column(
-                    Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = m.edge)
-                        .padding(top = m.boardTop, bottom = m.boardBottom),
-                ) {
-                    BoardBand(
-                        section = stringResource(R.string.catchup_title),
-                        // Short, because the cell it stands in is a fixed 90dp or so, and the same at every place: what this
-                        // page is and which category is open are the panel's header's to say, and said twice they were repeated
-                        // here (and the sentence cut off).
-                        list = stringResource(R.string.catchup_band),
-                        m = m,
-                        searchText = "",
-                        onSearch = {},
-                        onSearchFocus = {},
-                        withSearch = false,
-                        // The panel below has its own arrow, which steps back through the categories before it leaves.
-                        withBack = false,
-                    )
 
-                    Spacer(Modifier.height(m.headerGap))
-
-                    HubPanel(
-                        m = m,
-                        direction = direction,
-                        searchText = searchText,
-                        onSearch = hub::search,
-                        onSearchFocus = { searchFocused = it },
-                        // A category's channels read "choose a channel", then the category -- the action first, as a title, and what
-                        // it is chosen from after it, in the brighter of the two lines because it is the data.
-                        title = when (stage) {
-                            HubStage.Groups -> stringResource(R.string.catchup_title)
-                            else -> stringResource(R.string.catchup_pick_channel)
-                        },
-                        hint = when (val at = stage) {
-                            HubStage.Groups -> stringResource(R.string.catchup_hub_subtitle)
-                            is HubStage.Channels -> at.group?.name ?: stringResource(R.string.catchup_all)
-                            is HubStage.Programmes -> at.group?.name ?: stringResource(R.string.catchup_all)
-                        },
-                        hintIsName = stage != HubStage.Groups,
-                        onBack = { if (!hub.back()) onBack() },
+                is HubStage.Browse -> {
+                    // The chosen channel's listing, asked for once: its days are the third column.
+                    LaunchedEffect(at.channel?.id) { at.channel?.let(programmes::open) }
+                    Column(
+                        Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = m.edge)
+                            .padding(top = m.boardTop, bottom = m.boardBottom),
                     ) {
-                        val found = matches
-                        val onFirstPage = stage == HubStage.Groups || (stage as? HubStage.Programmes)?.fromGroups == true
-                        when {
-                            // The categories, or -- while something is searched -- what matched among them and the channels.
-                            onFirstPage && found == null -> GroupsPage(
+                        BoardHeader(
+                            m = m,
+                            searchText = searchText,
+                            onSearch = hub::search,
+                            hint = stringResource(R.string.channels_search_hint),
+                            order = null,
+                        )
+                        Spacer(Modifier.height(m.headerGap))
+                        Row(
+                            Modifier.fillMaxWidth().weight(1f),
+                            horizontalArrangement = Arrangement.spacedBy(m.railGap),
+                        ) {
+                            GroupsColumn(
                                 groups = groups,
-                                m = m,
-                                autoFocus = !searchFocused,
+                                total = allGroups?.total,
+                                open = at.group,
                                 supported = supported,
+                                searchText = groupSearch,
+                                onSearch = hub::searchGroups,
+                                m = m,
                                 onOpen = hub::openGroup,
+                                modifier = Modifier.fillMaxWidth(GROUPS_SHARE).fillMaxHeight().homeCard(m).padding(m.wellPad),
                             )
-                            onFirstPage && found != null -> SearchResults(
-                                found = found,
-                                channels = channels,
+                            Column(
+                                Modifier.fillMaxWidth(CHANNELS_SHARE).fillMaxHeight().homeCard(m).padding(m.wellPad),
+                                verticalArrangement = Arrangement.spacedBy(m.guideGap),
+                            ) {
+                                Text(
+                                    text = at.group?.name ?: stringResource(R.string.catchup_all),
+                                    style = castivioChipStyle(m.frame.fsChip),
+                                    color = CastivioTheme.colors.onBackgroundVariant,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                                ChannelSide(
+                                    searchText = searchText,
+                                    onSearch = hub::search,
+                                    withSearch = false,
+                                    channels = channels,
+                                    selected = at.channel,
+                                    m = m,
+                                    onOpen = hub::openChannel,
+                                    modifier = Modifier.fillMaxWidth().weight(1f),
+                                )
+                            }
+                            DaysColumn(
+                                channel = at.channel,
+                                model = programmes,
                                 m = m,
-                                direction = direction,
-                                onOpenGroup = hub::openGroup,
-                                onOpenChannel = hub::openChannel,
-                            )
-                            else -> ChannelsPage(
-                                channels = channels,
-                                m = m,
-                                searching = searchText.isNotBlank(),
-                                autoFocus = !searchFocused,
-                                onOpen = hub::openChannel,
+                                onDay = { index ->
+                                    programmes.selectDay(index)
+                                    hub.openDay()
+                                },
+                                modifier = Modifier.weight(1f).fillMaxHeight().homeCard(m).padding(m.wellPad),
                             )
                         }
                     }
@@ -259,57 +240,52 @@ fun CatchUpHubScreen(
     }
 }
 
-/**
- * The header every page of Catch-up has, so that the three look like one: Back, what this page is, and the one search box.
- *
- * It follows the language, as a page of this kind does: Back at the start -- the right in Arabic, mirrored to point right
- * there -- then [title], then at the end the box. The room that is left once those are placed is shared equally between the
- * three gaps -- Back and the title, the title and the box, the box and the panel's edge -- so none is tighter than another.
- * The pages under it are the board's, drawn left to right in every language, so the box keeps its own mark at its left.
- *
- * What gives, on a narrow screen, is the last thing in [title] that can: it ends in an ellipsis, and the box stays whole.
- *
- * @param title the words of the header's middle, in a row: what the page is and what it is about.
- */
+/** The bouquets that keep an archive, under their own search: "all" first, the open one in the chosen colour. */
 @Composable
-internal fun CatchUpHeader(
-    m: ChannelsMetrics,
-    direction: LayoutDirection,
-    onBack: () -> Unit,
+private fun GroupsColumn(
+    groups: HubGroups?,
+    total: Int?,
+    open: ArchiveGroup?,
+    supported: Boolean,
     searchText: String,
     onSearch: (String) -> Unit,
-    onSearchFocus: (Boolean) -> Unit,
-    searchHint: String,
-    title: @Composable RowScope.() -> Unit,
+    m: ChannelsMetrics,
+    onOpen: (ArchiveGroup?) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    CompositionLocalProvider(LocalLayoutDirection provides direction) {
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            CastivioIconButton(
-                icon = CastivioIcons.ArrowBack,
-                contentDescription = stringResource(R.string.catchup_back),
-                onClick = onBack,
-                modifier = if (direction == LayoutDirection.Rtl) Modifier.graphicsLayer(scaleX = -1f) else Modifier,
-            )
-            Row(
-                Modifier.weight(1f),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Row(
-                    Modifier.weight(1f, fill = false),
-                    horizontalArrangement = Arrangement.spacedBy(m.controlPadH),
-                    verticalAlignment = Alignment.CenterVertically,
-                    content = title,
-                )
-                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-                    HeaderSearchField(
-                        text = searchText,
+    val first = remember { FocusRequester() }
+    LaunchedEffect(groups != null) { if (groups != null) runCatching { first.requestFocus() } }
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(m.guideGap)) {
+        HeaderSearchField(
+            text = searchText,
+            m = m,
+            onType = onSearch,
+            hint = stringResource(R.string.catchup_search_groups),
+            modifier = Modifier.fillMaxWidth(),
+        )
+        when {
+            groups == null -> Waiting(m)
+            total == 0 -> Empty(m, if (supported) R.string.catchup_hub_empty else R.string.catchup_unsupported)
+            else -> LazyColumn(Modifier.fillMaxWidth().weight(1f), verticalArrangement = Arrangement.spacedBy(m.guideGap)) {
+                if (searchText.isBlank()) {
+                    item(key = ALL_KEY) {
+                        GroupCard(
+                            name = stringResource(R.string.catchup_all),
+                            count = total ?: groups.total,
+                            lead = open == null,
+                            m = m,
+                            modifier = Modifier.focusRequester(first),
+                            onClick = { onOpen(null) },
+                        )
+                    }
+                }
+                items(groups.groups, key = { it.id }) { group ->
+                    GroupCard(
+                        name = group.name,
+                        count = group.channels,
+                        lead = open?.id == group.id,
                         m = m,
-                        onType = onSearch,
-                        onFocusChange = onSearchFocus,
-                        hint = searchHint,
-                        markAsButton = true,
-                        scale = CATCHUP_SEARCH_SCALE,
+                        onClick = { onOpen(group) },
                     )
                 }
             }
@@ -317,98 +293,100 @@ internal fun CatchUpHeader(
     }
 }
 
-/** The frame of a page: the back control, the title, what to do, and the page under them. */
+/**
+ * The chosen channel's archive, a day to a line: today, yesterday, then the dates, each with its date. A press opens that
+ * day's programmes. Before a channel is chosen the column says what to do; while the listing is asked for, it says so.
+ */
 @Composable
-private fun ColumnScope.HubPanel(
+private fun DaysColumn(
+    channel: Channel?,
+    model: CatchUpViewModel,
     m: ChannelsMetrics,
-    direction: LayoutDirection,
-    title: String,
-    hint: String,
-    /** The line under the title is a name from the catalogue and not a sentence: it is drawn as one, in the brighter ink. */
-    hintIsName: Boolean,
-    searchText: String,
-    onSearch: (String) -> Unit,
-    onSearchFocus: (Boolean) -> Unit,
-    onBack: () -> Unit,
-    content: @Composable () -> Unit,
+    onDay: (Int) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val colors = CastivioTheme.colors
-    Column(
-        Modifier
-            .fillMaxWidth()
-            .weight(1f)
-            // Home's own card (owner, 2026-11-26), as the boards' columns are.
-            .homeCard(m)
-            .padding(m.wellPad),
-    ) {
-        CatchUpHeader(
-            m = m,
-            direction = direction,
-            onBack = onBack,
-            searchText = searchText,
-            onSearch = onSearch,
-            onSearchFocus = onSearchFocus,
-            searchHint = stringResource(R.string.catchup_search_hint),
-        ) {
-            Text(
-                text = title,
-                style = castivioTitleStyle(m.frame.fsLabel),
-                color = colors.onBackgroundStrong,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Text(
-                text = hint,
-                style = if (hintIsName) castivioChipStyle(m.frame.fsBody * HINT_SCALE)
-                else castivioBodyStyle(m.frame.fsBody * HINT_SCALE),
-                color = if (hintIsName) colors.onBackground else colors.onBackgroundMuted,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f, fill = false),
-            )
+    val state by model.state.collectAsStateWithLifecycle()
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(m.guideGap)) {
+        if (channel == null) {
+            Empty(m, R.string.catchup_pick_channel)
+            return@Column
         }
-        Spacer(Modifier.height(m.guideGap))
-        content()
+        Text(
+            text = stringResource(R.string.catchup_archive_of, channel.title),
+            style = castivioChipStyle(m.frame.fsChip),
+            color = colors.onBackgroundVariant,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        when (state.phase) {
+            CatchUpPhase.IDLE, CatchUpPhase.LOADING -> Waiting(m)
+            CatchUpPhase.EMPTY -> Empty(m, R.string.catchup_empty)
+            CatchUpPhase.UNSUPPORTED -> Empty(m, R.string.catchup_unsupported)
+            CatchUpPhase.FAILED -> Empty(m, R.string.catchup_failed)
+            CatchUpPhase.READY -> LazyColumn(
+                Modifier.fillMaxWidth().weight(1f),
+                verticalArrangement = Arrangement.spacedBy(m.guideGap),
+            ) {
+                itemsIndexed(state.days, key = { index, day -> "${index}_${day.date}" }) { index, day ->
+                    DayEntry(day, m) { onDay(index) }
+                }
+            }
+        }
     }
 }
 
-/** The categories that keep an archive, and "all" first, in the azure of the one thing a first press does. */
+/** One day: its name -- today, yesterday -- or its date, the date under a name, and the arrow that says it opens. */
 @Composable
-private fun GroupsPage(
-    groups: HubGroups?,
-    m: ChannelsMetrics,
-    autoFocus: Boolean,
-    supported: Boolean,
-    onOpen: (ArchiveGroup?) -> Unit,
-) {
-    val first = remember { FocusRequester() }
-    LaunchedEffect(groups?.groups?.isNotEmpty(), autoFocus) {
-        if (autoFocus && groups?.groups?.isNotEmpty() == true) runCatching { first.requestFocus() }
-    }
-    when {
-        groups == null -> Waiting(m)
-        // A subscription of a kind with no archive says so, which is a statement about the subscription; one that has the
-        // kind and no channel with an archive says that, which is a statement about the provider.
-        groups.groups.isEmpty() -> Empty(m, if (supported) R.string.catchup_hub_empty else R.string.catchup_unsupported)
-        else -> LazyVerticalGrid(
-            columns = GridCells.Adaptive(GROUP_MIN_WIDTH),
-            modifier = Modifier.fillMaxSize(),
-            horizontalArrangement = Arrangement.spacedBy(m.guideGap),
-            verticalArrangement = Arrangement.spacedBy(m.guideGap),
+private fun DayEntry(day: CatchUpDayView, m: ChannelsMetrics, onClick: () -> Unit) {
+    val colors = CastivioTheme.colors
+    val tv = CastivioTheme.device.isTv
+    InteractiveGlassCard(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(m.panelRadius),
+        fill = SolidColor(colors.glassFill),
+    ) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .heightIn(min = Sizing.minTarget(tv))
+                .padding(horizontal = m.controlPadH, vertical = Spacing.sm),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(m.controlPadH),
         ) {
-            item(key = ALL_KEY) {
-                GroupCard(
-                    name = stringResource(R.string.catchup_all),
-                    count = groups.total,
-                    lead = true,
-                    m = m,
-                    modifier = Modifier.focusRequester(first),
-                    onClick = { onOpen(null) },
+            Icon(
+                Icons.Rounded.CalendarMonth,
+                contentDescription = null,
+                tint = colors.hueAzure,
+                modifier = Modifier.size(Sizing.iconMd),
+            )
+            Column(Modifier.weight(1f)) {
+                Text(
+                    text = when (day.label) {
+                        DayLabel.TODAY -> stringResource(R.string.channels_guide_today)
+                        DayLabel.YESTERDAY -> stringResource(R.string.catchup_yesterday)
+                        DayLabel.DATE -> day.date
+                    },
+                    style = castivioChipStyle(m.frame.fsLabel),
+                    color = colors.onBackgroundStrong,
+                    maxLines = 1,
                 )
+                if (day.label != DayLabel.DATE) {
+                    Text(
+                        text = day.date,
+                        style = castivioBodyStyle(m.frame.fsBody),
+                        color = colors.onBackgroundMuted,
+                        maxLines = 1,
+                    )
+                }
             }
-            items(groups.groups, key = { it.id }) { group ->
-                GroupCard(name = group.name, count = group.channels, lead = false, m = m, onClick = { onOpen(group) })
-            }
+            Icon(
+                CastivioIcons.Chevron,
+                contentDescription = null,
+                tint = colors.onBackgroundMuted,
+                modifier = Modifier.size(Sizing.iconSm),
+            )
         }
     }
 }
@@ -475,45 +453,6 @@ private fun GroupCard(
     }
 }
 
-/** A category's channels that keep an archive, a window at a time. */
-@Composable
-private fun ChannelsPage(
-    channels: LazyPagingItems<Channel>,
-    m: ChannelsMetrics,
-    searching: Boolean,
-    autoFocus: Boolean,
-    onOpen: (Channel) -> Unit,
-) {
-    val first = remember { FocusRequester() }
-    LaunchedEffect(channels.itemCount > 0, autoFocus) {
-        if (autoFocus && channels.itemCount > 0) runCatching { first.requestFocus() }
-    }
-    when {
-        // A search is read again at every pause in the typing: a spinner at each would be a flicker, so there is none.
-        channels.itemCount == 0 && channels.loadState.refresh is LoadState.Loading ->
-            if (searching) Spacer(Modifier.fillMaxSize()) else Waiting(m)
-        channels.itemCount == 0 ->
-            Empty(m, if (searching) R.string.catchup_search_none else R.string.catchup_hub_empty)
-        else -> LazyVerticalGrid(
-            columns = GridCells.Adaptive(CHANNEL_MIN_WIDTH),
-            modifier = Modifier.fillMaxSize(),
-            horizontalArrangement = Arrangement.spacedBy(m.guideGap),
-            verticalArrangement = Arrangement.spacedBy(m.guideGap),
-        ) {
-            items(channels.itemCount, key = channels.itemKey { it.id }) { index ->
-                channels[index]?.let { channel ->
-                    ChannelEntry(
-                        channel = channel,
-                        m = m,
-                        modifier = if (index == 0) Modifier.focusRequester(first) else Modifier,
-                        onClick = { onOpen(channel) },
-                    )
-                }
-            }
-        }
-    }
-}
-
 /**
  * The list beside a channel's programmes: its own search at its head, then the category's channels with an archive, the open
  * one in the chosen colour. A press on another opens its programmes in the pane beside, and the list stays where it was
@@ -523,21 +462,28 @@ private fun ChannelsPage(
 private fun ChannelSide(
     searchText: String,
     onSearch: (String) -> Unit,
+    /** Whether the list carries its own search at its head: beside the programmes; on the first page the band has it. */
+    withSearch: Boolean,
     channels: LazyPagingItems<Channel>,
-    selected: Channel,
+    selected: Channel?,
     m: ChannelsMetrics,
     onOpen: (Channel) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val colors = CastivioTheme.colors
     Column(modifier, verticalArrangement = Arrangement.spacedBy(m.guideGap)) {
-        HeaderSearchField(
-            text = searchText,
-            m = m,
-            onType = onSearch,
-            hint = stringResource(R.string.channels_search_hint),
-            modifier = Modifier.fillMaxWidth(),
-        )
+        if (withSearch) {
+            HeaderSearchField(
+                text = searchText,
+                m = m,
+                onType = onSearch,
+                hint = stringResource(R.string.channels_search_hint),
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+        if (channels.itemCount == 0 && channels.loadState.refresh is LoadState.Loading && searchText.isBlank()) {
+            Waiting(m)
+        }
         if (channels.itemCount == 0 && searchText.isNotBlank() && channels.loadState.refresh !is LoadState.Loading) {
             Text(
                 text = stringResource(R.string.catchup_search_none),
@@ -551,7 +497,7 @@ private fun ChannelSide(
                     ChannelEntry(
                         channel = channel,
                         m = m,
-                        selected = channel.id == selected.id,
+                        selected = channel.id == selected?.id,
                         // The side is narrow: the number gives its room to the name.
                         numbered = false,
                         onClick = { onOpen(channel) },
@@ -634,90 +580,6 @@ private fun ChannelEntry(
     }
 }
 
-/**
- * What a search on the first page found: the categories whose names match, then the channels that match -- in two
- * sections of one grid, so a long list of channels scrolls under its heading and the categories above it go with it.
- *
- * A section with nothing in it is not drawn, and nothing at all says so in words. The channels' count is told only when
- * every one has been read: a window of them is not their number.
- */
-@Composable
-private fun SearchResults(
-    found: List<ArchiveGroup>,
-    channels: LazyPagingItems<Channel>,
-    m: ChannelsMetrics,
-    direction: LayoutDirection,
-    onOpenGroup: (ArchiveGroup) -> Unit,
-    onOpenChannel: (Channel) -> Unit,
-) {
-    val reading = channels.itemCount == 0 && channels.loadState.refresh is LoadState.Loading
-    if (found.isEmpty() && channels.itemCount == 0) {
-        // Reading is not finding nothing: the sentence waits for the channels' answer, and nothing stands in for it.
-        if (reading) Spacer(Modifier.fillMaxSize()) else Empty(m, R.string.catchup_search_none)
-        return
-    }
-    BoxWithConstraints(Modifier.fillMaxSize()) {
-        val columns = searchColumns(maxWidth.value, m.guideGap.value, GROUP_MIN_WIDTH.value, CHANNEL_MIN_WIDTH.value)
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(columns.total),
-            modifier = Modifier.fillMaxSize(),
-            horizontalArrangement = Arrangement.spacedBy(m.guideGap),
-            verticalArrangement = Arrangement.spacedBy(m.guideGap),
-        ) {
-            if (found.isNotEmpty()) {
-                item(key = SECTION_GROUPS, span = { GridItemSpan(maxLineSpan) }) {
-                    SearchHeading(stringResource(R.string.catchup_section_groups), found.size, direction, m)
-                }
-                items(found, key = { "group.${it.id}" }, span = { GridItemSpan(columns.groupSpan) }) { group ->
-                    GroupCard(name = group.name, count = group.channels, lead = false, m = m, onClick = { onOpenGroup(group) })
-                }
-            }
-            if (channels.itemCount > 0) {
-                item(key = SECTION_CHANNELS, span = { GridItemSpan(maxLineSpan) }) {
-                    val total = channels.itemCount.takeIf { channels.loadState.append.endOfPaginationReached }
-                    SearchHeading(stringResource(R.string.catchup_section_channels), total, direction, m)
-                }
-                items(
-                    count = channels.itemCount,
-                    key = channels.itemKey { "channel.${it.id}" },
-                    span = { GridItemSpan(columns.channelSpan) },
-                ) { index ->
-                    channels[index]?.let { channel -> ChannelEntry(channel = channel, m = m, onClick = { onOpenChannel(channel) }) }
-                }
-            }
-        }
-    }
-}
-
-/** A section's name, how many it holds when that is known, and a hairline to the far edge -- in the language's direction. */
-@Composable
-private fun SearchHeading(label: String, count: Int?, direction: LayoutDirection, m: ChannelsMetrics) {
-    val colors = CastivioTheme.colors
-    CompositionLocalProvider(LocalLayoutDirection provides direction) {
-        Row(
-            Modifier.fillMaxWidth().padding(top = Spacing.xs),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
-        ) {
-            Text(
-                text = label,
-                style = castivioChipStyle(m.frame.fsChip),
-                color = colors.onBackgroundMuted,
-                maxLines = 1,
-            )
-            if (count != null) {
-                Text(
-                    text = count.toString(),
-                    style = castivioChipStyle(m.frame.fsChip),
-                    color = colors.onBackground,
-                    maxLines = 1,
-                )
-            }
-            Box(Modifier.weight(1f).height(1.dp).background(colors.glassBorderSoft))
-        }
-    }
-}
-
 @Composable
 private fun Waiting(m: ChannelsMetrics) {
     Column(
@@ -752,8 +614,9 @@ private fun Empty(m: ChannelsMetrics, @StringRes message: Int = R.string.catchup
 /** The list of channels beside a channel's programmes, of the panel's width. */
 private const val SIDE_SHARE = 0.3f
 
-/** The line under the title a little larger than a body line: it is what the page says it is for. */
-private const val HINT_SCALE = 1.2f
+/** The first page's columns, of the width: the bouquets, then the channels; the days take what is left. */
+private const val GROUPS_SHARE = 0.27f
+private const val CHANNELS_SHARE = 0.48f
 
 /**
  * A category's card is at least this wide: four in a row on a handset's board (770dp wide, 4dp between the cards: 188dp a card), and still
@@ -789,7 +652,3 @@ private const val NUMBER_PLATE_ALPHA = 0.10f
 
 /** The first card's key: "all", which is no category's id. */
 private const val ALL_KEY = "catchup.all"
-
-/** The keys of a search's two headings: neither is a category's or a channel's id. */
-private const val SECTION_GROUPS = "catchup.section.groups"
-private const val SECTION_CHANNELS = "catchup.section.channels"

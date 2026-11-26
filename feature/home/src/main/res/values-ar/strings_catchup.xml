@@ -23,4 +23,6 @@
     <!-- The line under the feature's name in the top band: one short word, because its cell is about 90dp. -->
     <string name="catchup_band">أرشيف البرامج</string>
     <string name="catchup_search_programmes">البحث في البرامج</string>
+    <string name="catchup_search_groups">البحث في الباقات</string>
+    <string name="catchup_archive_of">أرشيف %1$s</string>
 </resources>
