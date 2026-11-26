@@ -43,4 +43,15 @@
     </plurals>
 
     <string name="locale_sentinel" translatable="false">bg</string>
+    <string name="setup_title">Настройка на източник</string>
+    <string name="send_title">Изпратете от телефона</string>
+    <string name="send_step_scan">Сканирайте кода с камерата</string>
+    <string name="send_step_ids">Въведете MAC адреса и ключа на устройството</string>
+    <string name="send_step_play">Добавете източника и гледайте тук</string>
+    <string name="add_heading">Добавете плейлиста</string>
+    <string name="add_sub">Изберете вида източник</string>
+    <string name="kind_m3u_sub">Връзка към плейлиста</string>
+    <string name="kind_xtream_sub">Потребител и парола</string>
+    <string name="add_new_source">Нов източник</string>
+    <string name="activation_exit">Изход</string>
 </resources>

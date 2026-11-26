@@ -57,4 +57,15 @@
     </plurals>
 
     <string name="locale_sentinel" translatable="false">en</string>
+    <string name="setup_title">Set up a viewing source</string>
+    <string name="send_title">Send it from your phone</string>
+    <string name="send_step_scan">Scan the code with your phone camera</string>
+    <string name="send_step_ids">Enter the MAC address and device key</string>
+    <string name="send_step_play">Add the source and play it on this device</string>
+    <string name="add_heading">Add your playlist</string>
+    <string name="add_sub">Choose the kind of source to add</string>
+    <string name="kind_m3u_sub">Playlist link</string>
+    <string name="kind_xtream_sub">Username and password</string>
+    <string name="add_new_source">Add a new source</string>
+    <string name="activation_exit">Exit</string>
 </resources>

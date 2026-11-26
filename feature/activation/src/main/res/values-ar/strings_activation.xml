@@ -47,4 +47,15 @@
     </plurals>
 
     <string name="locale_sentinel" translatable="false">ar</string>
+    <string name="setup_title">إعداد مصدر المشاهدة</string>
+    <string name="send_title">أرسلها من هاتفك</string>
+    <string name="send_step_scan">امسح الرمز بكاميرا هاتفك</string>
+    <string name="send_step_ids">أدخل عنوان MAC ومفتاح الجهاز</string>
+    <string name="send_step_play">أضف المصدر وشغّله على هذا الجهاز</string>
+    <string name="add_heading">أضف قائمة التشغيل</string>
+    <string name="add_sub">اختر نوع المصدر الذي تريد إضافته</string>
+    <string name="kind_m3u_sub">رابط قائمة التشغيل</string>
+    <string name="kind_xtream_sub">اسم المستخدم وكلمة المرور</string>
+    <string name="add_new_source">إضافة مصدر جديد</string>
+    <string name="activation_exit">خروج</string>
 </resources>

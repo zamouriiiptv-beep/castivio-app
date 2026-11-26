@@ -42,4 +42,15 @@
     </plurals>
 
     <string name="locale_sentinel" translatable="false">ms</string>
+    <string name="setup_title">Sediakan sumber tontonan</string>
+    <string name="send_title">Hantar dari telefon</string>
+    <string name="send_step_scan">Imbas kod dengan kamera</string>
+    <string name="send_step_ids">Masukkan alamat MAC dan kunci peranti</string>
+    <string name="send_step_play">Tambah sumber dan main di sini</string>
+    <string name="add_heading">Tambah senarai main</string>
+    <string name="add_sub">Pilih jenis sumber</string>
+    <string name="kind_m3u_sub">Pautan senarai main</string>
+    <string name="kind_xtream_sub">Nama pengguna dan kata laluan</string>
+    <string name="add_new_source">Tambah sumber baharu</string>
+    <string name="activation_exit">Keluar</string>
 </resources>

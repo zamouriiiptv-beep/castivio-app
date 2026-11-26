@@ -43,4 +43,15 @@
     </plurals>
 
     <string name="locale_sentinel" translatable="false">nl</string>
+    <string name="setup_title">Bron instellen</string>
+    <string name="send_title">Verstuur vanaf je telefoon</string>
+    <string name="send_step_scan">Scan de code met je camera</string>
+    <string name="send_step_ids">Voer het MAC-adres en de apparaatsleutel in</string>
+    <string name="send_step_play">Voeg de bron toe en speel hier af</string>
+    <string name="add_heading">Voeg je playlist toe</string>
+    <string name="add_sub">Kies het soort bron</string>
+    <string name="kind_m3u_sub">Playlistlink</string>
+    <string name="kind_xtream_sub">Gebruikersnaam en wachtwoord</string>
+    <string name="add_new_source">Nieuwe bron toevoegen</string>
+    <string name="activation_exit">Afsluiten</string>
 </resources>

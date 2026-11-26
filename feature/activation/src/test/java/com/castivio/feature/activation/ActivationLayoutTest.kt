@@ -14,6 +14,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 // DpRect carries its height as an extension property in this package, not as a
@@ -144,73 +145,32 @@ class ActivationLayoutTest {
         )
     }
 
-    /**
-     * The header's title is a line of type, not a slab the height of the row.
-     *
-     * ## The bug this is here for
-     *
-     * `CastivioHeader` measured its three slots with `constraints.copy(maxWidth =
-     * …)`, and the constraints it copied came from `Modifier.height`, which sets
-     * `minHeight == maxHeight`. So every slot was *required* to be exactly as tall
-     * as the row. A `Row` shrugs that off — it centres its own children, which is
-     * why the wordmark and the chips looked right and why this went unnoticed —
-     * but a `Text` handed a fixed height puts its one line at the **top** of it.
-     * The title rode eight dp above the wordmark on every device and in every
-     * language, and no arithmetic below the measure step could have corrected it:
-     * the placeable was already the row's height, so centring it was a no-op.
-     *
-     * ## Why this harness can see it, when it cannot see type
-     *
-     * Robolectric gives every `Text` the same 35dp whatever its style, which is
-     * what stops this file making claims about leading or fit. Here that is not a
-     * problem but the mechanism: 35 is *not* the header's height on any frame, so
-     * a title reporting the row's height reports the constraint rather than the
-     * text, and the two numbers cannot be confused. It is the rare defect a
-     * harness that cannot lay out text is perfectly placed to catch.
-     */
+    /** Each kind opens its own form; the button opens the whole choice (owner, 2026-11-26). */
     @Test
-    fun `the header's title is measured as text, not stretched to the row`() {
-        compose.setContent { Screen(Frame.Phone) }
-
-        val header = compose.onNodeWithTag(ActivationTags.HEADER)
-            .getUnclippedBoundsInRoot().height
-        val title = compose.onNodeWithText("Add a playlist", substring = true)
-            .getUnclippedBoundsInRoot().height
-
-        assertTrue(
-            "the title measures $title in a $header header — it was handed the " +
-                "row's own height, so its line is sitting at the top of the row " +
-                "rather than on the wordmark's baseline",
-            title < header,
-        )
-    }
-
-    /**
-     * The status region's whole promise: nothing moves when it fills.
-     *
-     * §6.3 calls it a reserved height, and the only way to check a reservation is
-     * to spend it — measure the column the region would push, with the region
-     * quiet and then speaking, and require the two to be equal. Measuring the
-     * region's own bounds cannot do it: empty, it has no width, and a degenerate
-     * rectangle reports nothing useful about the space it is holding.
-     */
-    @Test
-    fun `the status region reserves its height, so nothing moves when it fills`() {
-        val identity = mutableStateOf(restingIdentity())
-        compose.setContent { Screen(Frame.Phone, identity) }
-
-        val quiet = compose.onNodeWithTag(ActivationTags.IDENTITY)
-            .getUnclippedBoundsInRoot().height
-        identity.value = identity.value.copy(refresh = RefreshState.None)
+    fun `the two kinds and the button each go where they say`() {
+        val pressed = mutableListOf<String>()
+        compose.setContent {
+            CastivioTheme {
+                Stage(Frame.Phone) {
+                    MacActivationScreen(
+                        identity = restingIdentity(),
+                        onAddPlaylist = { pressed += "choose" },
+                        onPlaylistUrl = { pressed += "m3u" },
+                        onXtream = { pressed += "xtream" },
+                        onRefresh = { pressed += "refresh" },
+                        onCopied = {},
+                        onOpenLanguage = { pressed += "language" },
+                        onExit = { pressed += "exit" },
+                    )
+                }
+            }
+        }
+        compose.onNodeWithTag(ActivationTags.ACT_M3U).performClick()
+        compose.onNodeWithTag(ActivationTags.ACT_XTREAM).performClick()
+        compose.onNodeWithTag(ActivationTags.ACTIONS).performClick()
+        compose.onNodeWithTag(ActivationTags.ACT_EXIT).performClick()
         compose.waitForIdle()
-        val speaking = compose.onNodeWithTag(ActivationTags.IDENTITY)
-            .getUnclippedBoundsInRoot().height
-
-        assertEquals(
-            "the identity column moved when the status line filled: $quiet then $speaking",
-            quiet,
-            speaking,
-        )
+        assertEquals(listOf("m3u", "xtream", "choose", "exit"), pressed)
     }
 
     /**
@@ -309,9 +269,12 @@ private fun ActivationScreenUnderTest(state: MutableState<ActivationIdentityStat
     MacActivationScreen(
         identity = state?.value ?: restingIdentity(),
         onAddPlaylist = {},
+        onPlaylistUrl = {},
+        onXtream = {},
         onRefresh = {},
         onCopied = {},
         onOpenLanguage = {},
+        onExit = {},
     )
 }
 
@@ -410,89 +373,44 @@ private fun ComposeContentTestRule.assertActivationIsWhole(
             "mac ${size(ActivationTags.MAC_CAPSULE)} | " +
             "key ${size(ActivationTags.KEY_CAPSULE)} | " +
             "actions ${size(ActivationTags.ACTIONS)} | " +
-            "status ${size(ActivationTags.STATUS)} | " +
             "qr ${size(ActivationTags.QR)}",
     )
     println(
-        "activation text — title ${textSize("Add a playlist")} | " +
-            "legal ${textSize("Castivio is a multimedia player")} | " +
-            "caption ${textSize("Scan the QR code to activate")}",
+        "activation text — title ${textSize("Set up a viewing source")} | " +
+            "legal ${textSize("Castivio is a multimedia player")}",
     )
 
     // The three bands first. A band with no height is the failure this file
     // exists for, and naming it first makes the report read the way the screen
     // broke.
+    val target = if (television) 56.dp else MIN_TARGET
     byTag("the field band", ActivationTags.FIELD, min = 150.dp)
-    byTag("the identity zone", ActivationTags.IDENTITY, min = 100.dp)
-    byTag("the code zone", ActivationTags.CODE_ZONE, min = 100.dp)
+    byTag("the identifiers", ActivationTags.IDENTITY)
+    byTag("the send card", ActivationTags.CODE_ZONE, min = 100.dp)
 
-    // The two pills, at their declared height. This is one of the few sizes this
-    // harness can be trusted on: a capsule is `Modifier.height(m.capsule)`, not a
-    // line of text, so 56 here means 56 on a device. A pill that came back short
-    // would mean the band squeezed it, which is the failure this file is for.
-    // The surface's own pill height, not a constant: the capsule is a share of the
-    // measured height with the device's touch floor under it, so it is computed from
-    // the surface this test configures rather than from a table row picked by hand.
-    // One dp of slack, because the rendered height goes through pixels and back.
-    val pill = metricsFor(tv = television, width = frame.width, height = frame.height)
-        .capsule - 1.dp
-    byTag("the MAC capsule", ActivationTags.MAC_CAPSULE, min = pill)
-    byTag("the device key capsule", ActivationTags.KEY_CAPSULE, min = pill)
-
-    byText("the title", "Add a playlist")
-    // One node, not two. The badge used to be a name and a trailing count and
-    // is now one sentence with the numeral emphasised inside it, which is what
-    // lets a language put the number anywhere it likes.
-    byText("the trial badge", "7-day trial")
-
-    // The chip and the two code values carry `clearAndSetSemantics`, which
-    // replaces their text with one description -- deliberately, so a reader says
-    // "MAC address 2F 19 EB" rather than spelling the punctuation. A text finder
-    // cannot see them.
-    // Presence only, and not [MIN_TARGET]: `clearAndSetSemantics` puts the
-    // description on the chip's *label*, so this finder reaches a line of type
-    // inside the control rather than the 48dp control around it. Asserting a
-    // touch target against a text node would be the same category error as
-    // asserting one against the Add playlist label.
-    byDescription("the language control", "Language")
-
-    byText("the MAC label", "MAC address")
-    byDescription("the MAC address", "MAC address 2F 19 EB 20 44 7C")
+    byTag("the MAC address", ActivationTags.MAC_CAPSULE)
+    byTag("the device key", ActivationTags.KEY_CAPSULE)
+    byText("the MAC label", "Mac")
+    byText("the device key label", "Key")
+    byDescription("the MAC address, spoken", "MAC address 2F 19 EB 20 44 7C")
     byDescription("the copy-MAC control", "Copy MAC address", min = MIN_TARGET)
-
-    byText("the device key label", "Device key")
-    byDescription("the device key", "482731")
     byDescription("the copy-key control", "Copy device key", min = MIN_TARGET)
 
-    // The row, and then the labels inside it. The row is the assertion that
-    // matters, because a label keeps its line height inside a button that has
-    // been crushed to nothing -- but it is asserted at "not zero" and not at
-    // [MIN_TARGET], and the difference is not a compromise.
-    //
-    // The buttons are the last children of the identity column, so they are what
-    // a short band takes the space from. This harness gives every Text 35dp
-    // instead of its declared 18 or 20, which spends about 40dp of a column whose
-    // whole margin is nine -- so the row measures 41dp here and 48 on a device,
-    // and a touch-target assertion in this file would be reporting the harness.
-    // `ActivationBudgetTest` makes that claim on the real numbers.
-    byTag("the actions row", ActivationTags.ACTIONS)
-    byText("Add playlist", "Add playlist")
-    byText("Refresh", "Refresh")
+    byText("the screen's name", "Set up a viewing source")
+    byTag("Refresh", ActivationTags.ACT_REFRESH, min = target)
+    byTag("Language", ActivationTags.ACT_LANGUAGE, min = target)
+    byTag("Exit", ActivationTags.ACT_EXIT, min = target)
 
-    // Existence only. The region is a reserved height that is empty at rest, so
-    // its own bounds are degenerate; what it actually promises -- that nothing
-    // moves when it fills -- is asserted in its own test, against the column it
-    // would push.
-    check("the reserved status line") { onNodeWithTag(ActivationTags.STATUS).assertExists() }
+    byText("the heading", "Add your playlist")
+    byTag("the M3U kind", ActivationTags.ACT_M3U, min = target)
+    byTag("the Xtream kind", ActivationTags.ACT_XTREAM, min = target)
+    byTag("Add a new source", ActivationTags.ACTIONS, min = target)
 
+    byText("the send card's title", "Send it from your phone")
     byTag("the QR fixture", ActivationTags.QR, min = 100.dp)
-    byText("the QR caption", "Scan the QR code to activate")
-    // The symbol's text equivalent. A composition that drew the QR and dropped this
-    // would leave a reader who cannot scan with no route at all, which is the one
-    // thing the pair exists to prevent.
-    byTag("the activation address", ActivationTags.ADDRESS)
+    byTag("the send address", ActivationTags.ADDRESS)
 
-    byText("the legal line", "Castivio is a multimedia player")
+    byTag("the legal line", ActivationTags.FOOTER)
 
     if (missing.isNotEmpty()) {
         val report = "The approved activation composition is incomplete. " +

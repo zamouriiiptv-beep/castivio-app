@@ -384,6 +384,7 @@ fun ActivationRoute(
                 onRefresh = identityModel::refresh,
                 onCopied = identityModel::copied,
                 onOpenLanguage = { pickingLanguage = true },
+                onExit = onExit,
             )
         }
     }
@@ -473,6 +474,8 @@ private fun Steps(
      * the back key gets. See `goBack` in [ActivationRoute] for why it is not a step.
      */
     onBack: () -> Unit,
+    /** The first screen's Exit: the route's own leaving, out of the application. */
+    onExit: () -> Unit,
 ) {
     // Read outside the transition: transitionSpec is not a composable lambda, so a
     // token fetched inside it would not compile -- and reading it once is what makes
@@ -497,9 +500,18 @@ private fun Steps(
             ActivationStep.Mac -> MacActivationScreen(
                 identity = identity,
                 onAddPlaylist = { onStep(ActivationStep.Choose) },
+                onPlaylistUrl = {
+                    activation.usePlaylistUrl()
+                    onStep(ActivationStep.Playlist)
+                },
+                onXtream = {
+                    activation.useXtream()
+                    onStep(ActivationStep.Xtream)
+                },
                 onRefresh = onRefresh,
                 onCopied = onCopied,
                 onOpenLanguage = onOpenLanguage,
+                onExit = onExit,
             )
 
             ActivationStep.Choose -> SourceChoiceScreen(

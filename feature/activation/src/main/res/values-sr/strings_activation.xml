@@ -44,4 +44,15 @@
     </plurals>
 
     <string name="locale_sentinel" translatable="false">sr</string>
+    <string name="setup_title">Подеси извор</string>
+    <string name="send_title">Пошаљите са телефона</string>
+    <string name="send_step_scan">Скенирајте код камером</string>
+    <string name="send_step_ids">Унесите MAC адресу и кључ уређаја</string>
+    <string name="send_step_play">Додајте извор и гледајте овде</string>
+    <string name="add_heading">Додајте листу</string>
+    <string name="add_sub">Изаберите врсту извора</string>
+    <string name="kind_m3u_sub">Веза листе</string>
+    <string name="kind_xtream_sub">Корисничко име и лозинка</string>
+    <string name="add_new_source">Додај извор</string>
+    <string name="activation_exit">Излаз</string>
 </resources>

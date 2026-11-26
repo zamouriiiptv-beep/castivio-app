@@ -43,4 +43,15 @@
     </plurals>
 
     <string name="locale_sentinel" translatable="false">ur</string>
+    <string name="setup_title">دیکھنے کا ذریعہ ترتیب دیں</string>
+    <string name="send_title">فون سے بھیجیں</string>
+    <string name="send_step_scan">فون کے کیمرے سے کوڈ اسکین کریں</string>
+    <string name="send_step_ids">MAC ایڈریس اور ڈیوائس کی درج کریں</string>
+    <string name="send_step_play">ذریعہ شامل کریں اور یہیں چلائیں</string>
+    <string name="add_heading">پلے لسٹ شامل کریں</string>
+    <string name="add_sub">ذریعے کی قسم منتخب کریں</string>
+    <string name="kind_m3u_sub">پلے لسٹ کا لنک</string>
+    <string name="kind_xtream_sub">یوزرنیم اور پاس ورڈ</string>
+    <string name="add_new_source">نیا ذریعہ شامل کریں</string>
+    <string name="activation_exit">باہر نکلیں</string>
 </resources>

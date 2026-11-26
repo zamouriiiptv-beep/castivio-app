@@ -65,7 +65,7 @@ class LicenceQrTest {
      * claim as two encoders that cannot disagree; this makes it the second.
      */
     @Test
-    fun `it is the same symbol the activation screen shows`() {
+    fun `it encodes the activation page`() {
         assertEquals(ActivationDestination.URL, decode())
         assertFalse(
             "the QR carries a query string, which the activation symbol does not",

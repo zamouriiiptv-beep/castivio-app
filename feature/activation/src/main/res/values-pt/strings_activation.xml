@@ -43,4 +43,15 @@
     </plurals>
 
     <string name="locale_sentinel" translatable="false">pt-BR</string>
+    <string name="setup_title">Configurar uma fonte</string>
+    <string name="send_title">Envie pelo celular</string>
+    <string name="send_step_scan">Escaneie o código com a câmera</string>
+    <string name="send_step_ids">Digite o endereço MAC e a chave do aparelho</string>
+    <string name="send_step_play">Adicione a fonte e assista neste aparelho</string>
+    <string name="add_heading">Adicione sua lista</string>
+    <string name="add_sub">Escolha o tipo de fonte para adicionar</string>
+    <string name="kind_m3u_sub">Link da lista</string>
+    <string name="kind_xtream_sub">Usuário e senha</string>
+    <string name="add_new_source">Adicionar fonte</string>
+    <string name="activation_exit">Sair</string>
 </resources>

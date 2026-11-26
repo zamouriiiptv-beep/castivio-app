@@ -44,4 +44,15 @@
     </plurals>
 
     <string name="locale_sentinel" translatable="false">ro</string>
+    <string name="setup_title">Configurează o sursă</string>
+    <string name="send_title">Trimite de pe telefon</string>
+    <string name="send_step_scan">Scanează codul cu camera</string>
+    <string name="send_step_ids">Introdu adresa MAC și cheia dispozitivului</string>
+    <string name="send_step_play">Adaugă sursa și redă aici</string>
+    <string name="add_heading">Adaugă lista</string>
+    <string name="add_sub">Alege tipul sursei</string>
+    <string name="kind_m3u_sub">Linkul listei</string>
+    <string name="kind_xtream_sub">Utilizator și parolă</string>
+    <string name="add_new_source">Adaugă sursă</string>
+    <string name="activation_exit">Ieșire</string>
 </resources>

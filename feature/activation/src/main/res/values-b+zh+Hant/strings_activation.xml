@@ -42,4 +42,15 @@
     </plurals>
 
     <string name="locale_sentinel" translatable="false">zh-Hant</string>
+    <string name="setup_title">設定觀看來源</string>
+    <string name="send_title">從手機傳送</string>
+    <string name="send_step_scan">用手機相機掃描條碼</string>
+    <string name="send_step_ids">輸入 MAC 位址和裝置金鑰</string>
+    <string name="send_step_play">新增來源並在此裝置播放</string>
+    <string name="add_heading">新增播放清單</string>
+    <string name="add_sub">選擇要新增的來源類型</string>
+    <string name="kind_m3u_sub">播放清單連結</string>
+    <string name="kind_xtream_sub">使用者名稱和密碼</string>
+    <string name="add_new_source">新增來源</string>
+    <string name="activation_exit">離開</string>
 </resources>

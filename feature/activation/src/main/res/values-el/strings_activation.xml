@@ -43,4 +43,15 @@
     </plurals>
 
     <string name="locale_sentinel" translatable="false">el</string>
+    <string name="setup_title">Ρύθμιση πηγής</string>
+    <string name="send_title">Στείλτε από το κινητό</string>
+    <string name="send_step_scan">Σαρώστε τον κωδικό με την κάμερα</string>
+    <string name="send_step_ids">Εισαγάγετε διεύθυνση MAC και κλειδί συσκευής</string>
+    <string name="send_step_play">Προσθέστε την πηγή και παίξτε εδώ</string>
+    <string name="add_heading">Προσθέστε τη λίστα</string>
+    <string name="add_sub">Επιλέξτε το είδος της πηγής</string>
+    <string name="kind_m3u_sub">Σύνδεσμος λίστας</string>
+    <string name="kind_xtream_sub">Όνομα χρήστη και κωδικός</string>
+    <string name="add_new_source">Νέα πηγή</string>
+    <string name="activation_exit">Έξοδος</string>
 </resources>

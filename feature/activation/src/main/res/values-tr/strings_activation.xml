@@ -43,4 +43,15 @@
     </plurals>
 
     <string name="locale_sentinel" translatable="false">tr</string>
+    <string name="setup_title">İzleme kaynağını ayarla</string>
+    <string name="send_title">Telefonundan gönder</string>
+    <string name="send_step_scan">Kodu telefon kamerasıyla tara</string>
+    <string name="send_step_ids">MAC adresini ve cihaz anahtarını gir</string>
+    <string name="send_step_play">Kaynağı ekle ve bu cihazda oynat</string>
+    <string name="add_heading">Oynatma listeni ekle</string>
+    <string name="add_sub">Eklemek istediğin kaynak türünü seç</string>
+    <string name="kind_m3u_sub">Oynatma listesi bağlantısı</string>
+    <string name="kind_xtream_sub">Kullanıcı adı ve şifre</string>
+    <string name="add_new_source">Yeni kaynak ekle</string>
+    <string name="activation_exit">Çıkış</string>
 </resources>

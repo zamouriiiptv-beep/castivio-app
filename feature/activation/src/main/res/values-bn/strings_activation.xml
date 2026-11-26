@@ -43,4 +43,15 @@
     </plurals>
 
     <string name="locale_sentinel" translatable="false">bn</string>
+    <string name="setup_title">দেখার উৎস সেট করুন</string>
+    <string name="send_title">ফোন থেকে পাঠান</string>
+    <string name="send_step_scan">ফোনের ক্যামেরায় কোড স্ক্যান করুন</string>
+    <string name="send_step_ids">MAC ঠিকানা ও ডিভাইস কী লিখুন</string>
+    <string name="send_step_play">উৎস যোগ করে এখানে চালান</string>
+    <string name="add_heading">প্লেলিস্ট যোগ করুন</string>
+    <string name="add_sub">কোন ধরনের উৎস যোগ করবেন বেছে নিন</string>
+    <string name="kind_m3u_sub">প্লেলিস্টের লিংক</string>
+    <string name="kind_xtream_sub">ইউজারনেম ও পাসওয়ার্ড</string>
+    <string name="add_new_source">নতুন উৎস যোগ করুন</string>
+    <string name="activation_exit">প্রস্থান</string>
 </resources>

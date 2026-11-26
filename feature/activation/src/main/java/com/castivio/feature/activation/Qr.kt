@@ -44,7 +44,7 @@ import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
  * palette and inverting it for a dark interface is a well-meaning change that
  * stops it working.
  */
-internal fun activationQrBitmap(pixels: Int): Bitmap = qrBitmap(ActivationDestination.URL, pixels)
+internal fun activationQrBitmap(pixels: Int): Bitmap = qrBitmap(ActivationDestination.CONNECT_URL, pixels)
 
 /**
  * @param payload what goes in the symbol. Parameterised for the test that decodes

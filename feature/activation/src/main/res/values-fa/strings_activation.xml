@@ -43,4 +43,15 @@
     </plurals>
 
     <string name="locale_sentinel" translatable="false">fa</string>
+    <string name="setup_title">تنظیم منبع تماشا</string>
+    <string name="send_title">از گوشی بفرستید</string>
+    <string name="send_step_scan">کد را با دوربین گوشی اسکن کنید</string>
+    <string name="send_step_ids">آدرس MAC و کلید دستگاه را وارد کنید</string>
+    <string name="send_step_play">منبع را اضافه و همین‌جا پخش کنید</string>
+    <string name="add_heading">فهرست پخش را اضافه کنید</string>
+    <string name="add_sub">نوع منبع را انتخاب کنید</string>
+    <string name="kind_m3u_sub">پیوند فهرست پخش</string>
+    <string name="kind_xtream_sub">نام کاربری و رمز عبور</string>
+    <string name="add_new_source">افزودن منبع جدید</string>
+    <string name="activation_exit">خروج</string>
 </resources>

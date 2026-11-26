@@ -45,4 +45,15 @@
     </plurals>
 
     <string name="locale_sentinel" translatable="false">cs</string>
+    <string name="setup_title">Nastavit zdroj</string>
+    <string name="send_title">Pošlete z telefonu</string>
+    <string name="send_step_scan">Naskenujte kód fotoaparátem</string>
+    <string name="send_step_ids">Zadejte adresu MAC a klíč zařízení</string>
+    <string name="send_step_play">Přidejte zdroj a přehrávejte zde</string>
+    <string name="add_heading">Přidejte playlist</string>
+    <string name="add_sub">Vyberte druh zdroje</string>
+    <string name="kind_m3u_sub">Odkaz na playlist</string>
+    <string name="kind_xtream_sub">Jméno a heslo</string>
+    <string name="add_new_source">Přidat zdroj</string>
+    <string name="activation_exit">Ukončit</string>
 </resources>

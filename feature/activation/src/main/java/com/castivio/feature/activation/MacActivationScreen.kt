@@ -4,30 +4,40 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.automirrored.rounded.Logout
+import androidx.compose.material.icons.automirrored.rounded.Send
+import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.Dns
+import androidx.compose.material.icons.rounded.ErrorOutline
 import androidx.compose.material.icons.rounded.Language
-import androidx.compose.material.icons.rounded.Memory
+import androidx.compose.material.icons.rounded.Layers
+import androidx.compose.material.icons.rounded.Link
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Lan
 import androidx.compose.material.icons.rounded.Refresh
-import androidx.compose.material.icons.rounded.Smartphone
+import androidx.compose.material.icons.rounded.SlowMotionVideo
 import androidx.compose.material.icons.rounded.VpnKey
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,15 +46,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -52,417 +64,218 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.castivio.core.common.config.ActivationDestination
 import com.castivio.core.design.components.ButtonWeight
-import com.castivio.core.design.components.CapsuleForm
-import com.castivio.core.design.components.CapsuleMetrics
-import com.castivio.core.design.components.CapsuleTint
 import com.castivio.core.design.components.CastivioButton
-import com.castivio.core.design.components.CastivioHeader
-import com.castivio.core.design.components.CastivioHeaderTitle
+import com.castivio.core.design.components.CastivioClock
+import com.castivio.core.design.components.CastivioFittedText
+import com.castivio.core.design.components.CastivioHeaderAction
+import com.castivio.core.design.components.CastivioHeaderRule
 import com.castivio.core.design.components.CastivioLockup
-import com.castivio.core.design.components.CastivioLanguageChip
-import com.castivio.core.design.components.IdentityCapsule
+import com.castivio.core.design.components.CopyButton
 import com.castivio.core.design.components.QrPlate
-import com.castivio.core.design.components.StatusLine
-import com.castivio.core.design.components.BODY_LEADING
-import com.castivio.core.design.components.castivioBodyStyle
-import com.castivio.core.design.components.castivioButtonStyle
-import com.castivio.core.design.components.castivioFieldLabelStyle
-import com.castivio.core.design.components.castivioValueStyle
-import com.castivio.domain.identity.IdentityProvenance
-import com.castivio.core.design.components.castivioChipStyle
-import com.castivio.core.design.components.castivioDescriptionColor
+import com.castivio.core.design.components.castivioFocusScale
 import com.castivio.core.design.components.ltrToken
-import com.castivio.core.design.components.castivioTitleStyle
-import com.castivio.core.design.components.emphasiseNumber
 import com.castivio.core.design.theme.CastivioMetrics
 import com.castivio.core.design.theme.CastivioTheme
-import com.castivio.core.design.theme.Palette
-import com.castivio.core.design.theme.Sizing
-import com.castivio.core.design.theme.Spacing
-import com.castivio.core.design.theme.boundedFraction
+import com.castivio.core.design.theme.CastivioType
+import com.castivio.core.design.theme.Motion
 import com.castivio.core.design.theme.castivioMetrics
 import com.castivio.core.design.theme.castivioStage
+import com.castivio.domain.identity.IdentityProvenance
 
 /**
- * What this screen is drawn from: the shared metrics, plus the sizes only an
- * activation screen has — a QR plate, two field cards, a reserved status line.
+ * Every number on the first screen, for one frame.
  *
- * ## It was a table of four devices, and now it is arithmetic
+ * ## One unit, from the drawing
  *
- * `design/mockups/activation-mac.html` is still the record and the drawing is
- * unchanged. What changed is how its numbers reach a device. There used to be four
- * rows here — television, tablet, phone, short phone — each stating a value for
- * nearly every gap. That is exactly as many drawings as somebody had made, and a
- * device between two of them got whichever row it fell into: a 1280×800 tablet drew
- * a phone-sized composition until a late fix gave it a row of its own, and every
- * surface outside the four was a guess nobody had looked at.
- *
- * Every size below is now a share of the axis it spends, clamped at both ends,
- * through the one expression the whole product uses:
- * [com.castivio.core.design.theme.boundedFraction]. The shares are read off the
- * 1280×720 reference, which is the 960×540 television drawing at 4/3 — so the
- * television still lands on the numbers its drawing was approved at, to the dp, and
- * everything between and beyond is interpolated rather than rounded to the nearest
- * drawing.
- *
- * ## The arithmetic still has to be right, and now it is checked everywhere
- *
- * The margins are thin, and thin means the fit is not a matter of taste. A `Column`
- * whose children exceed the height it is given hands **zero** to the ones measured
- * last — not a scrollbar, not a clip, zero — so eight dp of overrun is not eight dp
- * of crowding, it is Add playlist and Refresh disappearing. That is the failure mode
- * `ActivationLayoutTest` exists to catch and `ActivationBudgetTest` to predict, and
- * the budget test now sweeps the whole range of surfaces rather than four points in
- * it, which is the thing a table could never be asked.
- *
- * The heights are the **whole display**: `:app` calls `enableEdgeToEdge`, so
- * activation is given every dp of it.
- *
- * What the shares produce where the table used to have rows:
- *
- * | surface | band | identity column | code panel | spare |
- * |---|---|---|---|---|
- * | 960×540 TV | 344 | 290 | 291 | 54 / 53 |
- * | 1280×800 tablet | 534 | 322 | 344 | 212 / 190 |
- * | 873×393 | 250 | 218 | 221 | 31 / 28 |
- * | 800×360 | 225 | 204 | 211 | 21 / 14 |
- *
- * The television's row is the approved drawing's, unchanged. The phones come out a
- * few dp tighter than the hand-drawn rows did and stay clear, because the shares
- * give a short surface slightly more outer margin than the drawings did and the
- * content pays for it — which is the trade the floors below are chosen to survive.
- *
- * ## What is a floor and what is a ceiling
- *
- * A floor is what the shortest surface this ships to needs to stay usable: a
- * pressable button, a legible caption, a scannable code. A ceiling is what keeps a
- * 4K set proportionate instead of magnified. Nothing here is allowed to be a bare
- * fraction — an unbounded share is how a control ends up at 26dp on a handset and
- * the size of a card on a television.
- *
- * Those rows are not a comment: [bandHeight], [identityHeight] and [codeHeight]
- * compute them, and `ActivationBudgetTest` fails if any of them goes negative.
+ * The approved drawing is `design/mockups/add-playlist-ar.png`, 2340×1080 pixels — a
+ * landscape phone — and the screen is that drawing (owner, 2026-11-26). Every size
+ * below is the drawing's own pixel count times [unit], one drawing pixel in dp on this
+ * frame: by the height (1080 pixels), unless the row of cards (2120 pixels) or what is
+ * under the header ([CONTENT] pixels) is the tighter fit. The header is Home's band at
+ * Home's numbers, so the two screens wear one header — the licence screen's arrangement.
  */
 internal data class Metrics(
-    /**
-     * The stage, the header and the shared type steps — from [CastivioMetrics],
-     * which every screen reads, so two screens cannot drift a dp apart.
-     */
     val frame: CastivioMetrics,
-    /* the three bands: this screen's own shape */
-    val bandBottom: Dp,
-    val footer: Dp,
-    /**
-     * The four sizes this screen sets that are **not** one of the frame's four
-     * steps, and the reason each is allowed to exist.
-     *
-     * [macSize] and [keySize] are the sanctioned functional exception: the address
-     * is the one string here a user reads aloud to somebody else, and on a set that
-     * happens from three metres. [fsStatus] and [fsButton] sit between `fsLabel` and
-     * `fsTitle` because a button's label and a reserved status line are neither a
-     * field's name nor the screen's, and the composition is approved at these
-     * numbers.
-     *
-     * A fifth size that was *not* one of these has just been deleted: `fsFooter`
-     * held `fsBody`'s value on all four frames — a copy of a step, agreeing only
-     * until somebody edited one of the two.
-     */
-    val fsStatus: Dp,
-    val fsButton: Dp,
-    val macSize: Dp,
-    val keySize: Dp,
-    val chipsGap: Dp,
-    /* the identity column */
-    val capsule: Dp,
-    val capsuleGap: Dp,
-    val cardPad: Dp,
+    val unit: Dp,
+    /** The header's own height: the frame's, never under the touch target. */
+    val header: Dp,
+    val headerBand: Dp,
+    val titleSize: Dp,
+    val titleIcon: Dp,
+
+    val cardsTop: Dp,
+    val cardHeight: Dp,
     val cardGap: Dp,
-    val labelWidth: Dp,
-    val actionsTop: Dp,
-    val actionsGap: Dp,
-    val button: Dp,
-    val statusTop: Dp,
-    val statusHeight: Dp,
-    /* the code panel */
+    val radius: Dp,
+
+    /* the send card, left */
+    val sendTitleBand: Dp,
+    val sendTitleSize: Dp,
+    val sendIcon: Dp,
+    val innerInset: Dp,
+    val innerPad: Dp,
+    val innerGap: Dp,
     val plate: Dp,
-    val zoneWidth: Dp,
-    val zonePad: Dp,
-    val zoneGap: Dp,
-    /* shared */
-    val bandGap: Dp,
-    val zoneRadius: Dp,
-    val mark: Dp,
-    val target: Dp,
+    val stepSize: Dp,
+    val stepGap: Dp,
+    val stepBadge: Dp,
+    val stepNumber: Dp,
+    val pillHeight: Dp,
+    val pillSize: Dp,
+    val pillIcon: Dp,
+
+    /* the identifiers, right, top */
+    val idsHeight: Dp,
+    val idsGap: Dp,
+    val idIcon: Dp,
+    val idLabelSize: Dp,
+    val idValueSize: Dp,
+    val copy: Dp,
+
+    /* adding here, right, below */
+    val headingTop: Dp,
+    val headingSize: Dp,
+    val headingIcon: Dp,
+    val subSize: Dp,
+    val kindsTop: Dp,
+    val kindHeight: Dp,
+    val kindDisc: Dp,
+    val kindIcon: Dp,
+    val kindNameSize: Dp,
+    val kindSubSize: Dp,
+    val ctaTop: Dp,
+    val ctaHeight: Dp,
+    val ctaSize: Dp,
+
+    /* the line at the foot */
+    val noteTop: Dp,
+    val noteSize: Dp,
+    val noteRule: Dp,
 ) {
-    /* The frame's numbers, reachable as this screen's own. Delegated rather than
-       copied: one table, one edit, and every call site below unchanged. */
-    val edge get() = frame.edge
-    val stageTop get() = frame.stageTop
-    val stageBottom get() = frame.stageBottom
-    val header get() = frame.header
-    val bandTop get() = frame.bandTop
-    val headGap get() = frame.headGap
-    val brand get() = frame.brand
-    val chip get() = frame.chip
-    val chipPad get() = frame.chipPad
-    val radius get() = frame.radius
-    val fsTitle get() = frame.fsTitle
-    val fsLabel get() = frame.fsLabel
-    val fsCaption get() = frame.fsBody
-
-    /**
-     * The written address, a step above the caption around it.
-     *
-     * One value, read by the drawing and by [codeHeight], because a budget computed
-     * from a different size than the text is set at is a budget that is quietly
-     * wrong — the same reason `BODY_LEADING` is public rather than copied.
-     */
-    val fsAddress get() = fsCaption * ADDRESS_STEP
-    val fsChip get() = frame.fsChip
+    val target: Dp get() = frame.touchTarget
 }
 
-
-/**
- * Below this, a system bar has taken height the composition was counting on.
- *
- * It is reached one way only: a transient system bar coming back on the shortest
- * phone. Activation runs immersive, so on a settled screen the insets are zero —
- * but a bar is one swipe away, a device may refuse to hide them, and a layout
- * that only fits while the system is cooperating is a layout that breaks in the
- * photograph somebody sends us.
- *
- * What gives when it happens is stated rather than left to chance, and it is the
- * plate's **floor** rather than the plate: everything on this screen is already a
- * share of the height, so a bar shrinks all of it proportionally on its own. The
- * one thing that does not shrink is a floor, and the plate's is the largest floor
- * on the screen — so below this height it steps down to what a camera can still
- * resolve, and nothing else is touched. Letting the panel overrun instead hands the
- * caption zero height, which is the failure this replaced.
- */
-internal val CRAMPED_PHONE = 345.dp
-
-/**
- * The screen's numbers for a measured surface.
- *
- * `width` and `height` are what a `BoxWithConstraints` around the screen's own
- * content reports — the surface, not the window and not the display. Horizontal
- * things are read off the width and vertical things off the height, because those
- * are the axes they actually spend: the code panel's width and the gap beside it
- * come off one, and everything stacked down the stage off the other.
- */
-internal fun metricsFor(tv: Boolean, width: Dp, height: Dp): Metrics = Metrics(
-    frame = castivioMetrics(width, height, tv),
-    bandBottom = height.boundedFraction(BAND_BOTTOM, 6.dp, 26.dp),
-    footer = height.boundedFraction(FOOTER, 34.dp, 60.dp),
-    fsStatus = height.boundedFraction(FS_STATUS, 13.dp, 20.dp),
-    fsButton = height.boundedFraction(FS_BUTTON, 14.dp, 21.dp),
-    macSize = height.boundedFraction(MAC_SIZE, 24.dp, 40.dp),
-    keySize = height.boundedFraction(KEY_SIZE, 21.dp, 36.dp),
-    chipsGap = height.boundedFraction(CHIPS_GAP, 6.dp, 10.dp),
-    capsule = height.boundedFraction(CAPSULE, 48.dp, 80.dp),
-    capsuleGap = height.boundedFraction(CAPSULE_GAP, 10.dp, 24.dp),
-    cardPad = height.boundedFraction(CARD_PAD, 13.dp, 20.dp),
-    cardGap = height.boundedFraction(CARD_GAP, 11.dp, 18.dp),
-    labelWidth = width.boundedFraction(LABEL_WIDTH, 92.dp, 140.dp),
-    actionsTop = height.boundedFraction(ACTIONS_TOP, 14.dp, 34.dp),
-    actionsGap = width.boundedFraction(ACTIONS_GAP, 14.dp, 24.dp),
-    // The floor is the device's own, so a button can never be drawn below what a
-    // thumb or a D-pad needs however short the surface gets. It is the one value
-    // on this screen whose floor asks what kind of device this is.
-    button = height.boundedFraction(BUTTON, Sizing.minTarget(tv), 60.dp),
-    statusTop = height.boundedFraction(STATUS_TOP, 8.dp, 18.dp),
-    statusHeight = height.boundedFraction(STATUS_HEIGHT, 16.dp, 26.dp),
-    plate = height.boundedFraction(plateShare(height), plateFloor(height), 210.dp),
-    zoneWidth = width.boundedFraction(ZONE_WIDTH, 190.dp, 330.dp),
-    zonePad = height.boundedFraction(ZONE_PAD, 6.dp, 18.dp),
-    zoneGap = height.boundedFraction(ZONE_GAP, 5.dp, 12.dp),
-    bandGap = width.boundedFraction(BAND_GAP, 20.dp, 40.dp),
-    zoneRadius = height.boundedFraction(ZONE_RADIUS, 16.dp, 28.dp),
-    mark = height.boundedFraction(MARK, 22.dp, 34.dp),
-    target = Sizing.minTarget(tv),
-)
-
-/**
- * The smallest plate a camera can still resolve, and what a system bar does to it.
- *
- * The quiet zone scales with the plate, so a smaller plate is a smaller symbol and
- * not a crowded one; what a floor protects is the number of pixels a phone's camera
- * gets per module from arm's length.
- *
- * ## Three tiers, and the middle one is new
- *
- * 132dp was the floor on every surface above [CRAMPED_PHONE], and on the shortest
- * phone it was the floor that *bound*: the share asks for 128dp there and the floor
- * pushed it back up. That is what held the QR column at 96.7% of its band while the
- * identity column beside it sat at 90.5% — a panel with 3% of air in it, which is
- * what reads as a screen drawn at the wrong scale.
- *
- * 124dp between [COMPACT_SURFACE] and [CRAMPED_PHONE] is measured rather than
- * guessed. The payload is a version 4 symbol, 33 modules, drawn with ZXing's margin
- * of one into a 35-module bitmap; at 124dp the plate gives 108.6dp of symbol and
- * **3.10dp a module**, against the 3.0dp floor `ActivationQrTest` holds. The quiet
- * zone does not move at all: the padding is a share of the plate and so is the
- * module, so it is 3.48 modules at every plate size this function can return.
- *
- * Under [CRAMPED_PHONE] it is still 112dp, unchanged, because there the alternative
- * is the caption underneath measuring zero.
- */
-private fun plateFloor(height: Dp): Dp = when {
-    height >= COMPACT_SURFACE -> 132.dp
-    height >= CRAMPED_PHONE -> 124.dp
-    else -> 112.dp
+internal fun metricsFor(tv: Boolean, width: Dp, height: Dp): Metrics {
+    val frame = castivioMetrics(width, height, tv)
+    val header = maxOf(frame.header, frame.touchTarget)
+    val headerBand = header + frame.stageTop
+    val below = height - headerBand - frame.stageBottom
+    val unit = minOf(height / DRAWING_HEIGHT, (width - frame.edge * 2) / ROW_WIDTH, below / CONTENT)
+    fun px(drawing: Float): Dp = unit * drawing
+    return Metrics(
+        frame = frame,
+        unit = unit,
+        header = header,
+        headerBand = headerBand,
+        titleSize = px(54f),
+        titleIcon = px(56f),
+        cardsTop = px(40f),
+        cardHeight = px(CARD_HEIGHT),
+        cardGap = px(CARD_GAP),
+        radius = px(30f),
+        sendTitleBand = px(150f),
+        sendTitleSize = px(46f),
+        sendIcon = px(52f),
+        innerInset = px(20f),
+        innerPad = px(28f),
+        innerGap = px(26f),
+        plate = px(PLATE),
+        stepSize = px(27f),
+        stepGap = px(30f),
+        stepBadge = px(52f),
+        stepNumber = px(28f),
+        pillHeight = px(72f),
+        pillSize = px(28f),
+        pillIcon = px(34f),
+        idsHeight = px(116f),
+        idsGap = px(50f),
+        idIcon = px(52f),
+        idLabelSize = px(30f),
+        idValueSize = px(40f),
+        copy = maxOf(px(66f), frame.touchTarget),
+        headingTop = px(44f),
+        headingSize = px(52f),
+        headingIcon = px(60f),
+        subSize = px(32f),
+        kindsTop = px(34f),
+        kindHeight = maxOf(px(150f), frame.touchTarget),
+        kindDisc = px(96f),
+        kindIcon = px(48f),
+        kindNameSize = px(40f),
+        kindSubSize = px(26f),
+        ctaTop = px(40f),
+        ctaHeight = maxOf(px(88f), frame.touchTarget),
+        ctaSize = px(36f),
+        noteTop = px(NOTE_TOP),
+        noteSize = px(28f),
+        noteRule = px(300f),
+    )
 }
 
+/** What the content under the header stacks: the cards, the gap, the note's line. */
+internal fun Metrics.contentHeight(): Dp = cardsTop + cardHeight + noteTop + (noteSize.value * LEADING).dp
+
+/** The row of the two cards and the gap between them. */
+internal fun Metrics.rowWidth(): Dp = unit * ROW_WIDTH
+
+/** What the right-hand column stacks under the identifiers, which must fit the card's height. */
+internal fun Metrics.rightColumnHeight(): Dp =
+    idsHeight + headingTop + (headingSize.value * LEADING).dp + (subSize.value * LEADING).dp +
+        kindsTop + kindHeight + ctaTop + ctaHeight
+
+private const val DRAWING_HEIGHT = 1080f
+internal const val SEND_WIDTH = 980f
+internal const val ADD_WIDTH = 1090f
+private const val CARD_GAP = 50f
+private const val ROW_WIDTH = SEND_WIDTH + CARD_GAP + ADD_WIDTH
+private const val CARD_HEIGHT = 700f
+private const val NOTE_TOP = 80f
 /**
- * Which share of the height the plate takes.
- *
- * [PLATE] above [COMPACT_SURFACE], so the television and both large frames reproduce
- * the approved drawing to the dp. [PLATE_COMPACT] below it, so the QR column comes in
- * with the surface instead of holding its reference size while the frame shrinks
- * around it.
- *
- * A share that changes at a stated threshold is this screen's own idea, not a new
- * one: [plateFloor] has worked that way since [CRAMPED_PHONE] was written.
+ * The QR: the activation screen's own size on the reference phone, 138dp, so a phone
+ * camera reads it at the distance it always has (owner, 2026-11-26) -- a little over the
+ * drawing's 320, which `ActivationQrTest` holds to three dp a module on every frame.
  */
-private fun plateShare(height: Dp): Float =
-    if (height >= COMPACT_SURFACE) PLATE else PLATE_COMPACT
+private const val PLATE = 380f
 
-/**
- * Where a surface stops being tall enough to carry the drawing at its own scale.
- *
- * Above this the frame has room for the approved proportions; below it the band is
- * short enough that holding them is what makes the screen read as zoomed. 400dp sits
- * between the television's 540 and the reference phone's 393, so the three large
- * frames are untouched by construction rather than by care.
- */
-internal val COMPACT_SURFACE = 400.dp
+/** Cards from the header, the cards, the note: 40 + 700 + 80 + 38. */
+internal const val CONTENT = 858f
 
-/* ------------------------------------------------------------------ the shares
- *
- * Read off the 1280×720 reference, which is the 960×540 television drawing at 4/3 —
- * so the television reproduces its approved numbers exactly. Nothing here was
- * chosen twice: each is one drawing's value divided by the axis it was drawn on.
- */
+private const val LEADING = 1.35f
 
-private const val BAND_BOTTOM = 26.67f / 720f
-private const val FOOTER = 72f / 720f
-private const val FS_STATUS = 20f / 720f
-private const val FS_BUTTON = 20.67f / 720f
-private const val MAC_SIZE = 40f / 720f
-private const val KEY_SIZE = 36f / 720f
-private const val CHIPS_GAP = 8f / 720f
-private const val CAPSULE = 96f / 720f
-private const val CAPSULE_GAP = 26.67f / 720f
-private const val CARD_PAD = 22.67f / 720f
-private const val CARD_GAP = 20f / 720f
-private const val LABEL_WIDTH = 141.3f / 1280f
-private const val ACTIONS_TOP = 40f / 720f
-private const val ACTIONS_GAP = 26.67f / 1280f
-private const val BUTTON = 74.67f / 720f
-private const val STATUS_TOP = 21.33f / 720f
-private const val STATUS_HEIGHT = 32f / 720f
-private const val PLATE = 256f / 720f
+/** The plate's white margin round the symbol, as the activation screen has always drawn it. */
+internal const val QUIET_ZONE = 0.062f
 
 /**
- * The plate's share below [COMPACT_SURFACE]: 248 against the drawing's 256.
+ * The first screen, where a source is set up: "Set up a viewing source".
  *
- * Three per cent off the symbol, and the number was chosen so that the share and the
- * floor meet exactly on the shortest phone — 360 x 248/720 is 124.0, which is also
- * [plateFloor] there. A share that lands above its own floor would have left the
- * floor doing nothing, which is the mistake the first attempt at this made.
- */
-private const val PLATE_COMPACT = 248f / 720f
-private const val ZONE_WIDTH = 325.3f / 1280f
-private const val ZONE_PAD = 18.67f / 720f
-private const val ZONE_GAP = 13.33f / 720f
-private const val BAND_GAP = 42.67f / 1280f
-private const val ZONE_RADIUS = 34.67f / 720f
-private const val MARK = 42.67f / 720f
-
-/**
- * How much of the frame is left for the middle band.
+ * ## The drawing (owner, 2026-11-26)
  *
- * ## Why this is arithmetic and not a measurement
+ *  - **Home's header band**, with the screen's name in its middle: the lockup,
+ *    Refresh, Language, Exit, a rule and the clock.
+ *  - **Send it from your phone**, on the one side by itself: the QR — the portal's
+ *    send page, castivio.app/connect — three numbered steps and the address.
+ *  - **On the other side**, with no frame round it: the MAC address and the device key,
+ *    each with its copy button, because they are what the send page asks for; then
+ *    "Add your playlist", its two kinds — M3U and Xtream, each opening its own form —
+ *    and "Add a new source", which opens the full choice.
+ *  - The player-only line at the foot.
  *
- * It should be a measurement. It cannot be one here, because the only harness
- * that can run Compose without a device does not lay text out: under Robolectric
- * every `Text` measures the same height whatever its style, which inflates this
- * column by more than the margin the design has, so a runtime assertion about fit
- * would be an assertion about the harness.
- *
- * So the fit is checked where the numbers are real: from the [Metrics] the screen
- * is built from. `ActivationLayoutTest` still asserts that Compose *places* all of
- * it — that is the bug that shipped — and this says the places it puts them add
- * up. Two claims, each measured where it can be measured honestly.
- *
- * Simpler than it used to be, and for a good reason: the header and the footer
- * are now containers with heights of their own rather than bare type separated by
- * hairlines, so their contribution is a number instead of a line height that has
- * to be looked up per script.
- *
- * @param frame the whole display. `:app` is edge-to-edge; nothing is subtracted.
- */
-internal fun Metrics.bandHeight(frame: Dp): Dp =
-    frame - stageTop - header - bandTop - bandBottom - footer - stageBottom
-
-/**
- * What the identity column needs, from the same numbers that build it.
- *
- * Mirrors `IdentityZone` child for child: two cards, the actions, and the
- * reserved status line, with the gap each one is given above it. Nothing here is
- * text-driven — the cards and the buttons are fixed heights — which is why this
- * arithmetic is trustworthy where a Robolectric measurement is not.
- */
-internal fun Metrics.identityHeight(): Dp =
-    capsule + capsuleGap + capsule + actionsTop + button + statusTop + statusHeight
-
-/**
- * What the code panel needs: the plate, its padding, two gaps and three lines.
- *
- * Three lines of type, in two pieces: the caption's [captionLines] and the one the
- * address under it takes. Two gaps, because the column spaces every child — plate to
- * caption, caption to address — and a budget that counted one of them was a budget
- * that would have been short by a gap the first time anybody drew what it describes.
- *
- * @param captionLines **two**, and measured rather than reserved. [CAPTION_LINES]
- *   holds the sweep that settled it; a sentence that wraps to three on any surface
- *   in any language puts this budget back under water.
- */
-internal fun Metrics.codeHeight(captionLines: Int = CAPTION_LINES): Dp =
-    plate + zonePad * 2 + zoneGap * 2 +
-        fsCaption * BODY_LEADING * captionLines +
-        fsAddress * BODY_LEADING * ADDRESS_LINES
-
-/**
- * The first screen, where a subscription is added.
- *
- * ## The composition, and what it is made of
- *
- * Three bands: a header, a field band, a footer. They used to be divided by two
- * full-width hairlines, on the argument that a rule reads as part of the surface
- * where a container reads as a component dropped onto it. The approved drawing
- * makes them out of containers instead — a framed code panel, two framed fields,
- * a footer bar — and the reason it works is that the containers are *darker* than
- * the ground rather than lighter. A pane sunk into the surface is still part of
- * the surface; it is the pale glass card laid on top that reads as clutter.
- *
- * The address lives in a field card, the largest type on the screen, because it
- * is the one thing here a user has to read to someone else. The code keeps its
- * plate, because a QR is only scannable on a light ground.
- *
- * The composition is approved and locked. `design/mockups/activation-mac.html` is
- * the drawing, `design/activation-spec.md` the contract.
+ * Every size is the drawing's own, through one unit — see [Metrics].
  */
 @Composable
 internal fun MacActivationScreen(
     identity: ActivationIdentityState,
     onAddPlaylist: () -> Unit,
+    onPlaylistUrl: () -> Unit,
+    onXtream: () -> Unit,
     onRefresh: () -> Unit,
     onCopied: (Copied) -> Unit,
     onOpenLanguage: () -> Unit,
+    onExit: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val tv = CastivioTheme.device.isTv
@@ -475,792 +288,633 @@ internal fun MacActivationScreen(
                 .testTag(ActivationTags.STAGE)
                 .castivioStage(m.frame),
         ) {
-            Header(m = m, trialDays = identity.trialDaysRemaining, onOpenLanguage = onOpenLanguage)
+            Header(
+                m = m,
+                refresh = identity.refresh,
+                onRefresh = onRefresh,
+                onOpenLanguage = onOpenLanguage,
+                onExit = onExit,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(m.header)
+                    .testTag(ActivationTags.HEADER),
+            )
 
-            // `weight(1f)`, and the reason it is safe here is stated rather than
-            // assumed: this screen is composed into a parent with a bounded height.
-            // It was not, once -- it was inside a vertically scrolling column, where
-            // the height constraint is infinite, there is no remaining space for a
-            // weight to claim, and this entire band measured 0dp. The screen looked
-            // like a header sitting on a legal line. See ActivationRoute, which now
-            // gives this screen the viewport rather than a scroller.
-            Row(
+            Column(
                 Modifier
                     .fillMaxWidth()
-                    .weight(1f)
-                    .padding(top = m.bandTop, bottom = m.bandBottom)
-                    .testTag(ActivationTags.FIELD),
-                horizontalArrangement = Arrangement.spacedBy(m.bandGap),
-                verticalAlignment = Alignment.CenterVertically,
+                    .weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
             ) {
-                IdentityZone(
-                    modifier = Modifier.weight(1f).testTag(ActivationTags.IDENTITY),
-                    identity = identity,
-                    m = m,
-                    onAddPlaylist = onAddPlaylist,
-                    onRefresh = onRefresh,
-                    onCopied = onCopied,
-                )
-                CodeZone(identity = identity, m = m)
+                Row(
+                    Modifier
+                        .padding(top = m.cardsTop)
+                        .fillMaxWidth()
+                        .height(m.cardHeight)
+                        .testTag(ActivationTags.FIELD),
+                    horizontalArrangement = Arrangement.spacedBy(m.cardGap),
+                ) {
+                    // Start first: in Arabic the identifiers and the choice take the
+                    // right, and the phone's card the left, as drawn.
+                    AddHere(
+                        identity = identity,
+                        m = m,
+                        onAddPlaylist = onAddPlaylist,
+                        onPlaylistUrl = onPlaylistUrl,
+                        onXtream = onXtream,
+                        onCopied = onCopied,
+                        modifier = Modifier
+                            .weight(ADD_WIDTH)
+                            .fillMaxHeight(),
+                    )
+                    SendCard(
+                        identity = identity,
+                        m = m,
+                        modifier = Modifier
+                            .weight(SEND_WIDTH)
+                            .fillMaxHeight(),
+                    )
+                }
+                Note(m, Modifier.padding(top = m.noteTop))
             }
-
-            FooterBar(m)
         }
     }
 }
 
 /* -------------------------------------------------------------------- header */
 
-@Composable
-private fun Header(m: Metrics, trialDays: Int?, onOpenLanguage: () -> Unit) {
-    val colors = CastivioTheme.colors
-    CastivioHeader(
-        height = m.header,
-        gap = m.headGap,
-        modifier = Modifier.fillMaxWidth().testTag(ActivationTags.HEADER),
-        lockup = {
-            CastivioLockup(markSize = m.brand, wordSize = (m.fsTitle.value * WORD_RATIO).sp)
-        },
-        title = {
-            CastivioHeaderTitle(
-                text = stringResource(R.string.activation_title),
-                style = castivioTitleStyle(m.fsTitle),
-                color = CastivioTheme.colors.onBackgroundStrong,
-            )
-        },
-        chips = {
-            // **The pair's order is part of the row, not part of the sentence.**
-            //
-            // The row is pinned left to right, so what mirrors here is each chip's
-            // own text — and letting the *group* mirror as well put the fact at the
-            // screen's edge and the control inside it, which is that priority
-            // backwards. Read from the outer end inward the header now says the
-            // same thing in every language: the language control, the trial, the
-            // page's name, the mark. The control takes the outer end because it is
-            // the only thing in the header anyone presses, and an edge is where a
-            // thumb reaches and an eye returning to the screen lands first.
-            //
-            // Pinned the way the lockup is — by declaring a direction for the
-            // subtree rather than by putting a `start` on one of them — and each
-            // chip is handed the reader's own direction back, because the words
-            // inside a chip are language and the order of the two is not.
-            val reading = LocalLayoutDirection.current
-            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(m.chipsGap),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    // The trial, as one sentence rather than a name and a count.
-                    //
-                    // The count comes from `EntitlementRepository` and is null until
-                    // the sealed record has been read, so the chip is absent for an
-                    // instant rather than announcing a seven that might turn out to
-                    // be a two.
-                    if (trialDays != null) {
-                        // Quantity and argument are the same number, which is what a
-                        // plural resource needs: Arabic and Polish choose different
-                        // forms for 1, 2, a few and many, and a string built here
-                        // would get all of that wrong.
-                        val badge = androidx.compose.ui.res.pluralStringResource(
-                            R.plurals.trial_badge, trialDays, trialDays,
-                        )
-                        CompositionLocalProvider(LocalLayoutDirection provides reading) {
-                            TrialChip(m, badge, trialDays)
-                        }
-                    }
-                    CompositionLocalProvider(LocalLayoutDirection provides reading) {
-                        CastivioLanguageChip(
-                            chip = m.chip,
-                            touchTarget = m.frame.touchTarget,
-                            pad = m.chipPad,
-                            fontSize = m.fsChip,
-                            label = stringResource(R.string.language),
-                            onClick = onOpenLanguage,
-                        )
-                    }
-                }
-            }
-        },
-    )
-}
-
 /**
- * The trial, drawn as information rather than as a control.
+ * Home's band, with the screen's name in the middle of it. Pinned left to right as
+ * Home's is: the lockup at the left edge, the clock at the right, each word still read
+ * in its own direction.
  *
- * It and the language chip used to be the same neutral glass, which said they
- * were the same kind of thing. They are not: one is a fact the user needs and the
- * other is a control they may never touch. So this one carries a tint of the
- * brand and its numeral is picked out in the azure end of the mark's own ramp —
- * a highlight, not a glow, and nowhere near the filled button.
+ * Refresh asks the portal whether something was sent from a phone, and says on itself
+ * how that went: a ring while it asks, the success green when a source arrived, the
+ * failure red when the portal could not be reached.
  */
 @Composable
-private fun TrialChip(m: Metrics, badge: String, days: Int) {
-    Row(
-        Modifier
-            .height(m.chip)
-            .clip(RoundedCornerShape(percent = 50))
-            .background(CastivioTheme.colors.trialChipBrush)
-            .border(BorderStroke(1.dp, CastivioTheme.colors.edgeCard), RoundedCornerShape(percent = 50))
-            .padding(horizontal = m.chipPad),
-        horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Box(
-            Modifier
-                .size(CHIP_DOT)
-                .clip(RoundedCornerShape(percent = 50))
-                .background(Palette.Azure70),
-        )
-        // **The colour is stated, and that is the whole of the first fix here.**
-        //
-        // It was not, and the sentence came out black on a dark chip. `bodyMedium`
-        // declares a weight and a size and no colour, so `Text` fell through to
-        // `LocalContentColor` — which, outside a Material `Surface`, is black.
-        // Every other string on this screen is handed a colour explicitly; this
-        // one was the exception, and an exception is exactly what it looked like.
-        //
-        // The sentence is white. **The count is not**, and it is the only thing in
-        // it that is not: [Palette.Azure50], the saturated end of the mark's own
-        // ramp, at the size and weight the numeral already carried. What a reader
-        // needs from this chip is the number, and a number set apart by weight
-        // alone inside a white sentence is a number that has to be looked for.
-        //
-        // Azure50 rather than the paler Azure70 the dot beside it uses: at 13dp,
-        // inside a phrase of white, a near-white blue reads as white. The dot
-        // stays where it is — it is a marker, not a value, and two saturations of
-        // one hue is what an accent and its echo look like.
-        //
-        // Nothing else on the screen takes a hue from this. The address and the
-        // device key are white, and they stay white.
-        Text(
-            text = emphasiseNumber(badge, days, Palette.Azure50, FontWeight.Bold),
-            style = castivioChipStyle(m.fsChip).copy(fontWeight = FontWeight.SemiBold),
-            color = Palette.White,
-            maxLines = 1,
-        )
+private fun Header(
+    m: Metrics,
+    refresh: RefreshState,
+    onRefresh: () -> Unit,
+    onOpenLanguage: () -> Unit,
+    onExit: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val frame = m.frame
+    val colors = CastivioTheme.colors
+    val reading = LocalLayoutDirection.current
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+        Box(modifier) {
+            Row(
+                Modifier.fillMaxSize(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(frame.chipPad),
+            ) {
+                CastivioLockup(markSize = frame.brand, wordSize = (frame.fsTitle.value * LOCKUP_WORD_RATIO).sp)
+                Spacer(Modifier.weight(1f))
+                CastivioHeaderRule(frame)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(frame.chipPad / 4),
+                ) {
+                    CastivioHeaderAction(
+                        icon = when (refresh) {
+                            RefreshState.Found -> Icons.Rounded.CheckCircle
+                            RefreshState.Error -> Icons.Rounded.ErrorOutline
+                            else -> Icons.Rounded.Refresh
+                        },
+                        label = stringResource(R.string.refresh),
+                        labelled = true,
+                        frame = frame,
+                        onClick = onRefresh,
+                        busy = refresh == RefreshState.Checking,
+                        hue = when (refresh) {
+                            RefreshState.Found -> colors.success
+                            RefreshState.Error -> colors.danger
+                            else -> null
+                        },
+                        spoken = stringResource(
+                            when (refresh) {
+                                RefreshState.Found -> R.string.refresh_found
+                                RefreshState.Error -> R.string.refresh_error
+                                RefreshState.None -> R.string.refresh_none
+                                RefreshState.Checking -> R.string.refresh_checking
+                                RefreshState.Idle -> R.string.refresh
+                            },
+                        ),
+                        modifier = Modifier.testTag(ActivationTags.ACT_REFRESH),
+                    )
+                    CastivioHeaderAction(
+                        icon = Icons.Rounded.Language,
+                        label = stringResource(R.string.language),
+                        labelled = true,
+                        frame = frame,
+                        onClick = onOpenLanguage,
+                        modifier = Modifier.testTag(ActivationTags.ACT_LANGUAGE),
+                    )
+                    CastivioHeaderAction(
+                        icon = Icons.AutoMirrored.Rounded.Logout,
+                        label = stringResource(R.string.activation_exit),
+                        labelled = true,
+                        frame = frame,
+                        onClick = onExit,
+                        modifier = Modifier.testTag(ActivationTags.ACT_EXIT),
+                    )
+                }
+                CastivioHeaderRule(frame)
+                CastivioClock(fsTime = frame.fsTitle, fsDate = frame.fsChip)
+            }
+
+            // The name, in the middle of the band whatever the two ends measure.
+            CompositionLocalProvider(LocalLayoutDirection provides reading) {
+                Row(
+                    Modifier.align(Alignment.Center),
+                    horizontalArrangement = Arrangement.spacedBy(m.unit * TITLE_GAP),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        Icons.Rounded.Layers,
+                        contentDescription = null,
+                        tint = colors.hueViolet,
+                        modifier = Modifier.size(m.titleIcon),
+                    )
+                    Text(
+                        text = stringResource(R.string.setup_title),
+                        style = text(CastivioType.headlineMedium, m.titleSize, FontWeight.Bold),
+                        color = colors.onBackgroundStrong,
+                        maxLines = 1,
+                    )
+                }
+            }
+        }
     }
 }
 
+private const val LOCKUP_WORD_RATIO = 0.75f
+private const val TITLE_GAP = 22f
 
-/* ----------------------------------------------------------- identity column */
+/* ------------------------------------------------------------------ add here */
 
+/**
+ * The identifiers, then adding a source on this device — with no frame round it, so
+ * the two kinds and the button are the surface's own (owner, 2026-11-26).
+ */
 @Composable
-private fun IdentityZone(
+private fun AddHere(
     identity: ActivationIdentityState,
     m: Metrics,
     onAddPlaylist: () -> Unit,
-    onRefresh: () -> Unit,
+    onPlaylistUrl: () -> Unit,
+    onXtream: () -> Unit,
     onCopied: (Copied) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val clipboard = LocalClipboardManager.current
-    val address = identity.address
+    val colors = CastivioTheme.colors
+    Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+        Identifiers(identity, m, onCopied)
 
-    Column(modifier) {
-        ActivationCard(
-            modifier = Modifier.testTag(ActivationTags.MAC_CAPSULE),
-            m = m,
-            label = stringResource(R.string.mac_label),
-            value = address ?: ADDRESS_PLACEHOLDER,
-            spoken = address?.let { stringResource(R.string.mac_spoken, spaced(it)) },
-            style = codeStyle(m.macSize),
-            copyLabel = stringResource(R.string.copy_mac),
-            isCopied = identity.addressCopied,
-            enabled = address != null,
-            // The chip Home marks this same address with.
-            fieldIcon = Icons.Rounded.Memory,
-            fieldTint = CastivioTheme.colors.onBackgroundMuted,
-            // No tint on the control. The field is named by the glyph at the row's
-            // start now, so a coloured disc at the other end would be a second
-            // answer to a question already answered -- and a plain copy button is
-            // what says "this value is copyable" without competing with the value.
-            tint = CapsuleTint.None,
-            onCopy = {
-                clipboard.setText(AnnotatedString(address.orEmpty()))
-                onCopied(Copied.Address)
-            },
-        )
-
-        // Absent until an issuing contract exists. Nothing derives one, and an
-        // empty slot where a credential belongs reads as a fault, so the row is
-        // not composed at all rather than composed empty.
-        identity.deviceKey?.let { key ->
-            Box(Modifier.height(m.capsuleGap))
-            ActivationCard(
-                modifier = Modifier.testTag(ActivationTags.KEY_CAPSULE),
-                m = m,
-                label = stringResource(R.string.key_label),
-                value = key,
-                spoken = null,
-                style = codeStyle(m.keySize, KEY_TRACKING),
-                copyLabel = stringResource(R.string.copy_key),
-                isCopied = identity.keyCopied,
-                enabled = true,
-                // The key Home marks this same value with, in Home's own amber.
-                fieldIcon = Icons.Rounded.VpnKey,
-                fieldTint = CastivioTheme.colors.hueAmber,
-                tint = CapsuleTint.None,
-                onCopy = {
-                    clipboard.setText(AnnotatedString(key))
-                    onCopied(Copied.Key)
-                },
-            )
-        }
-
-        // Said only when it is true, and only about what is actually at stake.
-        //
-        // This address is derived, never read off hardware — Android has not let an
-        // application read a hardware address since Marshmallow, which
-        // `AndroidDeviceIdentity` states at length. What *does* vary is how durable
-        // the derivation is: from the operating system's own identifier it survives a
-        // reinstall, and minted here it lasts as long as the application's data. A
-        // provider has bound a subscription to whichever one was read out to them, so
-        // the second case is worth a sentence — and the sentence is about re-sending
-        // the address, not about a missing one.
         if (identity.provenance == IdentityProvenance.INSTALLATION) {
-            Box(Modifier.height(m.capsuleGap))
             Text(
                 text = stringResource(R.string.mac_installation_note),
-                style = castivioBodyStyle(m.fsCaption),
-                color = castivioDescriptionColor,
+                style = text(CastivioType.bodySmall, m.kindSubSize, FontWeight.Normal),
+                color = colors.onBackgroundMuted,
+                maxLines = 1,
                 modifier = Modifier.testTag(ActivationTags.MAC_INSTALLATION_NOTE),
             )
         }
 
         Row(
-            Modifier
-                .padding(top = m.actionsTop)
-                .fillMaxWidth()
-                .testTag(ActivationTags.ACTIONS),
-            horizontalArrangement = Arrangement.spacedBy(m.actionsGap),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            // **Both are sized by the row, in a fixed proportion.**
-            //
-            // Refresh used to size to its own label and Add playlist to take what
-            // was left. That was right while Refresh was the lesser of the two,
-            // and it is not: a user who has just pasted a playlist URL on their
-            // phone presses Refresh, and a user who has not presses Add. Neither
-            // is the other's fallback, and a control drawn at a third of its
-            // neighbour's width says it is.
-            //
-            // 1.1 to 1 — near enough to equal that the two read as a pair, with
-            // just enough left over that the order of them is still visible
-            // without the fill having to say it a second time. The weights are a
-            // proportion of the row rather than of the labels, so Portuguese and
-            // Arabic get the same pair of buttons.
-            // **Which of the two is the filled one.**
-            //
-            // It was Add playlist, on the reading that a screen called "add a
-            // playlist" is a screen whose action is to add one. That reading is
-            // right for a first run and wrong for every run after it: a user who
-            // has pasted a URL on their phone comes back to this screen to press
-            // Refresh, and a user whose subscription has lapsed comes back to
-            // press Refresh. Add playlist is the thing you do once.
-            //
-            // So Refresh takes the fill and Add playlist steps down to the same
-            // ramp carried at `CTA_QUIET`. Still one filled control, still the
-            // brand's two families, and the order of them is now the order they
-            // are actually used in.
-            CastivioButton(
-                text = stringResource(R.string.add_playlist),
-                weight = ButtonWeight.Secondary,
-                onClick = onAddPlaylist,
-                modifier = Modifier.weight(ACTION_LEAD),
-                fill = CastivioTheme.colors.ctaQuietBrush,
-                ring = CastivioTheme.colors.ctaQuietRing,
-                corner = m.radius * BUTTON_CORNER,
-                labelStyle = castivioButtonStyle(m.fsButton),
-                minHeight = m.button,
-            )
-            CastivioButton(
-                text = stringResource(refreshLabel(identity.refresh)),
-                weight = ButtonWeight.Primary,
-                icon = Icons.Rounded.Refresh,
-                enabled = identity.refresh != RefreshState.Checking,
-                onClick = onRefresh,
-                modifier = Modifier.weight(1f),
-                fill = CastivioTheme.colors.leadBrush,
-                ring = CastivioTheme.colors.leadRing,
-                corner = m.radius * BUTTON_CORNER,
-                labelStyle = castivioButtonStyle(m.fsButton * LEAD_LABEL),
-                minHeight = m.button,
-            )
-        }
-
-        ActivationStatusLine(identity, m)
-    }
-}
-
-/**
- * One line under the actions, at a height it keeps whether or not it has anything
- * to say.
- *
- * Reserved rather than appearing, because a line that appears pushes the two
- * buttons up the instant a user presses one of them — and a control that moves
- * under the thumb that pressed it is a control that gets pressed twice.
- */
-@Composable
-private fun ActivationStatusLine(identity: ActivationIdentityState, m: Metrics) {
-    val colors = CastivioTheme.colors
-    val status = statusMessage(identity)
-    val tone = when (status?.tone) {
-        Tone.Good, Tone.Copied -> colors.success
-        Tone.Missing -> colors.warning
-        Tone.Broken -> colors.danger
-        Tone.Neutral, null -> colors.onBackgroundMuted
-    }
-
-    StatusLine(
-        modifier = Modifier
-            .padding(top = m.statusTop)
-            .testTag(ActivationTags.STATUS),
-        height = m.statusHeight,
-        text = status?.let { stringResource(it.message) },
-        tone = tone,
-        // The sentence carries the tone too, not just the dot. A six-dp circle
-        // is the whole signal otherwise, and it is the part a colour-blind
-        // reader is least likely to get.
-        //
-        // A copy confirmation is drawn at full strength rather than in the
-        // success green, deliberately: the operating system draws its own
-        // clipboard toast a moment later, in the *system's* language, and
-        // Castivio's answer is the one the user should be reading.
-        textColor = when (status?.tone) {
-            Tone.Copied -> colors.onBackground
-            Tone.Neutral -> colors.onBackgroundVariant
-            else -> tone
-        },
-    )
-}
-
-/**
- * The screen's field: the shared component, told this frame's numbers.
- *
- * The card, the copy control and the bidi isolation all live in `:core:design`
- * because the licence screen needs the same three. Nothing about the drawing is
- * decided here — the same values that used to be read off [Metrics] inside the
- * component are handed to it — and the layout and budget gates are what prove it.
- */
-@Composable
-private fun ActivationCard(
-    m: Metrics,
-    label: String,
-    value: String,
-    spoken: String?,
-    style: TextStyle,
-    copyLabel: String,
-    isCopied: Boolean,
-    enabled: Boolean,
-    tint: CapsuleTint,
-    onCopy: () -> Unit,
-    modifier: Modifier = Modifier,
-    /**
-     * What kind of field this is, drawn after the value.
-     *
-     * These two glyphs are not chosen here. `HomeScreen` marks the same two facts
-     * in its footer with `Icons.Rounded.Memory` and `Icons.Rounded.VpnKey`, at
-     * `onBackgroundMuted` and `hueAmber`, and a user who learns a mark on one
-     * screen should meet the same mark on the other. They are taken from there
-     * rather than picked again.
-     */
-    fieldIcon: ImageVector,
-    /** [fieldIcon]'s colour, also Home's. */
-    fieldTint: Color,
-) {
-    IdentityCapsule(
-        metrics = CapsuleMetrics(
-            height = m.capsule,
-            startPadding = m.cardPad,
-            gap = m.cardGap,
-            // The frame's floor, not the circle's drawn size. The drawing has a
-            // 52dp disc on a television and 42 on the shortest phone, and both
-            // are under the target a D-pad and a thumb need -- which is the
-            // defect that was called blocking the last time this control shipped
-            // 8dp short. The card grows to hold the target; the target does not
-            // shrink to fit the card. The inset and the inner gap stopped riding
-            // on it in the same change, so holding the floor widens the card once
-            // rather than three times.
-            target = m.target,
-            corner = m.radius,
-            labelWidth = m.labelWidth,
-        ),
-        label = label,
-        value = value,
-        valueStyle = style,
-        copyLabel = copyLabel,
-        isCopied = isCopied,
-        onCopy = onCopy,
-        modifier = modifier.fillMaxWidth(),
-        spoken = spoken,
-        copyEnabled = enabled,
-        tint = tint,
-        form = CapsuleForm.Card,
-        fieldIcon = fieldIcon,
-        fieldTint = fieldTint,
-        labelStyle = castivioFieldLabelStyle(m.fsLabel),
-    )
-}
-
-/* --------------------------------------------------------------- code panel */
-
-/**
- * The plate, its panel, the caption that says what to do with it, and the address.
- *
- * ## Why the address is written out as well as encoded
- *
- * A QR is the one instruction on this screen that cannot be read. No phone to hand, a
- * camera that will not focus, or a viewer three metres from a television, and the
- * symbol says nothing at all. The line under it is that symbol's text equivalent, not
- * an ornament beside it — and it is `ActivationDestination.URL` itself, the same
- * constant the encoder is handed, so the written address and the scanned one cannot
- * drift apart.
- *
- * ## Why the scheme is written out, and why the line is larger than the caption
- *
- * Because the screenshot is the delivery mechanism. A user sends this screen to
- * whoever sells them a subscription, and that person has to be able to read where
- * to go — from a photograph of a television, at whatever size the messaging app
- * compressed it to. `castivio.app/activate` is what a person would *type*, which is
- * why the scheme was dropped; `https://castivio.app/activate` is what a person
- * reading a picture recognises as an address, which is the job this line has turned
- * out to have. [ADDRESS_STEP] sizes it above the sentence it sits under for the
- * same reason: of everything in this panel it is the one thing that has to survive
- * being looked at second-hand.
- *
- * It costs the line the caption gave up when six translations were shortened; see
- * [CAPTION_LINES]. The panel is no taller than it was by anything but one gap.
- *
- * The plate is 192 / 174 / 164dp — an 11% step down from the first drawing, which
- * read as a poster rather than as a code to point a phone at — and what gives way
- * on a short screen is the space around it, not the symbol. The white margin inside the
- * plate is not decoration: it is the symbol's quiet zone, and a reader that cannot
- * find the quiet zone cannot find the symbol, so it scales with the plate rather
- * than being a fixed number.
- */
-@Composable
-private fun CodeZone(identity: ActivationIdentityState, m: Metrics) {
-    val colors = CastivioTheme.colors
-    val bitmap = remember(identity.qr) { identity.qr?.asImageBitmap() } ?: return
-    val shape = RoundedCornerShape(m.zoneRadius)
-
-    Column(
-        Modifier
-            .width(m.zoneWidth)
-            .clip(shape)
-            .background(colors.codePanelBrush)
-            .border(BorderStroke(1.dp, colors.edgeAccent), shape)
-            .padding(m.zonePad)
-            .testTag(ActivationTags.CODE_ZONE),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(m.zoneGap, Alignment.CenterVertically),
-    ) {
-        QrPlate(
-            code = bitmap,
-            plate = m.plate,
-            padding = m.plate * QUIET_ZONE,
-            modifier = Modifier.testTag(ActivationTags.QR),
-        )
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+            Modifier.padding(top = m.headingTop),
+            horizontalArrangement = Arrangement.spacedBy(m.unit * TITLE_GAP),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
-                imageVector = Icons.Rounded.Smartphone,
+                Icons.Rounded.Layers,
                 contentDescription = null,
-                tint = colors.onBackgroundMuted,
-                modifier = Modifier.size(m.fsCaption * CAPTION_ICON),
+                tint = colors.hueViolet,
+                modifier = Modifier.size(m.headingIcon),
             )
             Text(
-                text = stringResource(R.string.qr_caption),
-                style = castivioBodyStyle(m.fsCaption),
-                color = castivioDescriptionColor,
-                textAlign = TextAlign.Center,
-                maxLines = CAPTION_LINES,
+                text = stringResource(R.string.add_heading),
+                style = text(CastivioType.headlineMedium, m.headingSize, FontWeight.Bold),
+                color = colors.onBackgroundStrong,
+                maxLines = 1,
             )
         }
-        Text(
-            text = ltrToken(ActivationDestination.URL),
-            style = castivioBodyStyle(m.fsAddress),
-            // Azure50, the step the trial's numeral already takes. The address is the
-            // one thing in this panel a reader is meant to carry off the screen and
-            // type somewhere else, and the brand's own blue is what says so without
-            // inventing a colour for it. 6.4:1 on this panel.
-            color = Palette.Azure50,
-            fontWeight = FontWeight.SemiBold,
+        CastivioFittedText(
+            text = stringResource(R.string.add_sub),
+            style = text(CastivioType.bodyLarge, m.subSize, FontWeight.Normal),
+            color = colors.onBackgroundVariant,
             textAlign = TextAlign.Center,
-            maxLines = ADDRESS_LINES,
-            modifier = Modifier.testTag(ActivationTags.ADDRESS),
+        )
+
+        Row(
+            Modifier
+                .padding(top = m.kindsTop)
+                .fillMaxWidth()
+                .height(m.kindHeight),
+            horizontalArrangement = Arrangement.spacedBy(m.unit * KIND_GAP),
+        ) {
+            Kind(
+                name = "M3U",
+                sub = stringResource(R.string.kind_m3u_sub),
+                icon = Icons.Rounded.SlowMotionVideo,
+                m = m,
+                onClick = onPlaylistUrl,
+                modifier = Modifier
+                    .weight(1f)
+                    .testTag(ActivationTags.ACT_M3U),
+            )
+            Kind(
+                name = "Xtream",
+                sub = stringResource(R.string.kind_xtream_sub),
+                icon = Icons.Rounded.Dns,
+                m = m,
+                onClick = onXtream,
+                modifier = Modifier
+                    .weight(1f)
+                    .testTag(ActivationTags.ACT_XTREAM),
+            )
+        }
+
+        CastivioButton(
+            text = stringResource(R.string.add_new_source),
+            weight = ButtonWeight.Primary,
+            icon = Icons.Rounded.Add,
+            onClick = onAddPlaylist,
+            modifier = Modifier
+                .padding(top = m.ctaTop)
+                .fillMaxWidth(CTA_SHARE)
+                .testTag(ActivationTags.ACTIONS),
+            fill = colors.primaryBrush,
+            corner = m.radius,
+            labelStyle = text(CastivioType.titleLarge, m.ctaSize, FontWeight.Bold),
+            minHeight = m.ctaHeight,
         )
     }
 }
 
-/* -------------------------------------------------------------------- footer */
+/** The button against the column: narrower than the two kinds above it, as drawn. */
+private const val CTA_SHARE = 0.7f
+private const val KIND_GAP = 30f
 
 /**
- * The legal line, in a bar of its own.
- *
- * It used to be bare type under a hairline, which put the least important
- * sentence on the screen on the same footing as the background. In a bar it is
- * plainly a footnote — and the mark at its trailing edge is what stops the
- * centred sentence reading as a stranded caption.
+ * The MAC address and the device key, each with its copy button, in one line and with
+ * no frame. Selectable as well, so a long press copies on a phone without the button.
  */
 @Composable
-private fun FooterBar(m: Metrics) {
-    val colors = CastivioTheme.colors
-    val shape = RoundedCornerShape(m.radius * BUTTON_CORNER)
+private fun Identifiers(identity: ActivationIdentityState, m: Metrics, onCopied: (Copied) -> Unit) {
+    val clipboard = LocalClipboardManager.current
+    val address = identity.address
     Row(
         Modifier
             .fillMaxWidth()
-            .height(m.footer)
-            .clip(shape)
-            .background(colors.glassFill)
-            .border(BorderStroke(1.dp, colors.edgeQuiet), shape)
-            .padding(horizontal = m.footer * FOOTER_PAD)
-            .testTag(ActivationTags.FOOTER),
-        horizontalArrangement = Arrangement.spacedBy(Spacing.md),
+            .height(m.idsHeight)
+            .testTag(ActivationTags.IDENTITY),
+        horizontalArrangement = Arrangement.spacedBy(m.idsGap),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            text = stringResource(R.string.legal_player_only),
-            // The size token, and deliberately not its colour. A legal line is
-            // present without asking to be read, which is what `onBackgroundMuted`
-            // is for; recolouring it to the description's ink would make the
-            // disclaimer louder, and that is a decision about the product rather
-            // than about typography.
-            style = castivioBodyStyle(m.fsCaption),
-            color = colors.onBackgroundMuted,
-            textAlign = TextAlign.Center,
-            maxLines = 1,
-            modifier = Modifier.weight(1f),
+        Identifier(
+            label = MAC_LABEL,
+            value = address ?: ADDRESS_PLACEHOLDER,
+            valueTint = CastivioTheme.colors.onBackgroundStrong,
+            icon = Icons.Rounded.Lan,
+            copyLabel = stringResource(R.string.copy_mac),
+            spoken = address?.let { stringResource(R.string.mac_spoken, spaced(it)) },
+            isCopied = identity.addressCopied,
+            enabled = address != null,
+            m = m,
+            onCopy = {
+                clipboard.setText(AnnotatedString(address.orEmpty()))
+                onCopied(Copied.Address)
+            },
+            modifier = Modifier
+                .weight(MAC_SHARE)
+                .testTag(ActivationTags.MAC_CAPSULE),
         )
-        Box(
-            Modifier
-                .size(m.mark)
-                .clip(RoundedCornerShape(percent = 50))
-                .background(colors.infoMarkFill)
-                .border(BorderStroke(1.dp, colors.edgeAccent), RoundedCornerShape(percent = 50)),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                imageVector = Icons.Rounded.Info,
-                contentDescription = null,
-                tint = Palette.Violet80,
-                modifier = Modifier.size(m.mark * MARK_ICON),
+        identity.deviceKey?.let { key ->
+            Identifier(
+                label = KEY_LABEL,
+                value = key,
+                valueTint = CastivioTheme.colors.hueAmber,
+                icon = Icons.Rounded.VpnKey,
+                copyLabel = stringResource(R.string.copy_key),
+                spoken = null,
+                isCopied = identity.keyCopied,
+                enabled = true,
+                m = m,
+                onCopy = {
+                    clipboard.setText(AnnotatedString(key))
+                    onCopied(Copied.Key)
+                },
+                modifier = Modifier
+                    .weight(KEY_SHARE)
+                    .testTag(ActivationTags.KEY_CAPSULE),
             )
         }
     }
 }
 
-/* --------------------------------------------------------------------- type */
+/** The drawing's words for the two, the same in every language: what the portal's form calls them. */
+private const val MAC_LABEL = "Mac"
+private const val KEY_LABEL = "Key"
+private const val MAC_SHARE = 660f
+private const val KEY_SHARE = 450f
+
+@Composable
+private fun Identifier(
+    label: String,
+    value: String,
+    valueTint: androidx.compose.ui.graphics.Color,
+    icon: ImageVector,
+    copyLabel: String,
+    spoken: String?,
+    isCopied: Boolean,
+    enabled: Boolean,
+    m: Metrics,
+    onCopy: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val colors = CastivioTheme.colors
+    Row(
+        modifier,
+        horizontalArrangement = Arrangement.spacedBy(m.unit * ID_GAP),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(icon, contentDescription = null, tint = colors.onBackgroundStrong, modifier = Modifier.size(m.idIcon))
+        SelectionContainer(Modifier.weight(1f)) {
+            Column(
+                Modifier.then(
+                    if (spoken != null) Modifier.semantics(mergeDescendants = true) { contentDescription = spoken } else Modifier,
+                ),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = label,
+                    style = text(CastivioType.titleMedium, m.idLabelSize, FontWeight.Bold),
+                    color = colors.onBackground,
+                    maxLines = 1,
+                )
+                CastivioFittedText(
+                    text = ltrToken(value),
+                    style = text(CastivioType.titleLarge, m.idValueSize, FontWeight.Bold).copy(letterSpacing = 0.04.em),
+                    color = valueTint,
+                    textAlign = TextAlign.Center,
+                )
+            }
+        }
+        CopyButton(
+            size = m.copy,
+            label = copyLabel,
+            isCopied = isCopied,
+            onClick = { if (enabled) onCopy() },
+            fillBrush = colors.primaryBrush,
+            iconTint = colors.onPrimary,
+        )
+    }
+}
+
+private const val ID_GAP = 24f
+
+/** One kind of source: its name, what it asks for, and its mark in a disc. It opens that kind's form. */
+@Composable
+private fun Kind(
+    name: String,
+    sub: String,
+    icon: ImageVector,
+    m: Metrics,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val colors = CastivioTheme.colors
+    val interaction = remember { MutableInteractionSource() }
+    var focused by remember { mutableStateOf(false) }
+    val shape = RoundedCornerShape(m.radius)
+    Row(
+        modifier
+            .fillMaxHeight()
+            .castivioFocusScale(Motion.focusScaleCard, interaction)
+            .onFocusChanged { focused = it.isFocused }
+            .clip(shape)
+            .background(colors.homeCardSurface)
+            .background(colors.primaryBrush, alpha = KIND_TINT)
+            .border(
+                BorderStroke(if (focused) m.unit * 5f else m.unit * 2.5f, if (focused) colors.focusRing else colors.hueViolet.copy(alpha = KIND_EDGE)),
+                shape,
+            )
+            .clickable(interaction, indication = null, onClick = onClick)
+            .semantics(mergeDescendants = true) { role = Role.Button }
+            .padding(horizontal = m.unit * KIND_PAD),
+        horizontalArrangement = Arrangement.spacedBy(m.unit * KIND_PAD),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = name,
+                style = text(CastivioType.titleLarge, m.kindNameSize, FontWeight.Bold),
+                color = colors.onBackgroundStrong,
+                maxLines = 1,
+            )
+            CastivioFittedText(
+                text = sub,
+                style = text(CastivioType.bodyMedium, m.kindSubSize, FontWeight.Normal),
+                color = colors.onBackgroundVariant,
+                textAlign = TextAlign.Center,
+            )
+        }
+        Box(
+            Modifier
+                .size(m.kindDisc)
+                .clip(CircleShape)
+                .background(colors.primaryBrush),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(icon, contentDescription = null, tint = colors.onPrimary, modifier = Modifier.size(m.kindIcon))
+        }
+    }
+}
+
+private const val KIND_TINT = 0.18f
+private const val KIND_EDGE = 0.6f
+private const val KIND_PAD = 30f
+
+/* ---------------------------------------------------------------- send card */
 
 /**
- * The code, at this surface's size.
- *
- * Built from the shipped token rather than declared here: the family, the weight
- * and the numeral behaviour are the design system's decision and only the size is
- * the surface's. Tracking is the one place on this screen that keeps a positive
- * value — between six pairs of hexadecimal it is the difference between an
- * address and a word.
- *
- * ## It used to ask whether this was a television, and the answer never mattered
- *
- * The base was `if (tv) codeHero else codeCompact`. Those two tokens differ in exactly
- * two properties — `fontSize` and `lineHeight` — and both are overwritten by the `copy`
- * below, from a size the metrics already derived from the surface; `letterSpacing` is
- * overwritten too, and everything else about them is identical. So the two branches
- * produced the same `TextStyle`, field for field, on every surface Castivio has ever
- * drawn. Removing it changes no pixel. What it removes is a branch that looked like it
- * decided something, which is the more expensive of the two things it was.
+ * Send it from your phone: the QR on the portal's send page, three steps, and the
+ * address for a phone without a camera. A thin violet line round it, no glow.
  */
 @Composable
-@ReadOnlyComposable
-private fun codeStyle(size: Dp, tracking: Float = CODE_TRACKING): TextStyle =
-    castivioValueStyle(size, tracking)
-
-private fun refreshLabel(state: RefreshState): Int =
-    if (state == RefreshState.Checking) R.string.refresh_checking else R.string.refresh
-
-/**
- * What the reserved line says, and in which register.
- *
- * ## Why "nothing yet" is a warning and not an error
- *
- * The design system has three semantic colours and they answer different
- * questions. `danger` means *something failed* — a refresh that could not reach
- * anywhere is a fault, and it is red because the user needs to know the app tried
- * and could not. `warning` means *something is missing and you can supply it*,
- * which is exactly the state of a device with no subscription on it: nothing has
- * broken, the screen is simply not finished being set up.
- *
- * Painting that red would be telling a new user their brand-new install is
- * faulty on first launch. Painting it muted, which is what it used to be, says
- * nothing at all — and §8 of the contract is precisely that this screen must not
- * be ambiguous about it.
- */
-internal fun statusMessage(identity: ActivationIdentityState): Status? = when {
-    // **The transient answers come first, and that ordering is the fix for a
-    // real defect.** Copying used to be listed below the refresh outcomes, so a
-    // user who had pressed Refresh once -- leaving a permanent "no subscription
-    // yet" -- could copy the address and see no acknowledgement at all.
-    identity.lastCopied == Copied.Address -> Status(R.string.copied_mac, Tone.Copied)
-    identity.lastCopied == Copied.Key -> Status(R.string.copied_key, Tone.Copied)
-
-    // Checking is its own sentence on the button, not here; the line keeps
-    // describing the subscription while the check runs.
-    identity.refresh == RefreshState.Found -> Status(R.string.refresh_found, Tone.Good)
-
-    identity.refresh == RefreshState.Error -> Status(R.string.refresh_error, Tone.Broken)
-
-    // Asked and told no, or never asked at all: the user's situation is the same
-    // either way, so it is the same sentence in the same tone.
-    else -> Status(R.string.refresh_none, Tone.Missing)
+private fun SendCard(identity: ActivationIdentityState, m: Metrics, modifier: Modifier = Modifier) {
+    val colors = CastivioTheme.colors
+    val shape = RoundedCornerShape(m.radius)
+    val inner = RoundedCornerShape(m.radius - m.innerInset / 2)
+    Column(
+        modifier
+            .clip(shape)
+            .background(colors.homeCardSurface)
+            .background(colors.primaryBrush, alpha = SEND_TINT)
+            .border(BorderStroke(1.dp, colors.hueViolet.copy(alpha = SEND_EDGE)), shape)
+            .testTag(ActivationTags.CODE_ZONE),
+    ) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .height(m.sendTitleBand),
+            horizontalArrangement = Arrangement.spacedBy(m.unit * TITLE_GAP, Alignment.CenterHorizontally),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = stringResource(R.string.send_title),
+                style = text(CastivioType.headlineMedium, m.sendTitleSize, FontWeight.Bold),
+                color = colors.onBackgroundStrong,
+                maxLines = 1,
+            )
+            Icon(
+                Icons.AutoMirrored.Rounded.Send,
+                contentDescription = null,
+                tint = colors.onBackgroundStrong,
+                modifier = Modifier.size(m.sendIcon),
+            )
+        }
+        Row(
+            Modifier
+                .padding(start = m.innerInset, end = m.innerInset, bottom = m.innerInset)
+                .fillMaxSize()
+                .clip(inner)
+                .background(colors.surfaceWell)
+                .border(BorderStroke(1.dp, colors.edgeQuiet), inner)
+                .padding(horizontal = m.innerPad),
+            horizontalArrangement = Arrangement.spacedBy(m.innerGap),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(
+                Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(m.stepGap),
+            ) {
+                Step(1, stringResource(R.string.send_step_scan), m)
+                Step(2, stringResource(R.string.send_step_ids), m)
+                Step(3, stringResource(R.string.send_step_play), m)
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .height(m.pillHeight)
+                        .clip(RoundedCornerShape(percent = 50))
+                        .background(colors.hueAzure.copy(alpha = PILL_WASH))
+                        .border(BorderStroke(1.dp, colors.hueAzure.copy(alpha = PILL_EDGE)), RoundedCornerShape(percent = 50))
+                        .testTag(ActivationTags.ADDRESS),
+                    horizontalArrangement = Arrangement.spacedBy(m.unit * PILL_GAP, Alignment.CenterHorizontally),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(m.unit * PILL_GAP),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Icon(Icons.Rounded.Link, contentDescription = null, tint = colors.hueAzure, modifier = Modifier.size(m.pillIcon))
+                            Text(
+                                text = ActivationDestination.CONNECT_DISPLAY,
+                                style = text(CastivioType.titleMedium, m.pillSize, FontWeight.Bold),
+                                color = colors.hueAzure,
+                                maxLines = 1,
+                            )
+                        }
+                    }
+                }
+            }
+            Box(
+                Modifier
+                    .fillMaxHeight(DIVIDER_SHARE)
+                    .width(1.dp)
+                    .background(colors.edgeQuiet),
+            )
+            val bitmap = remember(identity.qr) { identity.qr?.asImageBitmap() }
+            if (bitmap != null) {
+                QrPlate(
+                    code = bitmap,
+                    plate = m.plate,
+                    padding = m.plate * QUIET_ZONE,
+                    modifier = Modifier.testTag(ActivationTags.QR),
+                )
+            } else {
+                Spacer(Modifier.size(m.plate))
+            }
+        }
+    }
 }
 
-internal data class Status(val message: Int, val tone: Tone)
+private const val SEND_TINT = 0.22f
+private const val SEND_EDGE = 0.7f
+private const val PILL_WASH = 0.12f
+private const val PILL_EDGE = 0.5f
+private const val PILL_GAP = 16f
+private const val DIVIDER_SHARE = 0.75f
 
-/** The four registers the one status line speaks in. */
-internal enum class Tone {
-    Neutral,
-    Good,
-
-    /**
-     * A copy just happened.
-     *
-     * Its own register rather than [Neutral], because this is the one message on
-     * the screen that competes with something the operating system draws.
-     */
-    Copied,
-
-    Missing,
-    Broken,
+@Composable
+private fun Step(number: Int, words: String, m: Metrics) {
+    val colors = CastivioTheme.colors
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(m.unit * STEP_GAP),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
+            Modifier
+                .size(m.stepBadge)
+                .clip(RoundedCornerShape(m.unit * STEP_RADIUS))
+                .background(colors.primaryBrush),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = number.toString(),
+                style = text(CastivioType.labelLarge, m.stepNumber, FontWeight.Bold, 1f),
+                color = colors.onPrimary,
+                maxLines = 1,
+            )
+        }
+        CastivioFittedText(
+            text = words,
+            style = text(CastivioType.bodyLarge, m.stepSize, FontWeight.Normal),
+            color = colors.onBackground,
+        )
+    }
 }
+
+private const val STEP_GAP = 18f
+private const val STEP_RADIUS = 14f
+
+/* -------------------------------------------------------------------- footer */
+
+/** The player-only line, between two rules, at the foot. */
+@Composable
+private fun Note(m: Metrics, modifier: Modifier = Modifier) {
+    val colors = CastivioTheme.colors
+    Row(
+        modifier.testTag(ActivationTags.FOOTER),
+        horizontalArrangement = Arrangement.spacedBy(m.unit * NOTE_GAP),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(Modifier.width(m.noteRule).height(1.dp).background(colors.edgeQuiet))
+        CastivioFittedText(
+            text = stringResource(R.string.legal_player_only),
+            style = text(CastivioType.bodyMedium, m.noteSize, FontWeight.Normal),
+            color = colors.onBackgroundVariant,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.weight(1f, fill = false),
+        )
+        Box(Modifier.width(m.noteRule).height(1.dp).background(colors.edgeQuiet))
+    }
+}
+
+private const val NOTE_GAP = 30f
+
+/** A step of the type scale at the drawing's size, weight and leading. */
+private fun text(base: TextStyle, size: Dp, weight: FontWeight, leading: Float = LEADING): TextStyle =
+    base.copy(fontSize = size.value.sp, lineHeight = (size.value * leading).sp, fontWeight = weight)
 
 /** `2F:19:EB:20:44:7C` read as separated pairs rather than one long number. */
 private fun spaced(address: String): String = address.replace(":", " ")
 
 /** Shown for the instant before the identity resolves. Never a real address. */
 private const val ADDRESS_PLACEHOLDER = "··:··:··:··:··:··"
-
-/**
- * The name against the screen's title.
- *
- * Under one, and it was over one until the header put the lockup at the leading
- * edge. Centred, a wordmark larger than the page's own name reads as the brand
- * announcing itself; at the edge, next to the title, the same proportion reads as
- * a splash screen that forgot to leave. The mark's job in a header is to say
- * whose screen this is, once, and then get out of the way of what the screen is
- * for.
- *
- * Down again, from .88, because the header carries four things and the wordmark
- * is the only one that can give width without losing anything. A control cannot
- * shrink below a thumb, a fact cannot be abbreviated, and a title that steps down
- * is a title the reader notices stepping down. A signature is recognised by its
- * shape rather than read at size, and the mark beside it is what carries the
- * brand across a room.
- */
-private const val WORD_RATIO = 0.80f
-
-/* ------------------------------------------------------------------- ratios */
-/*
- * Ratios, not dp, wherever a number is a proportion of another number that the
- * frame already sets. A fixed 13dp gap that is right beside a 40dp mark is loose
- * beside a 28dp one, and the frame table is long enough already.
- */
-
-
-/** Between the six pairs, and between the six digits, which want more air. */
-private const val CODE_TRACKING = 1.5f
-private const val KEY_TRACKING = 4f
-
-/** A button's corner against the card's, and Refresh's label against the CTA's. */
-private const val BUTTON_CORNER = 0.9f
-
-/**
- * How much wider the call to action is than Refresh.
- *
- * Not "how much of the row it takes": both buttons are weighted, so this is the
- * ratio between them and nothing in the row is sized by its own label. Ten
- * percent is the smallest difference that still reads as an order when the two
- * sit side by side — below it they look like a mistake in the arithmetic, and far
- * above it the narrower one looks like a fallback rather than a choice.
- *
- * It is the *quieter* control that is the wider one, now that Refresh carries the
- * fill. That is not an accident left over from the swap: width here is a
- * typographic allowance, because Add playlist's label is the longer of the two in
- * most of the 39 languages and it has no icon to lose. Emphasis is carried by the
- * fill, which is the louder channel of the two and the one that was swapped.
- */
-private const val ACTION_LEAD = 1.1f
-
-/**
- * Refresh's label against Add playlist's.
- *
- * It has an icon beside it and the other does not, so set at the same size the
- * pair of them reads as the heavier object even before the fill is considered.
- * Eight percent down is where the two labels look like the same type.
- */
-private const val LEAD_LABEL = 0.92f
-
-/** The QR's quiet zone, as a share of the plate. */
-private const val QUIET_ZONE = 0.062f
-
-/** The caption's phone glyph. */
-private const val CAPTION_ICON = 1.3f
-
-/**
- * One, and it cannot be more.
- *
- * The address is a single token with no space in it, so it does not wrap — it
- * overflows. `ActivationQrTest` measures it against the narrowest column this screen
- * has, which is why one line is a fact here and not an allowance.
- */
-private const val ADDRESS_LINES = 1
-
-/**
- * How much larger the written address is set than the caption above it.
- *
- * Ten per cent, and the ceiling rather than a preference. The address is a token
- * with no space in it, so a column that cannot hold it does not wrap it — it clips
- * it, and a clipped address is worse than none because a reader types what they can
- * see and lands nowhere. Two surfaces decide the number, from opposite ends:
- *
- * - **800x360**, the narrowest caption column at 184.6dp. The token is 173.5dp at
- *   13.2dp of type, which is 11.1dp of room.
- * - **1280x800**, where `fsCaption` has reached its 19dp ceiling while the column
- *   stopped growing at 330dp. The token is 277.5dp against 289.3dp — 11.8dp, and
- *   the tighter of the two in proportion.
- *
- * At 1.125 the tablet is down to 4.8dp and at 1.15 it overflows, so this is not a
- * round number with room above it. Measured in the face the line is actually drawn
- * in, IBM Plex Sans SemiBold, which is also what `ADDRESS_EM_PER_CHAR` in
- * `ActivationQrTest` now holds the bound for.
- *
- * It costs height as well as width: `codeHeight` reserves `fsAddress * leading` for
- * this line, which is 10% of one line more than before. The sweep's worst margin is
- * unchanged at 1.92dp, because on that surface it is the identity column that binds
- * and not this one.
- */
-private const val ADDRESS_STEP = 1.10f
-
-/**
- * Two, and it is now a measurement rather than a reserve.
- *
- * It was three: two for the sentence and a spare for "the one nobody measured". All
- * thirty-nine were then measured — every locale in every frame's real caption column,
- * at that frame's own body size — and six were over: English, Bulgarian, German,
- * Greek, Russian and Serbian. The spare was not spare; it was in use, and a seventh
- * language would have overrun it unseen.
- *
- * Those six are shorter now and the sweep is 156 of 156 at two lines or fewer, so the
- * third line is free. It is spent on [ActivationTags.ADDRESS], which is what makes
- * the QR readable by somebody who cannot scan it — see [CodeZone].
- */
-private const val CAPTION_LINES = 2
-
-/** The footer bar's inset, and the information glyph inside its disc. */
-private const val FOOTER_PAD = 0.34f
-private const val MARK_ICON = 0.56f
-
-/** The dot in the trial chip. */
-private val CHIP_DOT = 8.dp

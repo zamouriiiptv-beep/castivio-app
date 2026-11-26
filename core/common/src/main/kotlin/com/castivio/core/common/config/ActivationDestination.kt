@@ -55,6 +55,16 @@ object ActivationDestination {
     const val HOST: String = "castivio.app"
 
     /**
+     * The portal's send page, where a phone adds a playlist to this device with its MAC
+     * address and device key. The first screen's QR opens it (owner, 2026-11-26): that
+     * screen is where a source is set up, and sending one from a phone is its other way.
+     */
+    const val CONNECT_URL: String = "https://castivio.app/connect"
+
+    /** [CONNECT_URL] as a person types it. */
+    val CONNECT_DISPLAY: String = CONNECT_URL.removePrefix("https://")
+
+    /**
      * Where a user goes when the app cannot help them.
      *
      * Two states offer this and only two: a licence that was withdrawn, and a

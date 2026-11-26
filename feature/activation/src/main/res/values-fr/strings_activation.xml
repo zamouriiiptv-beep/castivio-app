@@ -43,4 +43,15 @@
     </plurals>
 
     <string name="locale_sentinel" translatable="false">fr</string>
+    <string name="setup_title">Configurer une source</string>
+    <string name="send_title">Envoyez-la depuis votre téléphone</string>
+    <string name="send_step_scan">Scannez le code avec l\'appareil photo</string>
+    <string name="send_step_ids">Saisissez l\'adresse MAC et la clé de l\'appareil</string>
+    <string name="send_step_play">Ajoutez la source et lisez-la sur cet appareil</string>
+    <string name="add_heading">Ajoutez votre playlist</string>
+    <string name="add_sub">Choisissez le type de source à ajouter</string>
+    <string name="kind_m3u_sub">Lien de la playlist</string>
+    <string name="kind_xtream_sub">Nom d\'utilisateur et mot de passe</string>
+    <string name="add_new_source">Ajouter une source</string>
+    <string name="activation_exit">Quitter</string>
 </resources>

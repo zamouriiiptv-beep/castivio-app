@@ -43,4 +43,15 @@
     </plurals>
 
     <string name="locale_sentinel" translatable="false">fi</string>
+    <string name="setup_title">Määritä lähde</string>
+    <string name="send_title">Lähetä puhelimesta</string>
+    <string name="send_step_scan">Skannaa koodi kameralla</string>
+    <string name="send_step_ids">Anna MAC-osoite ja laiteavain</string>
+    <string name="send_step_play">Lisää lähde ja toista täällä</string>
+    <string name="add_heading">Lisää soittolista</string>
+    <string name="add_sub">Valitse lähteen tyyppi</string>
+    <string name="kind_m3u_sub">Soittolistan linkki</string>
+    <string name="kind_xtream_sub">Käyttäjätunnus ja salasana</string>
+    <string name="add_new_source">Lisää lähde</string>
+    <string name="activation_exit">Poistu</string>
 </resources>

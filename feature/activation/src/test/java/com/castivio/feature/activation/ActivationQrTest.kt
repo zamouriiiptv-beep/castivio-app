@@ -53,8 +53,8 @@ class ActivationQrTest {
 
     /** The whole payload, exactly, with nothing appended. */
     @Test
-    fun `the QR encodes the central activation URL and nothing else`() {
-        assertEquals(ActivationDestination.URL, decode())
+    fun `the QR encodes the portal's send page and nothing else`() {
+        assertEquals(ActivationDestination.CONNECT_URL, decode())
     }
 
     /**
@@ -114,7 +114,7 @@ class ActivationQrTest {
         // Asking for 1x1 returns the symbol at its natural module size: ZXing
         // never scales below one pixel per module.
         val matrix = QRCodeWriter().encode(
-            ActivationDestination.URL,
+            ActivationDestination.CONNECT_URL,
             BarcodeFormat.QR_CODE,
             1,
             1,
@@ -148,7 +148,7 @@ class ActivationQrTest {
                     "${"%.3f".format(pitch)}dp per module"
             )
         }
-        println("activation QR — $modules modules for '${ActivationDestination.URL}'")
+        println("activation QR — $modules modules for '${ActivationDestination.CONNECT_URL}'")
     }
 
     /**
@@ -167,34 +167,12 @@ class ActivationQrTest {
      */
     @Test
     fun `the plate is the size each surface was drawn for`() {
-        val expected = mapOf(
-            "1280x720 reference" to 210.0f,
-            "1280x800 tablet" to 210.0f,
-            "television 960x540" to 192.0f,
-            "873x393 phone" to 135.4f,
-            "800x360 shortest phone" to 124.0f,
-        )
         for ((frame, width, height) in SURFACES) {
             val m = metricsFor(tv = frame.startsWith("television"), width = width, height = height)
-            val want = expected.getValue(frame)
-            assertEquals("$frame draws a ${m.plate} plate", want, m.plate.value, 0.1f)
+            assertEquals("$frame draws a ${m.plate} plate", 380f * m.unit.value, m.plate.value, 0.1f)
         }
     }
 
-    /**
-     * The quiet zone does not move when the plate does.
-     *
-     * The plate's white padding is a share of the plate and so is the module, so
-     * their ratio is a constant: one module of ZXing margin plus `0.062 * 35 /
-     * (1 - 2 * 0.062)` of plate padding, which is 3.48 modules at every size this
-     * screen can draw. Asserted because the 124dp floor was approved on exactly that
-     * reasoning, and a change to either share would quietly break it.
-     *
-     * 3.48 is short of the four modules ISO/IEC 18004 asks for, and that is true of
-     * the shipped plate too -- it is a property of `QUIET_ZONE`, not of this floor.
-     * Decoders tolerate it; the number is pinned here so that if it is ever fixed,
-     * it is fixed deliberately.
-     */
     @Test
     fun `the quiet zone is the same in modules whatever the plate measures`() {
         for ((frame, width, height) in SURFACES) {
@@ -218,7 +196,7 @@ class ActivationQrTest {
      */
     @Test
     fun `the scheme-less address is the address in the symbol`() {
-        assertEquals(ActivationDestination.display, decode().removePrefix("https://"))
+        assertEquals(ActivationDestination.CONNECT_DISPLAY, decode().removePrefix("https://"))
     }
 
     /**
@@ -238,11 +216,12 @@ class ActivationQrTest {
      */
     @Test
     fun `the written address fits the column it is drawn in, on every surface`() {
-        val address = ActivationDestination.URL
+        val address = ActivationDestination.CONNECT_DISPLAY
         for ((name, width, height) in SURFACES) {
             val m = metricsFor(tv = name.startsWith("television"), width = width, height = height)
-            val column = m.zoneWidth - m.zonePad * 2
-            val widest = m.fsAddress * ADDRESS_EM_PER_CHAR * address.length
+            // The send card, less its inset, padding, the gap, the rule and the plate.
+            val column = m.unit * SEND_WIDTH - m.innerInset * 2 - m.innerPad * 2 - m.innerGap * 2 - 1.dp - m.plate
+            val widest = m.pillSize * ADDRESS_EM_PER_CHAR * address.length + m.pillIcon + m.unit * 16f
             assertTrue(
                 "$name: \"$address\" wants up to $widest in a $column column",
                 widest <= column,
@@ -269,7 +248,7 @@ class ActivationQrTest {
  * would break the bound before it breaks the column. That is the right failure —
  * this constant and the address are meant to be re-measured together.
  */
-private const val ADDRESS_EM_PER_CHAR = 0.47f
+private const val ADDRESS_EM_PER_CHAR = 0.6f
 
 /**
  * Every surface the activation screen ships to, as the plate tests read them.

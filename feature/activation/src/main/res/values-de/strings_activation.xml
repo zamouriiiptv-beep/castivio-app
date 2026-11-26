@@ -43,4 +43,15 @@
     </plurals>
 
     <string name="locale_sentinel" translatable="false">de</string>
+    <string name="setup_title">Quelle einrichten</string>
+    <string name="send_title">Vom Handy senden</string>
+    <string name="send_step_scan">Code mit der Handykamera scannen</string>
+    <string name="send_step_ids">MAC-Adresse und Geräteschlüssel eingeben</string>
+    <string name="send_step_play">Quelle hinzufügen und hier abspielen</string>
+    <string name="add_heading">Playlist hinzufügen</string>
+    <string name="add_sub">Wähle die Art der Quelle</string>
+    <string name="kind_m3u_sub">Playlist-Link</string>
+    <string name="kind_xtream_sub">Benutzername und Passwort</string>
+    <string name="add_new_source">Neue Quelle hinzufügen</string>
+    <string name="activation_exit">Beenden</string>
 </resources>

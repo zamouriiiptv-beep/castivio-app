@@ -45,4 +45,15 @@
     </plurals>
 
     <string name="locale_sentinel" translatable="false">sk</string>
+    <string name="setup_title">Nastaviť zdroj</string>
+    <string name="send_title">Pošlite z telefónu</string>
+    <string name="send_step_scan">Naskenujte kód fotoaparátom</string>
+    <string name="send_step_ids">Zadajte adresu MAC a kľúč zariadenia</string>
+    <string name="send_step_play">Pridajte zdroj a prehrávajte tu</string>
+    <string name="add_heading">Pridajte playlist</string>
+    <string name="add_sub">Vyberte druh zdroja</string>
+    <string name="kind_m3u_sub">Odkaz na playlist</string>
+    <string name="kind_xtream_sub">Meno a heslo</string>
+    <string name="add_new_source">Pridať zdroj</string>
+    <string name="activation_exit">Ukončiť</string>
 </resources>

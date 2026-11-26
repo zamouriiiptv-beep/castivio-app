@@ -43,4 +43,15 @@
     </plurals>
 
     <string name="locale_sentinel" translatable="false">nb</string>
+    <string name="setup_title">Sett opp en kilde</string>
+    <string name="send_title">Send fra telefonen</string>
+    <string name="send_step_scan">Skann koden med kameraet</string>
+    <string name="send_step_ids">Skriv inn MAC-adresse og enhetsnøkkel</string>
+    <string name="send_step_play">Legg til kilden og spill her</string>
+    <string name="add_heading">Legg til spillelisten</string>
+    <string name="add_sub">Velg type kilde</string>
+    <string name="kind_m3u_sub">Lenke til spilleliste</string>
+    <string name="kind_xtream_sub">Brukernavn og passord</string>
+    <string name="add_new_source">Legg til kilde</string>
+    <string name="activation_exit">Avslutt</string>
 </resources>

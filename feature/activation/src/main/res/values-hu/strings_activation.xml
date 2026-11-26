@@ -43,4 +43,15 @@
     </plurals>
 
     <string name="locale_sentinel" translatable="false">hu</string>
+    <string name="setup_title">Forrás beállítása</string>
+    <string name="send_title">Küldd a telefonról</string>
+    <string name="send_step_scan">Olvasd be a kódot a kamerával</string>
+    <string name="send_step_ids">Add meg a MAC-címet és az eszközkulcsot</string>
+    <string name="send_step_play">Add hozzá a forrást és nézd itt</string>
+    <string name="add_heading">Add hozzá a lejátszási listát</string>
+    <string name="add_sub">Válaszd ki a forrás típusát</string>
+    <string name="kind_m3u_sub">Lejátszási lista linkje</string>
+    <string name="kind_xtream_sub">Felhasználónév és jelszó</string>
+    <string name="add_new_source">Új forrás</string>
+    <string name="activation_exit">Kilépés</string>
 </resources>

@@ -42,4 +42,15 @@
     </plurals>
 
     <string name="locale_sentinel" translatable="false">ja</string>
+    <string name="setup_title">視聴ソースの設定</string>
+    <string name="send_title">スマホから送信</string>
+    <string name="send_step_scan">スマホのカメラでコードを読み取る</string>
+    <string name="send_step_ids">MACアドレスとデバイスキーを入力</string>
+    <string name="send_step_play">ソースを追加してこの端末で再生</string>
+    <string name="add_heading">プレイリストを追加</string>
+    <string name="add_sub">追加するソースの種類を選択</string>
+    <string name="kind_m3u_sub">プレイリストのリンク</string>
+    <string name="kind_xtream_sub">ユーザー名とパスワード</string>
+    <string name="add_new_source">ソースを追加</string>
+    <string name="activation_exit">終了</string>
 </resources>

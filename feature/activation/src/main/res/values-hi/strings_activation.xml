@@ -43,4 +43,15 @@
     </plurals>
 
     <string name="locale_sentinel" translatable="false">hi</string>
+    <string name="setup_title">देखने का स्रोत सेट करें</string>
+    <string name="send_title">फ़ोन से भेजें</string>
+    <string name="send_step_scan">फ़ोन के कैमरे से कोड स्कैन करें</string>
+    <string name="send_step_ids">MAC पता और डिवाइस की डालें</string>
+    <string name="send_step_play">स्रोत जोड़ें और यहीं चलाएँ</string>
+    <string name="add_heading">प्लेलिस्ट जोड़ें</string>
+    <string name="add_sub">जोड़ने के लिए स्रोत का प्रकार चुनें</string>
+    <string name="kind_m3u_sub">प्लेलिस्ट लिंक</string>
+    <string name="kind_xtream_sub">यूज़रनेम और पासवर्ड</string>
+    <string name="add_new_source">नया स्रोत जोड़ें</string>
+    <string name="activation_exit">बाहर निकलें</string>
 </resources>

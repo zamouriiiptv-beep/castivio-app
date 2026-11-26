@@ -42,4 +42,15 @@
     </plurals>
 
     <string name="locale_sentinel" translatable="false">id</string>
+    <string name="setup_title">Atur sumber tontonan</string>
+    <string name="send_title">Kirim dari ponsel</string>
+    <string name="send_step_scan">Pindai kode dengan kamera</string>
+    <string name="send_step_ids">Masukkan alamat MAC dan kunci perangkat</string>
+    <string name="send_step_play">Tambahkan sumber dan putar di sini</string>
+    <string name="add_heading">Tambahkan playlist</string>
+    <string name="add_sub">Pilih jenis sumber</string>
+    <string name="kind_m3u_sub">Tautan playlist</string>
+    <string name="kind_xtream_sub">Nama pengguna dan kata sandi</string>
+    <string name="add_new_source">Tambah sumber baru</string>
+    <string name="activation_exit">Keluar</string>
 </resources>

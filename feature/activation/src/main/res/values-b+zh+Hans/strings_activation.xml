@@ -42,4 +42,15 @@
     </plurals>
 
     <string name="locale_sentinel" translatable="false">zh-Hans</string>
+    <string name="setup_title">设置观看来源</string>
+    <string name="send_title">从手机发送</string>
+    <string name="send_step_scan">用手机相机扫描二维码</string>
+    <string name="send_step_ids">输入 MAC 地址和设备密钥</string>
+    <string name="send_step_play">添加来源并在此设备播放</string>
+    <string name="add_heading">添加播放列表</string>
+    <string name="add_sub">选择要添加的来源类型</string>
+    <string name="kind_m3u_sub">播放列表链接</string>
+    <string name="kind_xtream_sub">用户名和密码</string>
+    <string name="add_new_source">添加新来源</string>
+    <string name="activation_exit">退出</string>
 </resources>

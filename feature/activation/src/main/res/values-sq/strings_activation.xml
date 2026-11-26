@@ -43,4 +43,15 @@
     </plurals>
 
     <string name="locale_sentinel" translatable="false">sq</string>
+    <string name="setup_title">Cakto burimin</string>
+    <string name="send_title">Dërgoje nga telefoni</string>
+    <string name="send_step_scan">Skano kodin me kamerë</string>
+    <string name="send_step_ids">Fut adresën MAC dhe çelësin e pajisjes</string>
+    <string name="send_step_play">Shto burimin dhe luaje këtu</string>
+    <string name="add_heading">Shto listën</string>
+    <string name="add_sub">Zgjidh llojin e burimit</string>
+    <string name="kind_m3u_sub">Lidhja e listës</string>
+    <string name="kind_xtream_sub">Përdoruesi dhe fjalëkalimi</string>
+    <string name="add_new_source">Shto burim</string>
+    <string name="activation_exit">Dil</string>
 </resources>

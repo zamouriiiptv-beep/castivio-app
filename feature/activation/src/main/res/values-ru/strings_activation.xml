@@ -45,4 +45,15 @@
     </plurals>
 
     <string name="locale_sentinel" translatable="false">ru</string>
+    <string name="setup_title">Настройка источника</string>
+    <string name="send_title">Отправьте с телефона</string>
+    <string name="send_step_scan">Отсканируйте код камерой</string>
+    <string name="send_step_ids">Введите MAC-адрес и ключ устройства</string>
+    <string name="send_step_play">Добавьте источник и смотрите здесь</string>
+    <string name="add_heading">Добавьте плейлист</string>
+    <string name="add_sub">Выберите тип источника</string>
+    <string name="kind_m3u_sub">Ссылка на плейлист</string>
+    <string name="kind_xtream_sub">Логин и пароль</string>
+    <string name="add_new_source">Добавить источник</string>
+    <string name="activation_exit">Выход</string>
 </resources>

@@ -43,4 +43,15 @@
     </plurals>
 
     <string name="locale_sentinel" translatable="false">it</string>
+    <string name="setup_title">Configura una sorgente</string>
+    <string name="send_title">Inviala dal telefono</string>
+    <string name="send_step_scan">Inquadra il codice con la fotocamera</string>
+    <string name="send_step_ids">Inserisci indirizzo MAC e chiave del dispositivo</string>
+    <string name="send_step_play">Aggiungi la sorgente e guardala qui</string>
+    <string name="add_heading">Aggiungi la playlist</string>
+    <string name="add_sub">Scegli il tipo di sorgente da aggiungere</string>
+    <string name="kind_m3u_sub">Link della playlist</string>
+    <string name="kind_xtream_sub">Nome utente e password</string>
+    <string name="add_new_source">Aggiungi sorgente</string>
+    <string name="activation_exit">Esci</string>
 </resources>

@@ -43,4 +43,15 @@
     </plurals>
 
     <string name="locale_sentinel" translatable="false">da</string>
+    <string name="setup_title">Opsæt en kilde</string>
+    <string name="send_title">Send fra din telefon</string>
+    <string name="send_step_scan">Scan koden med kameraet</string>
+    <string name="send_step_ids">Indtast MAC-adresse og enhedsnøgle</string>
+    <string name="send_step_play">Tilføj kilden og afspil her</string>
+    <string name="add_heading">Tilføj din playliste</string>
+    <string name="add_sub">Vælg typen af kilde</string>
+    <string name="kind_m3u_sub">Link til playliste</string>
+    <string name="kind_xtream_sub">Brugernavn og adgangskode</string>
+    <string name="add_new_source">Tilføj kilde</string>
+    <string name="activation_exit">Afslut</string>
 </resources>

@@ -42,4 +42,15 @@
     </plurals>
 
     <string name="locale_sentinel" translatable="false">th</string>
+    <string name="setup_title">ตั้งค่าแหล่งรับชม</string>
+    <string name="send_title">ส่งจากโทรศัพท์</string>
+    <string name="send_step_scan">สแกนโค้ดด้วยกล้องโทรศัพท์</string>
+    <string name="send_step_ids">ป้อนที่อยู่ MAC และคีย์อุปกรณ์</string>
+    <string name="send_step_play">เพิ่มแหล่งและเล่นบนอุปกรณ์นี้</string>
+    <string name="add_heading">เพิ่มเพลย์ลิสต์</string>
+    <string name="add_sub">เลือกประเภทแหล่งที่จะเพิ่ม</string>
+    <string name="kind_m3u_sub">ลิงก์เพลย์ลิสต์</string>
+    <string name="kind_xtream_sub">ชื่อผู้ใช้และรหัสผ่าน</string>
+    <string name="add_new_source">เพิ่มแหล่งใหม่</string>
+    <string name="activation_exit">ออก</string>
 </resources>

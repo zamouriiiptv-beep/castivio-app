@@ -42,4 +42,15 @@
     </plurals>
 
     <string name="locale_sentinel" translatable="false">ko</string>
+    <string name="setup_title">시청 소스 설정</string>
+    <string name="send_title">휴대폰에서 보내기</string>
+    <string name="send_step_scan">휴대폰 카메라로 코드 스캔</string>
+    <string name="send_step_ids">MAC 주소와 기기 키 입력</string>
+    <string name="send_step_play">소스를 추가하고 이 기기에서 재생</string>
+    <string name="add_heading">재생목록 추가</string>
+    <string name="add_sub">추가할 소스 유형 선택</string>
+    <string name="kind_m3u_sub">재생목록 링크</string>
+    <string name="kind_xtream_sub">사용자 이름과 비밀번호</string>
+    <string name="add_new_source">새 소스 추가</string>
+    <string name="activation_exit">나가기</string>
 </resources>

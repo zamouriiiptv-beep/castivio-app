@@ -51,6 +51,13 @@ internal object ActivationTags {
     /** Reserved height whether or not it has anything to say, so it is tagged. */
     const val STATUS = "activation.status"
 
+    /** The first screen's header buttons, and its two kinds of source. */
+    const val ACT_REFRESH = "activation.refresh"
+    const val ACT_LANGUAGE = "activation.language"
+    const val ACT_EXIT = "activation.exit"
+    const val ACT_M3U = "activation.kind.m3u"
+    const val ACT_XTREAM = "activation.kind.xtream"
+
     /**
      * The source choice: its two cards and its Back.
      *

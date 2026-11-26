@@ -44,4 +44,15 @@
     </plurals>
 
     <string name="locale_sentinel" translatable="false">hr</string>
+    <string name="setup_title">Postavi izvor</string>
+    <string name="send_title">Pošaljite s telefona</string>
+    <string name="send_step_scan">Skenirajte kod kamerom</string>
+    <string name="send_step_ids">Unesite MAC adresu i ključ uređaja</string>
+    <string name="send_step_play">Dodajte izvor i gledajte ovdje</string>
+    <string name="add_heading">Dodajte popis</string>
+    <string name="add_sub">Odaberite vrstu izvora</string>
+    <string name="kind_m3u_sub">Poveznica popisa</string>
+    <string name="kind_xtream_sub">Korisničko ime i lozinka</string>
+    <string name="add_new_source">Dodaj izvor</string>
+    <string name="activation_exit">Izlaz</string>
 </resources>
