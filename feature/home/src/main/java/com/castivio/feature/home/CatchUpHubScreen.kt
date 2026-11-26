@@ -602,9 +602,13 @@ private fun Empty(m: ChannelsMetrics, @StringRes message: Int = R.string.catchup
 }
 
 
-/** The first page's columns, of the width: the bouquets, then the channels; the days take what is left. */
-private const val GROUPS_SHARE = 0.27f
-private const val CHANNELS_SHARE = 0.48f
+/**
+ * The first page's columns: the bouquets take [GROUPS_SHARE] of the width, the channels [CHANNELS_SHARE] of what is left,
+ * and the days the rest. The bouquets wider and the days narrower (owner, 2026-11-26): bouquet names run long, and a day
+ * is a word and a date -- about 34%, 36% and 30% of the width.
+ */
+private const val GROUPS_SHARE = 0.34f
+private const val CHANNELS_SHARE = 0.55f
 
 /**
  * A category's card is at least this wide: four in a row on a handset's board (770dp wide, 4dp between the cards: 188dp a card), and still
