@@ -309,15 +309,11 @@ private fun WorldBoard(
     onSource: (RadioSource) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val colors = CastivioTheme.colors
-    val shape = RoundedCornerShape(m.panelRadius)
 
     Column(
         modifier
             .fillMaxWidth()
-            .clip(shape)
-            .background(colors.glassFill)
-            .border(1.dp, colors.glassBorderSoft, shape)
+            // No frame round the board (owner, 2026-11-26): its columns are Home's cards, as on the channels' board.
             .padding(m.panelPad),
     ) {
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
@@ -332,13 +328,12 @@ private fun WorldBoard(
                     onFilter = onFilter,
                     onShowTags = onShowTags,
                     onRetry = onRetryRail,
-                    modifier = Modifier.width(m.rail).fillMaxHeight(),
+                    modifier = Modifier.width(m.rail).fillMaxHeight().homeCard(m).padding(m.panelPad),
                 )
 
                 Spacer(Modifier.width(m.railGap))
 
-                val paneShape = RoundedCornerShape(m.wellRadius)
-                Box(Modifier.weight(1f).fillMaxHeight().clip(paneShape).border(1.dp, colors.glassBorderSoft, paneShape)) {
+                Box(Modifier.weight(1f).fillMaxHeight().homeCard(m)) {
                     if (saved != null) {
                         SavedList(
                             saved = saved,

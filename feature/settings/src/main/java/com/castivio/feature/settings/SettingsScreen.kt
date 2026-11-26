@@ -296,9 +296,10 @@ private fun Section(icon: ImageVector, title: String, m: CastivioMetrics, rows: 
     Column(
         Modifier
             .fillMaxWidth()
+            // Home's own card (owner, 2026-11-26): its calm indigo and violet edge, as every board's columns now are.
             .clip(shape)
-            .background(colors.glassFill)
-            .border(1.dp, colors.glassBorderSoft, shape)
+            .background(colors.homeCardSurface)
+            .border(1.dp, colors.cardSurfaceEdge, shape)
             .padding(Spacing.md),
         verticalArrangement = Arrangement.spacedBy(Spacing.sm),
     ) {

@@ -2,7 +2,6 @@ package com.castivio.feature.home
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -20,7 +19,6 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -35,11 +33,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
@@ -255,15 +251,11 @@ private fun RadioBoard(
     onSource: ((RadioSource) -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
-    val colors = CastivioTheme.colors
-    val shape = RoundedCornerShape(m.panelRadius)
 
     Column(
         modifier
             .fillMaxWidth()
-            .clip(shape)
-            .background(colors.glassFill)
-            .border(1.dp, colors.glassBorderSoft, shape)
+            // No frame round the board (owner, 2026-11-26): its columns are Home's cards, as on the channels' board.
             .padding(m.panelPad),
     ) {
         LoadStrip(section = PerfSection.RADIO, runningOnly = true, fontSize = m.frame.fsLabel)
@@ -282,7 +274,7 @@ private fun RadioBoard(
                     allLabel = stringResource(R.string.radio_all),
                     recentLabel = stringResource(R.string.radio_recent),
                     head = onSource?.let { choose -> @Composable { RadioSourceSwitch(RadioSource.Subscription, choose, m) } },
-                    modifier = Modifier.width(m.rail).fillMaxHeight(),
+                    modifier = Modifier.width(m.rail).fillMaxHeight().homeCard(m).padding(m.panelPad),
                 )
 
                 Spacer(Modifier.width(m.railGap))
@@ -329,9 +321,8 @@ private fun RadioPane(
         Box(modifier) { FetchFailed(CatalogSection.Radio, fetch, onRetry = model::refresh) }
         return
     }
-    val shape = RoundedCornerShape(m.wellRadius)
 
-    Box(modifier.clip(shape).border(1.dp, CastivioTheme.colors.glassBorderSoft, shape)) {
+    Box(modifier.homeCard(m)) {
         Paged(
             paged = rows,
             section = CatalogSection.Radio,

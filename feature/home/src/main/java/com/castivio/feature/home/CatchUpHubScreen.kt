@@ -3,7 +3,6 @@ package com.castivio.feature.home
 import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -153,16 +152,12 @@ fun CatchUpHubScreen(
                         order = null,
                     )
                     Spacer(Modifier.height(m.headerGap))
-                    val shape = RoundedCornerShape(m.panelRadius)
+                    // Two of Home's cards side by side (owner, 2026-11-26), as the channels' board's columns are.
                     Row(
                         Modifier
                             .fillMaxWidth()
-                            .weight(1f)
-                            .clip(shape)
-                            .background(CastivioTheme.colors.backgroundElevated)
-                            .border(1.dp, CastivioTheme.colors.glassBorder, shape)
-                            .padding(m.wellPad),
-                        horizontalArrangement = Arrangement.spacedBy(m.guideGap),
+                            .weight(1f),
+                        horizontalArrangement = Arrangement.spacedBy(m.railGap),
                     ) {
                         ChannelSide(
                             // The channels' own search, at the head of their list (owner, 2026-11-25); the band's looks
@@ -173,7 +168,7 @@ fun CatchUpHubScreen(
                             selected = at.channel,
                             m = m,
                             onOpen = hub::openChannel,
-                            modifier = Modifier.fillMaxWidth(SIDE_SHARE).fillMaxHeight(),
+                            modifier = Modifier.fillMaxWidth(SIDE_SHARE).fillMaxHeight().homeCard(m).padding(m.wellPad),
                         )
                         CatchUpProgrammes(
                             channel = at.channel,
@@ -182,7 +177,7 @@ fun CatchUpHubScreen(
                             onPlay = onPlay,
                             onClose = { hub.back() },
                             playing = playing,
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier.weight(1f).homeCard(m).padding(m.wellPad),
                         )
                     }
                 }
@@ -338,14 +333,12 @@ private fun ColumnScope.HubPanel(
     content: @Composable () -> Unit,
 ) {
     val colors = CastivioTheme.colors
-    val shape = RoundedCornerShape(m.panelRadius)
     Column(
         Modifier
             .fillMaxWidth()
             .weight(1f)
-            .clip(shape)
-            .background(colors.backgroundElevated)
-            .border(1.dp, colors.glassBorder, shape)
+            // Home's own card (owner, 2026-11-26), as the boards' columns are.
+            .homeCard(m)
             .padding(m.wellPad),
     ) {
         CatchUpHeader(

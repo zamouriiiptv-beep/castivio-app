@@ -1,7 +1,5 @@
 package com.castivio.feature.home
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -24,8 +22,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -34,13 +30,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
@@ -178,15 +172,11 @@ private fun SeriesBoard(
     modifier: Modifier = Modifier,
     prefetch: ShowPrefetchViewModel? = null,
 ) {
-    val colors = CastivioTheme.colors
-    val shape = RoundedCornerShape(m.panelRadius)
 
     Column(
         modifier
             .fillMaxWidth()
-            .clip(shape)
-            .background(colors.glassFill)
-            .border(1.dp, colors.glassBorderSoft, shape)
+            // No frame round the board (owner, 2026-11-26): its columns are Home's cards, as on the channels' board.
             .padding(m.panelPad),
     ) {
         LoadStrip(section = PerfSection.SERIES, runningOnly = true, fontSize = m.frame.fsLabel)
@@ -203,7 +193,7 @@ private fun SeriesBoard(
                     allLabel = stringResource(R.string.series_all),
                     onFavorites = model::openFavorites,
                     onRecent = model::openRecent,
-                    modifier = Modifier.width(m.rail).fillMaxHeight(),
+                    modifier = Modifier.width(m.rail).fillMaxHeight().homeCard(m).padding(m.panelPad),
                 )
 
                 Spacer(Modifier.width(m.railGap))
@@ -245,9 +235,8 @@ private fun SeriesPane(
         Box(modifier) { FetchFailed(CatalogSection.Series, fetch, onRetry = model::refresh) }
         return
     }
-    val shape = RoundedCornerShape(m.wellRadius)
 
-    Box(modifier.clip(shape).border(1.dp, CastivioTheme.colors.glassBorderSoft, shape)) {
+    Box(modifier.homeCard(m)) {
         BoxWithConstraints(Modifier.fillMaxSize().padding(m.wellPad / 2)) {
             val gutter = m.nameGap
             val columns = posterColumns(maxWidth, gutter, MIN_POSTER_WIDTH).coerceAtMost(POSTER_COLUMNS)

@@ -352,9 +352,10 @@ private fun RadioPlateCard(
     val shape = RoundedCornerShape(m.previewRadius)
     Column(
         modifier
+            // Home's own card (owner, 2026-11-26), as the channels' board's columns are.
             .clip(shape)
-            .background(colors.cardSurface)
-            .border(1.dp, colors.cardSurfaceEdge, shape)
+            .background(colors.homeCardSurface)
+            .border(HOME_CARD_EDGE, colors.cardSurfaceEdge, shape)
             .padding(if (plate == null) m.wellPad else m.nameGap),
         verticalArrangement = Arrangement.spacedBy(m.nameGap),
     ) {
