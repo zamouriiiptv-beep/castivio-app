@@ -37,7 +37,12 @@ internal data class LicenceMetrics(
     val frame: CastivioMetrics,
     /** One drawing pixel, in dp, on this frame. */
     val unit: Dp,
-    /** The header band: the frame's header and the stage's top margin above it. */
+    /**
+     * The header's own height: the frame's, but never under the touch target, so its
+     * buttons are never cut short (48dp on a phone, where the frame says 40).
+     */
+    val header: Dp,
+    /** The header band: [header] and the stage's top margin above it. */
     val headerBand: Dp,
 
     /* the hero */
@@ -95,7 +100,8 @@ internal data class LicenceMetrics(
 
 internal fun licenceMetricsFor(tv: Boolean, width: Dp, height: Dp): LicenceMetrics {
     val frame = castivioMetrics(width, height, tv)
-    val headerBand = frame.header + frame.stageTop
+    val header = maxOf(frame.header, frame.touchTarget)
+    val headerBand = header + frame.stageTop
     val below = height - headerBand - frame.stageBottom
     val unit = minOf(
         height / DRAWING_HEIGHT,
@@ -107,6 +113,7 @@ internal fun licenceMetricsFor(tv: Boolean, width: Dp, height: Dp): LicenceMetri
     return LicenceMetrics(
         frame = frame,
         unit = unit,
+        header = header,
         headerBand = headerBand,
 
         badgeStyle = text(CastivioType.labelLarge, px(28f), FontWeight.SemiBold),

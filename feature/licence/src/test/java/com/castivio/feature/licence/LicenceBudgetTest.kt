@@ -95,7 +95,8 @@ class LicenceBudgetTest {
         for (s in frames) {
             val m = metrics(s)
             assertEquals("$s: the frame did not come from castivioMetrics", castivioMetrics(s.width, s.height, s.tv), m.frame)
-            assertEquals("$s: the header band is not Home's", m.frame.header + m.frame.stageTop, m.headerBand)
+            assertEquals("$s: the header band is not the frame's", maxOf(m.frame.header, m.frame.touchTarget) + m.frame.stageTop, m.headerBand)
+            assertTrue("$s: the header cuts its buttons short", m.header >= m.frame.touchTarget)
         }
     }
 

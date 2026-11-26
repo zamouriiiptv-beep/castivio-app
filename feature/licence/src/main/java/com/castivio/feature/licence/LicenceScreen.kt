@@ -135,7 +135,7 @@ internal fun LicenceScreen(
                 onExit = onExit,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(m.frame.header)
+                    .height(m.header)
                     .testTag(LicenceTags.HEADER),
             )
 

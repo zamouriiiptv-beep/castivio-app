@@ -19,7 +19,7 @@ class PricingConfigTest {
     private val config = PricingDefaults.config
 
     @Test
-    fun `the shipped terms are seven days, 5.99 dollars a year, 14.99 for life`() {
+    fun `the shipped terms are seven days, 5,99 dollars a year, 14,99 for life`() {
         assertEquals(7 * day, config.trialDurationMs)
 
         val annual = config.offer(Plan.ANNUAL)!!
