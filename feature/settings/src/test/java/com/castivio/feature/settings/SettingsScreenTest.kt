@@ -94,6 +94,12 @@ class SettingsScreenTest {
         compose.waitForIdle()
     }
 
+    /** Opens a section from the side list. */
+    private fun open(pane: SettingsPane) {
+        compose.onNodeWithTag(settingsNavTag(pane)).performClick()
+        compose.waitForIdle()
+    }
+
     private fun scrollTo(text: String) {
         compose.onNodeWithTag(SETTINGS_PAGE_TAG).performScrollToNode(hasText(text))
     }
@@ -102,22 +108,41 @@ class SettingsScreenTest {
     fun `the sections and their rows are the mockup's`() {
         settings()
 
-        for (row in listOf(
-            "Preferred audio language", "Preferred subtitle language", "Restore hidden bouquets", "Restore hidden channels",
-            "Change the lock password", "Motion", "Clear picture cache", "About", "Help and support", "Privacy policy",
-            "Terms of use",
-        )) {
-            scrollTo(row)
-            compose.onNodeWithText(row).assertExists()
+        val rows = mapOf(
+            SettingsPane.PLAYER to listOf("Preferred audio language", "Preferred subtitle language"),
+            SettingsPane.LIBRARY to listOf("Restore hidden bouquets", "Restore hidden channels"),
+            SettingsPane.LOCK to listOf("Change the lock password"),
+            SettingsPane.APPLICATION to listOf("Motion", "Clear picture cache", "About"),
+            SettingsPane.HELP to listOf("Help and support", "Privacy policy", "Terms of use"),
+        )
+        for ((pane, texts) in rows) {
+            open(pane)
+            for (row in texts) {
+                scrollTo(row)
+                compose.onNodeWithText(row).assertExists()
+            }
         }
         // No preference yet: the original sound, and no subtitles.
+        open(SettingsPane.PLAYER)
         compose.onNodeWithText("Original sound").assertExists()
         compose.onNodeWithText("No subtitles").assertExists()
     }
 
     @Test
+    fun `the side list opens one section at a time`() {
+        settings()
+
+        compose.onNodeWithText("Preferred audio language").assertExists()
+        assertTrue(compose.onAllNodesWithText("Change the lock password").fetchSemanticsNodes().isEmpty())
+        open(SettingsPane.LOCK)
+        compose.onNodeWithText("Change the lock password").assertExists()
+        assertTrue(compose.onAllNodesWithText("Preferred audio language").fetchSemanticsNodes().isEmpty())
+    }
+
+    @Test
     fun `a count of nothing hidden is a line with nothing to press, and one of some brings them back`() {
         settings(hiddenBouquets = 3, hiddenChannels = 0)
+        open(SettingsPane.LIBRARY)
 
         compose.onNodeWithText("Restore hidden channels").assertHasNoClickAction()
         compose.onNodeWithText("Restore hidden bouquets").performClick()
@@ -143,6 +168,7 @@ class SettingsScreenTest {
     @Test
     fun `loading the films and series by themselves is on, and one press turns it off`() {
         settings()
+        open(SettingsPane.LIBRARY)
 
         compose.onNodeWithText("Load films and series automatically").assertExists()
         compose.onNodeWithText("On Wi-Fi, and not while you watch").assertExists()
@@ -163,6 +189,7 @@ class SettingsScreenTest {
     @Test
     fun `a measuring build opens the smoothness panel from Settings, and Back closes it`() {
         settings(measuring = true)
+        open(SettingsPane.MEASURE)
 
         scrollTo(SMOOTHNESS_ROW)
         compose.onNodeWithText(SMOOTHNESS_ROW).performClick()
@@ -178,6 +205,7 @@ class SettingsScreenTest {
     @Test
     fun `the motion level is picked in its own row`() {
         settings()
+        open(SettingsPane.APPLICATION)
 
         scrollTo("Motion")
         compose.onNodeWithText("Reduced").performClick()
@@ -188,6 +216,7 @@ class SettingsScreenTest {
     @Test
     fun `about opens the licence screen, and the arrow goes back`() {
         settings()
+        open(SettingsPane.APPLICATION)
 
         scrollTo("About")
         compose.onNodeWithText("About").performClick()
@@ -200,6 +229,7 @@ class SettingsScreenTest {
     @Test
     fun `on a handset the help page opens the browser and the mail`() {
         settings()
+        open(SettingsPane.HELP)
 
         scrollTo("Help and support")
         compose.onNodeWithText("Help and support").performClick()

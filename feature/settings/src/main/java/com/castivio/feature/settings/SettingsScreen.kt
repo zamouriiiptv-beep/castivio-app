@@ -85,6 +85,11 @@ import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.castivio.core.design.theme.Sizing
+import com.castivio.core.design.components.InteractiveGlassCard
+import com.castivio.core.design.components.CastivioLockup
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.graphics.SolidColor
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.castivio.core.design.components.ButtonWeight
@@ -155,101 +160,138 @@ fun SettingsScreen(
     var choosing by rememberSaveable { mutableStateOf<LanguageKind?>(null) }
     var reading by rememberSaveable { mutableStateOf<SitePage?>(null) }
     var smoothness by rememberSaveable { mutableStateOf(false) }
+    // The section open beside the list: the player's first, as the list is in that order.
+    var pane by rememberSaveable { mutableStateOf(SettingsPane.PLAYER) }
+    val panes = remember(measuring, developerTitle, developer.isNotEmpty()) {
+        SettingsPane.entries.filter {
+            when (it) {
+                SettingsPane.MEASURE -> measuring
+                SettingsPane.DEVELOPER -> developerTitle != null && developer.isNotEmpty()
+                else -> true
+            }
+        }
+    }
     val firstRow = remember { FocusRequester() }
     val tv = CastivioTheme.device.isTv
 
     BoxWithConstraints(modifier.fillMaxSize().castivioBackdrop()) {
         val m = rememberMetrics(maxWidth, maxHeight)
         // Left out while a page of the site covers it, so the remote cannot wander into rows nobody can see.
+        //
+        // **A side list of the sections and the open one beside it** (owner, 2026-11-26,
+        // design/mockups/settings-sidebar-ar.png): the channels' board's own way -- a column to choose from at the start, what
+        // was chosen beside it, on Home's cards. No band: this is a place to change something and leave.
         if (reading == null && !smoothness) Column(
             Modifier
                 .fillMaxSize()
-                .castivioStage(m)
-                .verticalScroll(rememberScrollState())
-                .testTag(SETTINGS_PAGE_TAG),
+                .castivioStage(m),
             verticalArrangement = Arrangement.spacedBy(Spacing.lg),
         ) {
             TitleRow(stringResource(R.string.prefs_title), Icons.Rounded.Settings, m, onBack)
-            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.lg)) {
-                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(Spacing.md)) {
-                    Section(Icons.Rounded.PlayCircle, stringResource(R.string.prefs_player), m) {
-                        SettingRow(
-                            Icons.AutoMirrored.Rounded.VolumeUp,
-                            stringResource(R.string.prefs_audio_language),
-                            state.audio?.endonym ?: stringResource(R.string.prefs_audio_original),
-                            m,
-                            onClick = { choosing = LanguageKind.AUDIO },
-                            modifier = Modifier.focusRequester(firstRow),
-                        )
-                        SettingRow(
-                            Icons.Rounded.ClosedCaption,
-                            stringResource(R.string.prefs_subtitle_language),
-                            state.subtitle?.endonym ?: stringResource(R.string.prefs_subtitles_none),
-                            m,
-                            onClick = { choosing = LanguageKind.SUBTITLE },
-                        )
+            Row(Modifier.fillMaxWidth().weight(1f), horizontalArrangement = Arrangement.spacedBy(Spacing.lg)) {
+                SettingsNav(
+                    panes = panes,
+                    open = pane,
+                    developerTitle = developerTitle,
+                    m = m,
+                    first = firstRow,
+                    onOpen = { pane = it },
+                    modifier = Modifier.fillMaxWidth(NAV_SHARE).fillMaxHeight(),
+                )
+                Column(
+                    Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .verticalScroll(rememberScrollState())
+                        .testTag(SETTINGS_PAGE_TAG),
+                    verticalArrangement = Arrangement.spacedBy(Spacing.md),
+                ) {
+                    when (pane) {
+                    SettingsPane.PLAYER -> {
+                        Section(Icons.Rounded.PlayCircle, stringResource(R.string.prefs_player), m) {
+                            SettingRow(
+                                Icons.AutoMirrored.Rounded.VolumeUp,
+                                stringResource(R.string.prefs_audio_language),
+                                state.audio?.endonym ?: stringResource(R.string.prefs_audio_original),
+                                m,
+                                onClick = { choosing = LanguageKind.AUDIO },
+                            )
+                            SettingRow(
+                                Icons.Rounded.ClosedCaption,
+                                stringResource(R.string.prefs_subtitle_language),
+                                state.subtitle?.endonym ?: stringResource(R.string.prefs_subtitles_none),
+                                m,
+                                onClick = { choosing = LanguageKind.SUBTITLE },
+                            )
+                        }
                     }
-                    Section(Icons.Rounded.VideoLibrary, stringResource(R.string.prefs_library), m) {
-                        SwitchRow(
-                            Icons.Rounded.Download,
-                            stringResource(R.string.prefs_auto_load),
-                            stringResource(R.string.prefs_auto_load_detail),
-                            on = state.autoLoad,
-                            m = m,
-                            onChange = model::setAutoLoad,
-                        )
-                        SettingRow(
-                            Icons.AutoMirrored.Rounded.ListAlt,
-                            stringResource(R.string.prefs_restore_bouquets),
-                            hiddenBouquets.toString(),
-                            m,
-                            onClick = onRestoreBouquets.takeIf { hiddenBouquets > 0 },
-                        )
-                        SettingRow(
-                            Icons.Rounded.Tv,
-                            stringResource(R.string.prefs_restore_channels),
-                            hiddenChannels.toString(),
-                            m,
-                            onClick = onRestoreChannels.takeIf { hiddenChannels > 0 },
-                        )
+                    SettingsPane.LIBRARY -> {
+                        Section(Icons.Rounded.VideoLibrary, stringResource(R.string.prefs_library), m) {
+                            SwitchRow(
+                                Icons.Rounded.Download,
+                                stringResource(R.string.prefs_auto_load),
+                                stringResource(R.string.prefs_auto_load_detail),
+                                on = state.autoLoad,
+                                m = m,
+                                onChange = model::setAutoLoad,
+                            )
+                            SettingRow(
+                                Icons.AutoMirrored.Rounded.ListAlt,
+                                stringResource(R.string.prefs_restore_bouquets),
+                                hiddenBouquets.toString(),
+                                m,
+                                onClick = onRestoreBouquets.takeIf { hiddenBouquets > 0 },
+                            )
+                            SettingRow(
+                                Icons.Rounded.Tv,
+                                stringResource(R.string.prefs_restore_channels),
+                                hiddenChannels.toString(),
+                                m,
+                                onClick = onRestoreChannels.takeIf { hiddenChannels > 0 },
+                            )
+                        }
                     }
-                    Section(Icons.Rounded.Lock, stringResource(R.string.prefs_lock), m) {
-                        SettingRow(Icons.Rounded.Key, stringResource(R.string.prefs_change_pin), null, m, onClick = onChangePin)
+                    SettingsPane.LOCK -> {
+                        Section(Icons.Rounded.Lock, stringResource(R.string.prefs_lock), m) {
+                            SettingRow(Icons.Rounded.Key, stringResource(R.string.prefs_change_pin), null, m, onClick = onChangePin)
+                        }
                     }
-                }
-                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(Spacing.md)) {
-                    Section(Icons.Rounded.Apps, stringResource(R.string.prefs_application), m) {
-                        MotionRow(motion, onMotion, m)
-                        val context = LocalContext.current
-                        SettingRow(
-                            Icons.Rounded.Image,
-                            stringResource(R.string.prefs_clear_pictures),
-                            state.pictureBytes?.let { Formatter.formatShortFileSize(context, it) },
-                            m,
-                            onClick = if (state.clearing) null else model::clearPictures,
-                            ltrValue = true,
-                        )
-                        SettingRow(Icons.Rounded.Info, stringResource(R.string.prefs_about), version, m, onClick = onAbout, ltrValue = true)
+                    SettingsPane.APPLICATION -> {
+                        Section(Icons.Rounded.Apps, stringResource(R.string.prefs_application), m) {
+                            MotionRow(motion, onMotion, m)
+                            val context = LocalContext.current
+                            SettingRow(
+                                Icons.Rounded.Image,
+                                stringResource(R.string.prefs_clear_pictures),
+                                state.pictureBytes?.let { Formatter.formatShortFileSize(context, it) },
+                                m,
+                                onClick = if (state.clearing) null else model::clearPictures,
+                                ltrValue = true,
+                            )
+                            SettingRow(Icons.Rounded.Info, stringResource(R.string.prefs_about), version, m, onClick = onAbout, ltrValue = true)
+                        }
                     }
-                    Section(Icons.AutoMirrored.Rounded.Help, stringResource(R.string.prefs_help), m) {
-                        SettingRow(Icons.Rounded.HeadsetMic, stringResource(R.string.prefs_support), null, m, onClick = { reading = SitePage.SUPPORT })
-                        SettingRow(Icons.Rounded.Shield, stringResource(R.string.prefs_privacy), null, m, onClick = { reading = SitePage.PRIVACY })
-                        SettingRow(Icons.Rounded.Description, stringResource(R.string.prefs_terms), null, m, onClick = { reading = SitePage.TERMS })
+                    SettingsPane.HELP -> {
+                        Section(Icons.AutoMirrored.Rounded.Help, stringResource(R.string.prefs_help), m) {
+                            SettingRow(Icons.Rounded.HeadsetMic, stringResource(R.string.prefs_support), null, m, onClick = { reading = SitePage.SUPPORT })
+                            SettingRow(Icons.Rounded.Shield, stringResource(R.string.prefs_privacy), null, m, onClick = { reading = SitePage.PRIVACY })
+                            SettingRow(Icons.Rounded.Description, stringResource(R.string.prefs_terms), null, m, onClick = { reading = SitePage.TERMS })
+                        }
                     }
-                    if (measuring) {
+                    SettingsPane.MEASURE -> {
                         // A measurement tool, in English like the strips it sits beside: never in a viewer's build.
                         Section(Icons.Rounded.Speed, SMOOTHNESS_TITLE, m) {
                             SettingRow(Icons.Rounded.Timeline, SMOOTHNESS_ROW, null, m, onClick = { smoothness = true })
                         }
                     }
-                    if (developerTitle != null && developer.isNotEmpty()) {
-                        Section(Icons.Rounded.Code, developerTitle, m) {
+                    SettingsPane.DEVELOPER -> {
+                        Section(Icons.Rounded.Code, developerTitle.orEmpty(), m) {
                             developer.forEach { SettingRow(Icons.Rounded.Code, it.label, it.value, m, onClick = it.onClick) }
                         }
                     }
+                    }
                 }
             }
-            Box(Modifier.heightIn(min = Spacing.lg))
         }
         // The remote starts on the first row, as every screen of the application starts on its first control.
         LaunchedEffect(tv, reading, smoothness) { if (tv && reading == null && !smoothness) runCatching { firstRow.requestFocus() } }
@@ -268,6 +310,92 @@ fun SettingsScreen(
         }
         reading?.let { page -> SitePageView(page, tv, m, onClose = { reading = null }) }
         if (smoothness) SmoothnessPanel(m, onClose = { smoothness = false })
+    }
+}
+
+/** The sections of Settings, in the side list's order; the last two only in a measuring or a development build. */
+internal enum class SettingsPane { PLAYER, LIBRARY, LOCK, APPLICATION, HELP, MEASURE, DEVELOPER }
+
+/** A section's entry in the side list carries this tag, so a test can open it. */
+internal fun settingsNavTag(pane: SettingsPane): String = "castivio.settings.nav.${pane.name.lowercase()}"
+
+/**
+ * The side list (owner, 2026-11-26): the mark at its head, then each section -- its glyph and its name -- with the open one in
+ * the chosen colour, as the channels' board marks its open bouquet. A press opens the section beside it; the remote starts on
+ * the open entry.
+ */
+@Composable
+private fun SettingsNav(
+    panes: List<SettingsPane>,
+    open: SettingsPane,
+    developerTitle: String?,
+    m: CastivioMetrics,
+    first: FocusRequester,
+    onOpen: (SettingsPane) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val colors = CastivioTheme.colors
+    val shape = RoundedCornerShape(Radius.md)
+    Column(
+        modifier
+            .clip(shape)
+            .background(colors.homeCardSurface)
+            .border(1.dp, colors.cardSurfaceEdge, shape)
+            .verticalScroll(rememberScrollState())
+            .padding(Spacing.md),
+        verticalArrangement = Arrangement.spacedBy(Spacing.sm),
+    ) {
+        CastivioLockup(
+            markSize = m.brand * NAV_MARK_OF_BRAND,
+            wordSize = (m.fsTitle.value * NAV_WORD_OF_TITLE).sp,
+            modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = Spacing.sm),
+        )
+        panes.forEach { pane ->
+            val selected = pane == open
+            val (icon, label) = when (pane) {
+                SettingsPane.PLAYER -> Icons.Rounded.PlayCircle to stringResource(R.string.prefs_player)
+                SettingsPane.LIBRARY -> Icons.Rounded.VideoLibrary to stringResource(R.string.prefs_library)
+                SettingsPane.LOCK -> Icons.Rounded.Lock to stringResource(R.string.prefs_lock)
+                SettingsPane.APPLICATION -> Icons.Rounded.Apps to stringResource(R.string.prefs_application)
+                SettingsPane.HELP -> Icons.AutoMirrored.Rounded.Help to stringResource(R.string.prefs_help)
+                SettingsPane.MEASURE -> Icons.Rounded.Speed to SMOOTHNESS_TITLE
+                SettingsPane.DEVELOPER -> Icons.Rounded.Code to developerTitle.orEmpty()
+            }
+            InteractiveGlassCard(
+                onClick = { onOpen(pane) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(settingsNavTag(pane))
+                    .semantics { this.selected = selected }
+                    .then(if (selected) Modifier.focusRequester(first) else Modifier),
+                shape = RoundedCornerShape(Radius.sm),
+                fill = SolidColor(if (selected) colors.secondary else colors.glassFill),
+                restBorder = if (selected) null else colors.cardSurfaceEdge,
+            ) {
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = Sizing.minTarget(CastivioTheme.device.isTv))
+                        .padding(horizontal = Spacing.md, vertical = Spacing.sm),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+                ) {
+                    Icon(
+                        icon,
+                        null,
+                        tint = if (selected) colors.onSecondary else colors.secondary,
+                        modifier = Modifier.size(SECTION_ICON),
+                    )
+                    Text(
+                        label,
+                        style = castivioChipStyle(m.fsLabel),
+                        color = if (selected) colors.onSecondary else colors.onBackgroundStrong,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -716,5 +844,12 @@ private val ROW_HEIGHT: Dp = 48.dp
 private val CHIP_HEIGHT: Dp = 36.dp
 private val ROW_ICON: Dp = 20.dp
 private val SECTION_ICON: Dp = 18.dp
+
+/** The side list, of the page's width. */
+private const val NAV_SHARE = 0.3f
+
+/** The mark and the word at the side list's head, against Home's lockup: a little smaller, in a narrower place. */
+private const val NAV_MARK_OF_BRAND = 0.9f
+private const val NAV_WORD_OF_TITLE = 0.6f
 private val SHEET_WIDTH: Dp = 360.dp
 private val QR_SIDE: Dp = 220.dp
