@@ -322,14 +322,14 @@ private const val LOGO_IN_TITLE = 1.6f
  */
 internal const val CATCHUP_ART_ALPHA = 0.12f
 
-/** The archive's picture, filling what it is given, at [CATCHUP_ART_ALPHA]. */
+/** The archive's picture, filling what it is given, at [CATCHUP_ART_ALPHA] unless asked otherwise. */
 @Composable
-internal fun CatchUpArt(modifier: Modifier = Modifier) {
+internal fun CatchUpArt(modifier: Modifier = Modifier, alpha: Float = CATCHUP_ART_ALPHA) {
     Image(
         painter = painterResource(R.drawable.catchup_art),
         contentDescription = null,
         contentScale = ContentScale.Crop,
-        alpha = CATCHUP_ART_ALPHA,
+        alpha = alpha,
         modifier = modifier,
     )
 }

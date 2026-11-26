@@ -293,11 +293,20 @@ private fun DaysColumn(
 ) {
     val colors = CastivioTheme.colors
     val state by model.state.collectAsStateWithLifecycle()
-    Column(modifier, verticalArrangement = Arrangement.spacedBy(m.guideGap)) {
-        if (channel == null) {
-            Empty(m, R.string.catchup_pick_channel)
-            return@Column
+    if (channel == null) {
+        // No channel chosen yet -- "all" or a bouquet just opened (owner, 2026-11-26): the archive's picture fills the column,
+        // as Home's sections carry theirs, with what to do over it, instead of an empty frame.
+        Box(modifier, contentAlignment = Alignment.Center) {
+            CatchUpArt(Modifier.matchParentSize(), alpha = EMPTY_DAYS_ART_ALPHA)
+            Text(
+                text = stringResource(R.string.catchup_pick_channel),
+                style = castivioChipStyle(m.frame.fsLabel),
+                color = colors.onBackgroundStrong,
+            )
         }
+        return
+    }
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(m.guideGap)) {
         Text(
             text = stringResource(R.string.catchup_archive_of, channel.title),
             style = castivioChipStyle(m.frame.fsChip),
@@ -608,6 +617,9 @@ private fun Empty(m: ChannelsMetrics, @StringRes message: Int = R.string.catchup
  * is a word and a date -- about 34%, 36% and 30% of the width.
  */
 private const val GROUPS_SHARE = 0.34f
+
+/** The archive's picture in the days' column before a channel is chosen: Home's sections' own 40%. */
+private const val EMPTY_DAYS_ART_ALPHA = 0.4f
 private const val CHANNELS_SHARE = 0.55f
 
 /**
