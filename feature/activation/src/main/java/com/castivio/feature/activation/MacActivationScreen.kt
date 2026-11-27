@@ -808,9 +808,31 @@ private fun SendCard(identity: ActivationIdentityState, m: Metrics, modifier: Mo
                 Step(1, stringResource(R.string.send_step_scan), m)
                 Step(2, stringResource(R.string.send_step_ids), m)
                 Step(3, stringResource(R.string.send_step_play), m)
+            }
+            Box(
+                Modifier
+                    .fillMaxHeight(DIVIDER_SHARE)
+                    .width(1.dp)
+                    .background(colors.edgeQuiet),
+            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(m.stepGap),
+            ) {
+                val bitmap = remember(identity.qr) { identity.qr?.asImageBitmap() }
+                if (bitmap != null) {
+                    QrPlate(
+                        code = bitmap,
+                        plate = m.plate,
+                        padding = m.plate * QUIET_ZONE,
+                        modifier = Modifier.testTag(ActivationTags.QR),
+                    )
+                } else {
+                    Spacer(Modifier.size(m.plate))
+                }
                 Row(
                     Modifier
-                        .fillMaxWidth()
+                        .width(m.plate)
                         .height(m.pillHeight)
                         .clip(RoundedCornerShape(percent = 50))
                         .background(colors.hueAzure.copy(alpha = PILL_WASH))
@@ -834,23 +856,6 @@ private fun SendCard(identity: ActivationIdentityState, m: Metrics, modifier: Mo
                         }
                     }
                 }
-            }
-            Box(
-                Modifier
-                    .fillMaxHeight(DIVIDER_SHARE)
-                    .width(1.dp)
-                    .background(colors.edgeQuiet),
-            )
-            val bitmap = remember(identity.qr) { identity.qr?.asImageBitmap() }
-            if (bitmap != null) {
-                QrPlate(
-                    code = bitmap,
-                    plate = m.plate,
-                    padding = m.plate * QUIET_ZONE,
-                    modifier = Modifier.testTag(ActivationTags.QR),
-                )
-            } else {
-                Spacer(Modifier.size(m.plate))
             }
         }
     }
