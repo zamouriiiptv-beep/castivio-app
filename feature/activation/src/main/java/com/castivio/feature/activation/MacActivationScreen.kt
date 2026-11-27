@@ -670,8 +670,10 @@ private fun Identifier(
             label = copyLabel,
             isCopied = isCopied,
             onClick = { if (enabled) onCopy() },
-            fillBrush = colors.primaryBrush,
-            iconTint = colors.onPrimary,
+            // No fill (owner, 2026-11-27): the glyph alone, with the quiet edge so a
+            // remote can see where the control is; focus still draws its ring.
+            ring = colors.edgeQuiet,
+            iconTint = colors.onBackgroundStrong,
         )
     }
 }
