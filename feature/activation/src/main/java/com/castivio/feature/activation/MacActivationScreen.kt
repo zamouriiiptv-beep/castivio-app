@@ -227,8 +227,8 @@ internal fun Metrics.rightColumnHeight(): Dp =
         kindsTop + kindHeight + ctaTop + ctaHeight
 
 private const val DRAWING_HEIGHT = 1080f
-internal const val SEND_WIDTH = 724.5f
-internal const val ADD_WIDTH = 1345.5f
+internal const val SEND_WIDTH = 742f
+internal const val ADD_WIDTH = 1328f
 private const val CARD_GAP = 50f
 private const val ROW_WIDTH = SEND_WIDTH + CARD_GAP + ADD_WIDTH
 private const val CARD_HEIGHT = 700f
