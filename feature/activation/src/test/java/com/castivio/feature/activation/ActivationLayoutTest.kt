@@ -391,7 +391,7 @@ private fun ComposeContentTestRule.assertActivationIsWhole(
     byTag("the MAC address", ActivationTags.MAC_CAPSULE)
     byTag("the device key", ActivationTags.KEY_CAPSULE)
     byText("the MAC label", "Mac")
-    byText("the device key label", "Key")
+    byText("the device key label", "Device key")
     byDescription("the MAC address, spoken", "MAC address 2F 19 EB 20 44 7C")
     byDescription("the copy-MAC control", "Copy MAC address", min = MIN_TARGET)
     byDescription("the copy-key control", "Copy device key", min = MIN_TARGET)

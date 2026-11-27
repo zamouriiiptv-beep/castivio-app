@@ -31,7 +31,7 @@ import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.Layers
 import androidx.compose.material.icons.rounded.Link
 import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material.icons.rounded.Lan
+import androidx.compose.material.icons.rounded.Memory
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.SlowMotionVideo
 import androidx.compose.material.icons.rounded.VpnKey
@@ -77,7 +77,6 @@ import com.castivio.core.design.components.CastivioLockup
 import com.castivio.core.design.components.CopyButton
 import com.castivio.core.design.components.QrPlate
 import com.castivio.core.design.components.castivioFocusScale
-import com.castivio.core.design.components.ltrToken
 import com.castivio.core.design.theme.CastivioMetrics
 import com.castivio.core.design.theme.CastivioTheme
 import com.castivio.core.design.theme.CastivioType
@@ -195,7 +194,7 @@ internal fun metricsFor(tv: Boolean, width: Dp, height: Dp): Metrics {
         idsGap = px(50f),
         idIcon = px(52f),
         idLabelSize = px(30f),
-        idValueSize = px(40f),
+        idValueSize = px(34f),
         copy = maxOf(px(66f), frame.touchTarget),
         headingTop = px(44f),
         headingSize = px(52f),
@@ -561,67 +560,75 @@ private const val CTA_SHARE = 0.7f
 private const val KIND_GAP = 30f
 
 /**
- * The MAC address and the device key, each with its copy button, in one line and with
- * no frame. Selectable as well, so a long press copies on a phone without the button.
+ * The MAC address and the device key, each in one line with no frame, read left to right
+ * in every language (owner, 2026-11-27): the mark, the name, the value, and the copy
+ * button at the right-hand end; the MAC first. The marks are the first screen's own --
+ * the chip in the muted ink, the key in amber. Selectable as well, so a long press
+ * copies on a phone without the button.
  */
 @Composable
 private fun Identifiers(identity: ActivationIdentityState, m: Metrics, onCopied: (Copied) -> Unit) {
     val clipboard = LocalClipboardManager.current
     val address = identity.address
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .height(m.idsHeight)
-            .testTag(ActivationTags.IDENTITY),
-        horizontalArrangement = Arrangement.spacedBy(m.idsGap),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Identifier(
-            label = MAC_LABEL,
-            value = address ?: ADDRESS_PLACEHOLDER,
-            valueTint = CastivioTheme.colors.onBackgroundStrong,
-            icon = Icons.Rounded.Lan,
-            copyLabel = stringResource(R.string.copy_mac),
-            spoken = address?.let { stringResource(R.string.mac_spoken, spaced(it)) },
-            isCopied = identity.addressCopied,
-            enabled = address != null,
-            m = m,
-            onCopy = {
-                clipboard.setText(AnnotatedString(address.orEmpty()))
-                onCopied(Copied.Address)
-            },
-            modifier = Modifier
-                .weight(MAC_SHARE)
-                .testTag(ActivationTags.MAC_CAPSULE),
-        )
-        identity.deviceKey?.let { key ->
+    val colors = CastivioTheme.colors
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .height(m.idsHeight)
+                .testTag(ActivationTags.IDENTITY),
+            horizontalArrangement = Arrangement.spacedBy(m.idsGap),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             Identifier(
-                label = KEY_LABEL,
-                value = key,
-                valueTint = CastivioTheme.colors.hueAmber,
-                icon = Icons.Rounded.VpnKey,
-                copyLabel = stringResource(R.string.copy_key),
-                spoken = null,
-                isCopied = identity.keyCopied,
-                enabled = true,
+                label = MAC_LABEL,
+                value = address ?: ADDRESS_PLACEHOLDER,
+                valueTint = colors.onBackgroundStrong,
+                icon = Icons.Rounded.Memory,
+                iconTint = colors.onBackgroundMuted,
+                copyLabel = stringResource(R.string.copy_mac),
+                spoken = address?.let { stringResource(R.string.mac_spoken, spaced(it)) },
+                isCopied = identity.addressCopied,
+                enabled = address != null,
                 m = m,
                 onCopy = {
-                    clipboard.setText(AnnotatedString(key))
-                    onCopied(Copied.Key)
+                    clipboard.setText(AnnotatedString(address.orEmpty()))
+                    onCopied(Copied.Address)
                 },
                 modifier = Modifier
-                    .weight(KEY_SHARE)
-                    .testTag(ActivationTags.KEY_CAPSULE),
+                    .weight(MAC_SHARE)
+                    .testTag(ActivationTags.MAC_CAPSULE),
             )
+            identity.deviceKey?.let { key ->
+                Identifier(
+                    label = KEY_LABEL,
+                    value = key,
+                    valueTint = colors.hueAmber,
+                    icon = Icons.Rounded.VpnKey,
+                    iconTint = colors.hueAmber,
+                    copyLabel = stringResource(R.string.copy_key),
+                    spoken = null,
+                    isCopied = identity.keyCopied,
+                    enabled = true,
+                    m = m,
+                    onCopy = {
+                        clipboard.setText(AnnotatedString(key))
+                        onCopied(Copied.Key)
+                    },
+                    modifier = Modifier
+                        .weight(KEY_SHARE)
+                        .testTag(ActivationTags.KEY_CAPSULE),
+                )
+            }
         }
     }
 }
 
-/** The drawing's words for the two, the same in every language: what the portal's form calls them. */
+/** The names the portal's form gives the two, the same in every language. */
 private const val MAC_LABEL = "Mac"
-private const val KEY_LABEL = "Key"
+private const val KEY_LABEL = "Device key"
 private const val MAC_SHARE = 660f
-private const val KEY_SHARE = 450f
+private const val KEY_SHARE = 480f
 
 @Composable
 private fun Identifier(
@@ -629,6 +636,7 @@ private fun Identifier(
     value: String,
     valueTint: androidx.compose.ui.graphics.Color,
     icon: ImageVector,
+    iconTint: androidx.compose.ui.graphics.Color,
     copyLabel: String,
     spoken: String?,
     isCopied: Boolean,
@@ -643,25 +651,26 @@ private fun Identifier(
         horizontalArrangement = Arrangement.spacedBy(m.unit * ID_GAP),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icon(icon, contentDescription = null, tint = colors.onBackgroundStrong, modifier = Modifier.size(m.idIcon))
+        Icon(icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(m.idIcon))
         SelectionContainer(Modifier.weight(1f)) {
-            Column(
+            Row(
                 Modifier.then(
                     if (spoken != null) Modifier.semantics(mergeDescendants = true) { contentDescription = spoken } else Modifier,
                 ),
-                horizontalAlignment = Alignment.CenterHorizontally,
+                horizontalArrangement = Arrangement.spacedBy(m.unit * ID_GAP),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
                     text = label,
                     style = text(CastivioType.titleMedium, m.idLabelSize, FontWeight.Bold),
-                    color = colors.onBackground,
+                    color = colors.onBackgroundVariant,
                     maxLines = 1,
                 )
                 CastivioFittedText(
-                    text = ltrToken(value),
+                    text = value,
                     style = text(CastivioType.titleLarge, m.idValueSize, FontWeight.Bold).copy(letterSpacing = 0.04.em),
                     color = valueTint,
-                    textAlign = TextAlign.Center,
+                    modifier = Modifier.weight(1f, fill = false),
                 )
             }
         }
