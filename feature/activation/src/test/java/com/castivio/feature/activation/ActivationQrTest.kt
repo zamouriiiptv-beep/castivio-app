@@ -200,31 +200,19 @@ class ActivationQrTest {
     }
 
     /**
-     * The address is a token, and a token does not wrap — it overflows.
-     *
-     * The caption above it is a sentence and survives a narrow column by taking a
-     * second line. `castivio.app/activate` has no space in it, so the column either
-     * holds it or cuts it, and a cut address is worse than none: a reader types what
-     * they can see and lands nowhere.
-     *
-     * Measured against every surface rather than against the smallest, because the
-     * tightest one is not the smallest. 800x360 has the narrowest column at 184.6dp,
-     * and 1280x800 has the widest type: `fsCaption` has reached its 19dp ceiling there
-     * while the column stopped growing at 330dp, so the tablet runs out of room by
-     * setting the address large rather than by being small. Both clear by about 11dp
-     * and nothing else is close.
+     * The URL is placed directly below the QR and uses the QR column's full width.
+     * Keep its single-line label within that width on every supported surface.
      */
     @Test
-    fun `the written address fits the column it is drawn in, on every surface`() {
+    fun `the written address fits below the QR on every surface`() {
         val address = ActivationDestination.CONNECT_DISPLAY
         for ((name, width, height) in SURFACES) {
             val m = metricsFor(tv = name.startsWith("television"), width = width, height = height)
-            // The send card, less its inset, padding, the gap, the rule and the plate.
-            val column = m.unit * SEND_WIDTH - m.innerInset * 2 - m.innerPad * 2 - m.innerGap * 2 - 1.dp - m.plate
+            val qrColumn = m.plate
             val widest = m.pillSize * ADDRESS_EM_PER_CHAR * address.length + m.pillIcon + m.unit * 16f
             assertTrue(
-                "$name: \"$address\" wants up to $widest in a $column column",
-                widest <= column,
+                "$name: \"$address\" wants up to $widest in a $qrColumn QR column",
+                widest <= qrColumn,
             )
         }
     }
