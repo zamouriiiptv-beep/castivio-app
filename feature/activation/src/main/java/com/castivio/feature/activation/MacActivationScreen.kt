@@ -906,7 +906,6 @@ private fun Note(m: Metrics, modifier: Modifier = Modifier) {
         horizontalArrangement = Arrangement.spacedBy(m.unit * NOTE_GAP),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(Modifier.width(m.noteRule).height(1.dp).background(colors.edgeQuiet))
         CastivioFittedText(
             text = stringResource(R.string.legal_player_only),
             style = text(CastivioType.bodyMedium, m.noteSize, FontWeight.Normal),
@@ -914,7 +913,6 @@ private fun Note(m: Metrics, modifier: Modifier = Modifier) {
             textAlign = TextAlign.Center,
             modifier = Modifier.weight(1f, fill = false),
         )
-        Box(Modifier.width(m.noteRule).height(1.dp).background(colors.edgeQuiet))
     }
 }
 
